@@ -1,0 +1,6 @@
+@Nasteafy_HostAddress = http://localhost:5136
+
+GET {{Nasteafy_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
