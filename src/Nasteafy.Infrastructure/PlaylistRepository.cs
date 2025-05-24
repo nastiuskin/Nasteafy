@@ -1,5 +1,5 @@
 ﻿using Nasteafy.Application.Abstractions;
-using Nasteafy.Domain.Entities;
+using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Infrastructure
 {
@@ -27,9 +27,9 @@ namespace Nasteafy.Infrastructure
             return Task.CompletedTask;
         }
 
-        public Task<IQueryable<Playlist>> GetAll(CancellationToken ct)
+        public IQueryable<Playlist> GetAll(CancellationToken ct)
         {
-            return Task.FromResult(_playlists.AsQueryable());
+            throw new NotImplementedException();
         }
 
         public Task<Playlist?> GetById(Guid id, CancellationToken ct)
@@ -37,31 +37,27 @@ namespace Nasteafy.Infrastructure
             return Task.FromResult(_playlists.FirstOrDefault(p => p.Id == id));
         }
 
-        public Task<IEnumerable<Playlist>> GetByUserIdAsync(Guid userId, CancellationToken ct)
+        public Task<Playlist?> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            var result = _playlists.Where(p => p.UserId == userId);
-            return Task.FromResult(result.AsEnumerable());
+            throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Playlist>> GetPublicPlaylistsAsync(CancellationToken ct)
+        public IQueryable<Playlist> GetByUserId(Guid userId, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
         public Task RemoveTrackFromPlaylistAsync(Guid playlistId, Guid trackId, CancellationToken ct)
         {
-            var playlist = _playlists.FirstOrDefault(p => p.Id == playlistId);
-            if (playlist is not null)
-            {
-                var track = playlist.Tracks.FirstOrDefault(t => t.Id == trackId);
-                if (track is not null)
-                    playlist.Tracks.Remove(track);
-            }
-
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
 
         public Task UpdateAsync(Playlist entity, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryable<Playlist> IBaseRepository<Playlist>.GetAll(CancellationToken ct)
         {
             throw new NotImplementedException();
         }

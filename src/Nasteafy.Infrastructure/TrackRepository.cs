@@ -1,5 +1,5 @@
 ﻿using Nasteafy.Application.Abstractions;
-using Nasteafy.Domain.Entities;
+using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Infrastructure
 {
@@ -22,45 +22,34 @@ namespace Nasteafy.Infrastructure
             return Task.CompletedTask;
         }
 
-        public Task<IQueryable<Track>> GetAll(CancellationToken ct)
+        public IQueryable<Track> GetAll(CancellationToken ct)
         {
-            return Task.FromResult(_tracks.AsQueryable());
+            return _tracks.AsQueryable();
         }
 
-        public Task<IEnumerable<Track>> GetByAlbumIdAsync(Guid albumId, CancellationToken ct)
+        public IQueryable<Track> GetByAlbumId(Guid albumId, CancellationToken ct)
         {
-            var albumTracks = _tracks.Where(x => x.AlbumId == albumId); 
-            return Task.FromResult(albumTracks);
+            throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Track>> GetByArtistIdAsync(Guid artistId, CancellationToken ct)
+        public IQueryable<Track> GetByArtistId(Guid artistId, CancellationToken ct)
         {
-            var artistTracks = _tracks.Where(x =>x.ArtistId == artistId);   
-            return Task.FromResult(artistTracks);
+            throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Track>> GetByGenreAsync(Guid genreId, CancellationToken ct)
+        public Task<Track?> GetByIdAsync(Guid id, CancellationToken ct)
         {
-            var result = _tracks.Where(t => t.Genres.Any(g => g.Id == genreId));
-            return Task.FromResult(result);
+            throw new NotImplementedException();
         }
 
-        public Task<Track?> GetById(Guid id, CancellationToken ct)
+        public IQueryable<Track> GetByName(string name, CancellationToken ct)
         {
-            var track = _tracks.FirstOrDefault(t => t.Id == id);
-            return Task.FromResult(track);
+            throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Track>> GetByNameAsync(string title, CancellationToken ct)
+        public IQueryable<Track> GetByPlaylistId(Guid playlistId, CancellationToken ct)
         {
-            var result = _tracks.Where(t => t.Title.Contains(title));
-            return Task.FromResult(result);
-        }
-
-        public Task<IEnumerable<Track>> GetByPlaylistIdAsync(Guid playlistId, CancellationToken ct)
-        {
-            var result = _tracks.Where(t => t.Playlists.Any(p => p.Id == playlistId));
-            return Task.FromResult(result);
+            throw new NotImplementedException();
         }
 
         public Task UpdateAsync(Track entity, CancellationToken ct)

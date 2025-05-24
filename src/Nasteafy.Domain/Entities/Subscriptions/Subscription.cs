@@ -1,7 +1,6 @@
 ﻿using Nasteafy.Domain.Contracts;
-using Nasteafy.Domain.Enums;
 
-namespace Nasteafy.Domain.Entities
+namespace Nasteafy.Domain.Entities.Subscriptions
 {
     public class Subscription : BaseEntity
     {
