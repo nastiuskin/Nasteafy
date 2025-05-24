@@ -2,7 +2,7 @@
 
 namespace Nasteafy.Domain.Entities.Tracks
 {
-    public class AlbumArtist : BaseEntity
+    public class AlbumArtist 
     {
         public required Album Album { get; set; }
         public required Guid AlbumId { get; set; }

@@ -3,7 +3,7 @@ using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Domain.Entities.Subscriptions
 {
-    public class UserSubscription : BaseEntity
+    public class UserSubscription
     { 
         public required DateTime StartDate { get; set; }
         public required DateTime EndDate { get; set; }

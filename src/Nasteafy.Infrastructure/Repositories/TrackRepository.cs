@@ -1,7 +1,7 @@
 ﻿using Nasteafy.Application.Abstractions;
 using Nasteafy.Domain.Entities.Tracks;
 
-namespace Nasteafy.Infrastructure
+namespace Nasteafy.Persistence.Repositories
 {
     public class TrackRepository : ITrackRepository
     {

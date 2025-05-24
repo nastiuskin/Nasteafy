@@ -9,6 +9,6 @@ namespace Nasteafy.Domain.Entities.Subscriptions
         public decimal Price { get; set; }
         public int DurationInDays { get; set; }
 
-        public ICollection<UserSubscription> UserSubscriptions { get; set; }
+        public required virtual ICollection<UserSubscription> UserSubscriptions { get; set; }
     }
 }
