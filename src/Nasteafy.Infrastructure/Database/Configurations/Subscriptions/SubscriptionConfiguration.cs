@@ -13,9 +13,13 @@ namespace Nasteafy.Persistence.Database.Configurations.Subscriptions
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Price).IsRequired();
-            builder.Property(x => x.Type).IsRequired();
             builder.Property(x => x.DurationInDays).IsRequired();
             builder.Property(x => x.Description).HasMaxLength(500).IsRequired();
+            builder.Property(x => x.Type)
+                .HasConversion(
+                    v => v.Name,
+                    v => new SubscriptionType(v))
+                .IsRequired();
 
             builder.HasMany(x => x.UserSubscriptions)
                 .WithOne(us => us.Subscription)

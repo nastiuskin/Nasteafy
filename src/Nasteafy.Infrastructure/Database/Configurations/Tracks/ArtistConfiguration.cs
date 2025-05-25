@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nasteafy.Domain.Entities.Tracks;
+using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
 {
@@ -13,6 +14,11 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Name).HasMaxLength(100).IsRequired();
+
+            builder.HasOne(a => a.User)
+            .WithOne()
+            .HasForeignKey<Artist>(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

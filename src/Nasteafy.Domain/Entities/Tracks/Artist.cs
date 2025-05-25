@@ -7,7 +7,7 @@ namespace Nasteafy.Domain.Entities.Tracks
     {
         public required string Name { get; set; }
 
-        public required User User { get; set; }
+        public User User { get; set; }
         public required Guid UserId { get; set; }
 
         public required virtual ICollection<AlbumArtist> AlbumArtists { get; set; }

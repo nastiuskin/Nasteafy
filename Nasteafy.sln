@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nasteafy.Domain", "src\Nast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nasteafy.Application", "src\Nasteafy.Application\Nasteafy.Application.csproj", "{7915C024-C2DC-4B12-B458-4A2FC2644B24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nasteafy.Infrastructure", "src\Nasteafy.Infrastructure\Nasteafy.Infrastructure.csproj", "{11684093-E6F3-480E-B260-41656DF39FC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nasteafy.Persistence", "src\Nasteafy.Infrastructure\Nasteafy.Persistence.csproj", "{11684093-E6F3-480E-B260-41656DF39FC9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nasteafy.Shared", "src\Nasteafy.Shared\Nasteafy.Shared.csproj", "{7387C7B5-1E4C-4DC1-84CF-365EE4687658}"
 EndProject

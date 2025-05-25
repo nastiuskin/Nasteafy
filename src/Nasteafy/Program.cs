@@ -1,41 +1,43 @@
+using Microsoft.AspNetCore.Builder;
+using Nasteafy.Application.Extensions;
+using Nasteafy.Extensions;
+using Nasteafy.Persistence.Database.Extensions;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Add application also
+// Add persistence layer and here
+// Add fluent validation https://docs.fluentvalidation.net/en/latest/
+// Add auth
+// Add global exception handler
+// Add transactions
+// Check/Add Migrations
+// Divide entities by schemas
+
+builder.Services
+    .AddPersistence(builder.Configuration);
+
+builder.Services.AddApplication();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
+
+builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
+builder.Services.AddSwaggerGenWithAuth();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.MapEndpoints();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwaggerWithUi();
+
+    app.ApplyMigrations();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+await app.RunAsync();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

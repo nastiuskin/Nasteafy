@@ -13,11 +13,6 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Users
 
             builder.HasKey(x => x.Id);
 
-            builder.HasOne(x => x.Artist)
-             .WithOne()
-             .HasForeignKey<Artist>(a => a.UserId)
-             .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasMany(x => x.UserSubscriptions)
                 .WithOne(us => us.User)
                 .HasForeignKey(us => us.UserId)
