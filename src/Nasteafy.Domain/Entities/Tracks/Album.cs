@@ -1,5 +1,4 @@
 ﻿using Nasteafy.Domain.Contracts;
-using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Domain.Entities.Tracks
 {

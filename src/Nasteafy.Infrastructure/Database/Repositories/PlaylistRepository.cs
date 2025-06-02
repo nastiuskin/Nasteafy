@@ -4,7 +4,7 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Infrastructure.Database.Repositories
 {
-    public class PlaylistRepository : BaseRepository<Playlist>, IPlaylistRepository
+    public class PlaylistRepository : GenericRepository<Playlist>, IPlaylistRepository
     {
         public PlaylistRepository(DatabaseContext context) : base(context) { }
 

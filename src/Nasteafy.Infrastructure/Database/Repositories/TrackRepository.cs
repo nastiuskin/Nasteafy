@@ -4,7 +4,7 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Infrastructure.Database.Repositories
 {
-    public class TrackRepository : BaseRepository<Track>, ITrackRepository
+    public class TrackRepository : GenericRepository<Track>, ITrackRepository
     {
         public TrackRepository(DatabaseContext context) : base(context) { }
 

@@ -1,15 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Abstractions;
+using Nasteafy.Domain.Base;
 using Nasteafy.Domain.Contracts;
 
 namespace Nasteafy.Infrastructure.Database.Repositories
 {
-    public abstract class BaseRepository<T> : IBaseRepository<T> where T : BaseEntity
+    public class GenericRepository<T> : IGenericRepository<T> where T : class, IEntity
     {
-        protected readonly DbSet<T> _dbSet;
         protected readonly DatabaseContext _context;
+        protected readonly DbSet<T> _dbSet;
 
-        protected BaseRepository(DatabaseContext context)
+        public GenericRepository(DatabaseContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();
@@ -49,8 +50,8 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
         public Task UpdateAsync(T entity, CancellationToken ct)
         {
-             _dbSet.Update(entity);
-             return Task.CompletedTask;
+            _dbSet.Update(entity);
+            return Task.CompletedTask;
         }
     }
 }

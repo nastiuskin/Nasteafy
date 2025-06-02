@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nasteafy.Domain.Entities.Tracks;
 using Nasteafy.Domain.Entities.Users;
+using Nasteafy.Persistence.Constants;
 
 namespace Nasteafy.Infrastructure.Database.Configurations.Users
 {
@@ -9,7 +10,7 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Users
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("Users", "auth");
+            builder.ToTable("Users", schema: SchemaConstants.Auth);
 
             builder.HasKey(x => x.Id);
 

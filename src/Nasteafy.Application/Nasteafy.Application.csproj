@@ -7,12 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentResults" Version="3.16.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Nasteafy.Domain\Nasteafy.Domain.csproj" />
-    <ProjectReference Include="..\Nasteafy.Shared\Nasteafy.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Tracks\" />
+    <Folder Include="Users\Queries\" />
   </ItemGroup>
 
 </Project>

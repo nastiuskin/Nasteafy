@@ -1,4 +1,5 @@
-﻿using Nasteafy.Domain.Contracts;
+﻿using Nasteafy.Domain.Base;
+using Nasteafy.Domain.Contracts;
 
 namespace Nasteafy.Domain.Entities.Subscriptions
 {

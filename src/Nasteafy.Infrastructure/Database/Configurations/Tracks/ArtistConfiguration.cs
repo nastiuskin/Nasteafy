@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nasteafy.Domain.Entities.Tracks;
 using Nasteafy.Domain.Entities.Users;
+using Nasteafy.Persistence.Constants;
 
 namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
 {
@@ -9,7 +10,7 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
     {
         public void Configure(EntityTypeBuilder<Artist> builder)
         {
-            builder.ToTable("Artists", schema: "music");
+            builder.ToTable("Artists", schema: SchemaConstants.Music);
 
             builder.HasKey(x => x.Id);
 
@@ -18,7 +19,7 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
             builder.HasOne(a => a.User)
             .WithOne()
             .HasForeignKey<Artist>(a => a.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade); //maybe restrict
         }
     }
 }

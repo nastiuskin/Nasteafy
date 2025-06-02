@@ -2,7 +2,7 @@
 
 namespace Nasteafy.Application.Abstractions
 {
-    public interface ITrackRepository : IBaseRepository<Track>
+    public interface ITrackRepository : IGenericRepository<Track>
     {
         Task<IEnumerable<Track>> GetByArtistId(Guid artistId, CancellationToken ct);
         Task<IEnumerable<Track>> GetByAlbumId(Guid albumId, CancellationToken ct);

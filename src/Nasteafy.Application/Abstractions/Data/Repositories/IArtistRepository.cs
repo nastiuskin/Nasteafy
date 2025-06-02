@@ -2,7 +2,7 @@
 
 namespace Nasteafy.Application.Abstractions.Data.Repositories
 {
-    public interface IArtistRepository : IBaseRepository<Artist>
+    public interface IArtistRepository : IGenericRepository<Artist>
     {
         Task<IEnumerable<Artist>> GetByNameAsync(string name, CancellationToken ct);
         Task<bool> ExistsByUserIdAsync(Guid userId, CancellationToken ct);

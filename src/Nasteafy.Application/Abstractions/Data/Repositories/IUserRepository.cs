@@ -2,7 +2,8 @@
 
 namespace Nasteafy.Application.Abstractions
 {
-    public interface IUserRepository : IBaseRepository<User>
+    public interface IUserRepository : IGenericRepository<User>
     {
+        Task<User?> GetWithSubscriptionsAsync(Guid userId, CancellationToken ct);
     }
 }

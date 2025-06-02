@@ -1,8 +1,9 @@
-﻿using Nasteafy.Domain.Contracts;
+﻿using Nasteafy.Domain.Base;
+using Nasteafy.Domain.Contracts;
 
 namespace Nasteafy.Application.Abstractions
 {
-    public interface IBaseRepository<T> where T : BaseEntity
+    public interface IGenericRepository<T> where T : class, IEntity
     {
         Task<T?> GetByIdAsync(Guid id, CancellationToken ct);
         IQueryable<T> GetAll(CancellationToken ct);

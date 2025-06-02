@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nasteafy.Domain.Entities.Tracks;
+using Nasteafy.Persistence.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
     {
         public void Configure(EntityTypeBuilder<Album> builder)
         {
-            builder.ToTable("Albums", schema: "music");
+            builder.ToTable("Albums", schema: SchemaConstants.Music);
 
             builder.HasKey(x => x.Id);
 

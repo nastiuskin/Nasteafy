@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nasteafy.Domain.Entities.Subscriptions;
+using Nasteafy.Persistence.Constants;
 
 namespace Nasteafy.Infrastructure.Database.Configurations.Subscriptions
 {
@@ -8,7 +9,7 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Subscriptions
     {
         public void Configure(EntityTypeBuilder<UserSubscription> builder) 
         {
-            builder.ToTable("UserSubscriptions", schema: "subscriptions");
+            builder.ToTable("UserSubscriptions", schema: SchemaConstants.Subscription);
 
             builder.HasKey(x => new {x.UserId, x.SubscriptionId});
 

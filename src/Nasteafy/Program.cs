@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Builder;
-using Nasteafy.Application.Extensions;
 using Nasteafy.Extensions;
-using Nasteafy.Persistence.Database.Extensions;
+using Nasteafy.Middlewares;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,15 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Check/Add Migrations
 // Divide entities by schemas
 
-builder.Services
-    .AddPersistence(builder.Configuration);
-
-builder.Services.AddApplication();
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication();
+builder.AddServices();
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
-builder.Services.AddSwaggerGenWithAuth();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -38,6 +31,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseDbTransaction();
 
 await app.RunAsync();
 
