@@ -1,5 +1,4 @@
-﻿using FluentResults;
-using MediatR;
+﻿using MediatR;
 using Nasteafy.Application.Abstractions.Auth;
 
 namespace Nasteafy.Application.Users.Commands.Register
