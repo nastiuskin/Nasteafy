@@ -11,7 +11,9 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         public async Task<User?> GetWithSubscriptionsAsync(Guid userId, CancellationToken ct = default)
         {
             return await _context.Users
+                .AsNoTracking()
                 .Include(u => u.UserSubscriptions)
+                .ThenInclude(x => x.Subscription)
                 .FirstOrDefaultAsync(u => u.Id == userId, ct);
         }
     }

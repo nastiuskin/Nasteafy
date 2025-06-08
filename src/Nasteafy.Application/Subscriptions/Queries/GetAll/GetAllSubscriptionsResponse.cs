@@ -2,7 +2,8 @@
 {
     public class GetAllSubscriptionsResponse
     {
-        public Guid Id { get; set; }
-        public string Description { get; set; }
+        public List<GetSubscriptionDto> Subscriptions { get; set; } = [];
     }
+
+    public record GetSubscriptionDto(Guid Id, string Name, string Description, decimal Price);
 }

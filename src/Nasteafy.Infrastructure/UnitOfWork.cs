@@ -20,13 +20,15 @@ namespace Nasteafy.Persistence
             ITrackRepository tracks,
             IPlaylistRepository playlists,
             IArtistRepository artists,
-            IUserRepository users)
+            IUserRepository users,
+            ISubscriptionRepository subscriptions)
         {
             _context = context;
             Tracks = tracks;
             Playlists = playlists;
             Artists = artists;
             Users = users;
+            Subscriptions = subscriptions;
         }
 
         public async Task SaveChangesAsync(CancellationToken ct)

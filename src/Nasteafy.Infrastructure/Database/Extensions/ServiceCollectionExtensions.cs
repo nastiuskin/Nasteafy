@@ -10,6 +10,7 @@ using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Auth;
 using Nasteafy.Infrastructure.Database;
 using Nasteafy.Infrastructure.Database.Repositories;
+using Nasteafy.Infrastructure.Services;
 
 namespace Nasteafy.Persistence.Database.Extensions
 {
@@ -67,6 +68,7 @@ namespace Nasteafy.Persistence.Database.Extensions
         {
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IUserProvider, UserProvider>();
 
             return services;
         }

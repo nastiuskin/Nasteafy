@@ -1,5 +1,4 @@
 using Nasteafy.Extensions;
-using Nasteafy.Middlewares;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +31,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseDbTransaction();
+app.UseGlobalExceptionHandling();
 
 await app.RunAsync();
 

@@ -1,7 +1,7 @@
-﻿using MediatR;
+﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Nasteafy.Application.Abstractions.Auth;
 using Nasteafy.Application.Behaviors;
-using Nasteafy.Application.Exceptions;
 using System.Reflection;
 
 namespace Nasteafy.Application.Extensions
@@ -17,8 +17,7 @@ namespace Nasteafy.Application.Extensions
                 cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });
 
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-            services.AddExceptionHandler<GlobalExceptionHandler>();
+            services.AddValidatorsFromAssembly(assembly);
 
             return services;
         }

@@ -1,6 +1,4 @@
-﻿using FluentResults;
-
-namespace Nasteafy.Application.Abstractions.Auth
+﻿namespace Nasteafy.Application.Abstractions.Auth
 {
     public interface IAuthenticationService
     {

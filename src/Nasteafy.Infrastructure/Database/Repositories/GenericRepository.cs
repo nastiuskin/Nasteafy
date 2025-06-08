@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Abstractions;
 using Nasteafy.Domain.Base;
-using Nasteafy.Domain.Contracts;
 
 namespace Nasteafy.Infrastructure.Database.Repositories
 {
@@ -20,14 +19,14 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             await _dbSet.AddAsync(entity, ct);
         }
 
-        public async Task AddRange(IEnumerable<T> objModel)
+        public async Task AddRange(IEnumerable<T> objModel, CancellationToken ct)
         {
-            await _dbSet.AddRangeAsync(objModel);
+            await _dbSet.AddRangeAsync(objModel, ct);
         }
 
-        public async Task<int> CountAsync()
+        public async Task<int> CountAsync(CancellationToken ct)
         {
-            return await _dbSet.CountAsync();
+            return await _dbSet.CountAsync(ct);
         }
 
         public async Task DeleteAsync(Guid id, CancellationToken ct)
@@ -37,7 +36,13 @@ namespace Nasteafy.Infrastructure.Database.Repositories
                 _dbSet.Remove(entity);
         }
 
-        public IQueryable<T> GetAll(CancellationToken ct)
+        public async Task<bool> ExistsAsync(Guid id,CancellationToken ct)
+        {
+            var entity = await GetByIdAsync(id, ct);
+            return entity is not null;
+        }
+
+        public IQueryable<T> GetAll()
         {
             return _dbSet.AsNoTracking();
         }
@@ -45,6 +50,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbSet
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
