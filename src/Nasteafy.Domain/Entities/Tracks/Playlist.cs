@@ -1,5 +1,4 @@
-﻿using Nasteafy.Domain.Base;
-using Nasteafy.Domain.Contracts;
+﻿using Nasteafy.Domain.Contracts;
 using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Domain.Entities.Tracks
@@ -7,6 +6,7 @@ namespace Nasteafy.Domain.Entities.Tracks
     public class Playlist : BaseEntity
     {
         public required string Title { get; set; }
+        public string? CoverUrl { get; set; }
 
         public User User { get; set; }
         public required Guid UserId { get; set; }

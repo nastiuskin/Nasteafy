@@ -3,6 +3,7 @@ using MediatR;
 using Nasteafy.Application.Abstractions.Auth;
 using Nasteafy.Application.Abstractions.Data;
 using Nasteafy.Domain.Entities.Subscriptions;
+using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Subscriptions.Commands
 {
@@ -10,19 +11,20 @@ namespace Nasteafy.Application.Subscriptions.Commands
         : IRequest<Result>;
 
 
-    public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork, IUserProvider userProvider)
+    public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork, IUserIdProvider userProvider)
         : IRequestHandler<SubscribeUserCommand, Result>
     {
         public async Task<Result> Handle(SubscribeUserCommand command, CancellationToken ct)
         {
             var userId = userProvider.GetUserId();
 
+            if (userId == null  || userId == Guid.Empty)
+                return Result.Fail("UserId not found");
+
             var user = await unitOfWork.Users
-                .GetWithSubscriptionsAsync(userId, ct);
+                .GetWithSubscriptionsAsync(userId.Value, ct);
 
             var subscription = await unitOfWork.Subscriptions.GetByIdAsync(command.SubscriptionId, ct);
-
-            //if req is trial subscription, check if was activated earlier
 
             if (subscription!.Type == SubscriptionType.Trial)
             {
@@ -33,6 +35,17 @@ namespace Nasteafy.Application.Subscriptions.Commands
                 {
                     return Result.Fail("Trial subscription can be activated only once.");
                 }
+            }
+
+            if (subscription.Type == SubscriptionType.Artist)
+            {
+                var artist = new Artist
+                {
+                    UserId = user!.Id,
+                    Name = user!.Email!,
+                    AlbumArtists = [],
+                    ArtistTracks = [],
+                };
             }
 
             var now = DateTime.UtcNow;

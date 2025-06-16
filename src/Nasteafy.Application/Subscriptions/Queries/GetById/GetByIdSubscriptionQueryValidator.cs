@@ -3,7 +3,7 @@ using Nasteafy.Application.Abstractions.Data;
 
 namespace Nasteafy.Application.Subscriptions.Queries.GetById
 {
-    public class GetByIdSubscriptionQueryValidator : AbstractValidator<GetByIdSubscriptionQuery>
+    public class GetByIdSubscriptionQueryValidator : AbstractValidator<GetSubscriptionByIdQuery>
     {
         private readonly IUnitOfWork _unitOfWork;
 
