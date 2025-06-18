@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions;
+using Nasteafy.Application.Common.Abstractions.Data.Repositories;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Domain.Entities.Tracks;
 using Nasteafy.Infrastructure.Persistence.Contexts;
+using Nasteafy.Infrastructure.Persistence.Extensions;
 
 namespace Nasteafy.Infrastructure.Database.Repositories
 {
@@ -12,8 +14,9 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         public async Task AddTrackToPlaylistAsync(Guid playlistId, Guid trackId, CancellationToken ct)
         {
             var currentMaxOrder = await _context.PlaylistTracks
-             .Where(pt => pt.PlaylistId == playlistId)
-             .MaxAsync(pt => pt.Order, ct);
+                .Where(pt => pt.PlaylistId == playlistId)
+                .Select(pt => pt.Order)
+                .MaxAsync(ct);
 
             var entity = new PlaylistTrack
             {
@@ -25,32 +28,45 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             await _context.PlaylistTracks.AddAsync(entity, ct);
         }
 
-        public IQueryable<Playlist> GetByIdWithTracks(Guid id, CancellationToken ct)
+        public async Task<Playlist?> GetByIdWithTracks(Guid id, CancellationToken ct)
         {
-            return _context.Playlists
-                .Where(x => x.Id == id);
-        }   
+            return await _context.Playlists
+              .Where(x => x.Id == id)
+              .Include(p => p.PlaylistTracks)
+                .FirstOrDefaultAsync(ct);
+        }
 
-        public IQueryable<Playlist> GetByUserIdWithTracks(Guid userId, CancellationToken ct)
+        public async Task<PagedResult<Playlist>> GetByUserIdAsync(Guid userId, PagedRequest request, CancellationToken ct)
+        {
+            var query = _context.Playlists
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                    .Include(x => x.PlaylistTracks);
+
+            return await query.ToPagedResultAsync(request, ct);
+        }
+
+        public IQueryable<Playlist> GetByUserIdWithTracks(Guid userId, PagedRequest request, CancellationToken ct)
         {
             return _context.Playlists
-                .Where(p => p.UserId == userId);
+                .Where(p => p.UserId == userId)
+                .Include(p => p.PlaylistTracks)
+                    .ThenInclude(pt => pt.Track);
         }
 
         public async Task RemoveTrackFromPlaylistAsync(Guid playlistId, Guid trackId, CancellationToken ct)
         {
-            var entity = await _context.PlaylistTracks
-                .FirstOrDefaultAsync(pt => pt.PlaylistId == playlistId && pt.TrackId == trackId, ct);
+            var playlistTracks = await _context.PlaylistTracks
+                .Where(pt => pt.PlaylistId == playlistId)
+                .ToListAsync(ct);
 
-            if (entity != null)
+            var playlistTrackToRemove = playlistTracks.FirstOrDefault(x => x.TrackId == trackId);
+
+            if (playlistTrackToRemove is not null)
             {
-                _context.PlaylistTracks.Remove(entity);
+                _context.PlaylistTracks.Remove(playlistTrackToRemove);
 
-                var remainingTracks = await _context.PlaylistTracks
-                    .Where(pt => pt.PlaylistId == playlistId && pt.Order > entity.Order)
-                    .ToListAsync(ct);
-
-                foreach (var track in remainingTracks)
+                foreach (var track in playlistTracks.Where(x => x.Order > playlistTrackToRemove.Order))
                 {
                     track.Order--;
                 }

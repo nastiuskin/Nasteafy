@@ -1,7 +1,6 @@
 ﻿using Google.Cloud.Storage.V1;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Nasteafy.Application.Abstractions;
 using Nasteafy.Infrastructure.Options;
 
 //public class FirebaseStorageService : IFileStorageService

@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Playlists.Commands.Create;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Playlists
 {
@@ -13,11 +15,12 @@ namespace Nasteafy.Endpoints.Playlists
                 var result = await sender.Send(command, ct);
 
                 if (result.IsFailed)
-                    return Results.BadRequest(result.Errors.First().Message);
+                    return result.ToApiError();
 
                 return Results.Ok(result.Value);
             })
-            .Produces<Guid>(StatusCodes.Status200OK);
+            .Produces<Guid>(StatusCodes.Status200OK)
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

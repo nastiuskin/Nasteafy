@@ -1,4 +1,4 @@
-﻿using Nasteafy.Application.Abstractions.Data;
+﻿using Nasteafy.Application.Common.Abstractions.Data;
 
 namespace Nasteafy.Middlewares
 {

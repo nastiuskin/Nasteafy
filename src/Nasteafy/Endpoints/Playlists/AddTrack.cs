@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
-using Nasteafy.Application.Playlists.Commands.AddTrack;
+using Nasteafy.Application.Common.Models;
+using Nasteafy.Application.Tracks.Commands.AddTrack;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Playlists
 {
@@ -17,10 +19,12 @@ namespace Nasteafy.Endpoints.Playlists
                 var result = await sender.Send(new AddTrackToPlaylistCommand(playlistId, trackId), ct);
 
                 if (result.IsFailed)
-                    return Results.BadRequest(result.Errors.First().Message);
+                    return result.ToApiError();
 
-                return Results.NoContent();
-            });
+                return Results.Ok();
+            })
+            .Produces(StatusCodes.Status200OK)
+            .Produces<ApiError>(StatusCodes.Status400BadRequest); 
         }
     }
 }

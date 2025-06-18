@@ -1,6 +1,9 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Subscriptions.Commands.Cancel;
+using Nasteafy.Application.Subscriptions.Queries.GetAll;
+using Nasteafy.Extensions;
 using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Subscriptions
@@ -15,10 +18,12 @@ namespace Nasteafy.Endpoints.Subscriptions
                 var response = await sender.Send(new CancelActiveSubscriptionCommand(), ct);
 
                 if (response.IsFailed)
-                    return Results.BadRequest(response.Errors.Select(e => e.Message));
+                    return response.ToApiError();
 
-                return Results.Ok("Subscription canceled successfully");
-            });
+                return Results.Ok();
+            })
+            .Produces(StatusCodes.Status200OK)
+            .Produces<ApiError>(StatusCodes.Status400BadRequest); 
         }
     }
 }

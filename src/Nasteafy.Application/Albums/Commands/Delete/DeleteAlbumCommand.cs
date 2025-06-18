@@ -1,0 +1,31 @@
+﻿using FluentResults;
+using MediatR;
+using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Domain;
+
+namespace Nasteafy.Application.Albums.Commands.Delete
+{
+    public record DeleteAlbumCommand(Guid AlbumId) : IRequest<Result>;
+
+    public class DeletePlaylistCommandHandler(IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
+        : IRequestHandler<DeleteAlbumCommand, Result>
+    {
+        public async Task<Result> Handle(DeleteAlbumCommand request, CancellationToken ct)
+        {
+            var album = await unitOfWork
+                .Albums
+                .GetByIdAsync(request.AlbumId, ct);
+
+            if (album == null)
+                return Result.Fail("Album not found");
+
+            if (!string.IsNullOrEmpty(album.CoverUrl))
+                await fileStorageService.DeleteFileAsync(FileType.AlbumCover, album.CoverUrl);
+
+            await unitOfWork.Playlists.DeleteAsync(request.AlbumId, ct);
+            await unitOfWork.SaveChangesAsync(ct);
+
+            return Result.Ok();
+        }
+    }
+}

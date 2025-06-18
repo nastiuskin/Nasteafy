@@ -1,7 +1,5 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions.Data;
 using Nasteafy.Application.Artists.Queries.GetAll;
 
 namespace Nasteafy.Application.Artists.Queries

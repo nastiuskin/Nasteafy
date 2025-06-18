@@ -1,7 +1,8 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Subscriptions.Commands;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Subscriptions
 {
@@ -14,10 +15,12 @@ namespace Nasteafy.Endpoints.Subscriptions
                 var response = await sender.Send(command, ct);
 
                 if (response.IsFailed)
-                    return Results.BadRequest(response.Errors.Select(e => e.Message));
+                    return response.ToApiError();
 
-                return Results.Ok("Subscription added successfully");
-            });
+                return Results.Ok();
+            })
+            .Produces(StatusCodes.Status200OK)
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

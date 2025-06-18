@@ -1,62 +1,35 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Playlists.Queries.GetByUserId;
 using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Playlists.Queries.GetById
 {
-    public record GetPlaylistByIdQuery(Guid PlaylistId) : IRequest<Result<PlaylistDetailsDto>>;
+    public record GetPlaylistByIdQuery(Guid PlaylistId) : IRequest<Result<UserPlaylistDto>>;
 
     public class GetPlaylistByIdQueryHandler(IUnitOfWork unitOfWork,
         IFileStorageService fileStorageService)
-       : IRequestHandler<GetPlaylistByIdQuery, Result<PlaylistDetailsDto>>
+       : IRequestHandler<GetPlaylistByIdQuery, Result<UserPlaylistDto>>
     {
-        public async Task<Result<PlaylistDetailsDto>> Handle(GetPlaylistByIdQuery req, CancellationToken ct)
+        public async Task<Result<UserPlaylistDto>> Handle(GetPlaylistByIdQuery req, CancellationToken ct)
         {
-            var query = unitOfWork.Playlists.GetByIdWithTracks(req.PlaylistId, ct);
+            var playlist = await unitOfWork.Playlists.GetByIdWithTracks(req.PlaylistId, ct);
 
-            var rawPlaylist = await query
-                .Select(p => new
-                {
-                    p.Id,
-                    p.Title,
-                    p.CoverUrl,
-                    Tracks = p.PlaylistTracks.Select(pt => new
-                    {
-                        pt.Track.Id,
-                        pt.Track.Title,
-                        pt.Track.Duration,
-                        pt.Track.CoverUrl,
-                        Artists = pt.Track.ArtistTracks.Select(at => at.Artist.Name).ToList()
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync(ct);
-
-            if (rawPlaylist is null)
+            if (playlist is null)
                 return Result.Fail("Playlist not found");
 
-            var trackDtos = rawPlaylist.Tracks.Select(t => new PlaylistTrackDto(
-                t.Id,
-                t.Title,
-                string.Join(", ", t.Artists),
-                t.Duration,
-                t.CoverUrl
-            )).ToList();
-
             string? coverUrl = null;
-            if (!string.IsNullOrEmpty(rawPlaylist.CoverUrl))
+            if (!string.IsNullOrEmpty(playlist.CoverUrl))
             {
-                coverUrl = await fileStorageService.GetFileUrlAsync(FileType.PlaylistCover, rawPlaylist.CoverUrl);
+                coverUrl = await fileStorageService.GetFileUrlAsync(FileType.PlaylistCover, playlist.CoverUrl);
             }
 
-            var playlistDto = new PlaylistDetailsDto(
-                rawPlaylist.Id,
-                rawPlaylist.Title,
+            var playlistDto = new UserPlaylistDto(
+                playlist.Id,
+                playlist.Title,
                 coverUrl,
-                trackDtos.Count,
-                trackDtos
-            );
+                playlist.PlaylistTracks.Count);
 
             return Result.Ok(playlistDto);
         }

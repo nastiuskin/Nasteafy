@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
-using Nasteafy.Application.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data;
 
 namespace Nasteafy.Application.Subscriptions.Commands.Update
 {
@@ -8,9 +8,9 @@ namespace Nasteafy.Application.Subscriptions.Commands.Update
         Guid Id,
         string Description,
         decimal Price,
-        int DurationInDays) : IRequest<Result<Guid>>;
+        int DurationInDays) : IRequest<Result>;
 
-    public class UpdateSubscriptionCommandHandler : IRequestHandler<UpdateSubscriptionCommand, Result<Guid>>
+    public class UpdateSubscriptionCommandHandler : IRequestHandler<UpdateSubscriptionCommand, Result>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -19,7 +19,7 @@ namespace Nasteafy.Application.Subscriptions.Commands.Update
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result<Guid>> Handle(UpdateSubscriptionCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(UpdateSubscriptionCommand request, CancellationToken cancellationToken)
         {
             var subscription = await _unitOfWork.Subscriptions.GetByIdAsync(request.Id, cancellationToken);
 
@@ -30,7 +30,7 @@ namespace Nasteafy.Application.Subscriptions.Commands.Update
             await _unitOfWork.Subscriptions.UpdateAsync(subscription, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result.Ok(subscription.Id);
+            return Result.Ok();
         }
     }
 }

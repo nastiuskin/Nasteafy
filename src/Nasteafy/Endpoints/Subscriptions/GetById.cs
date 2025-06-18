@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Subscriptions.Queries.GetAll;
 using Nasteafy.Application.Subscriptions.Queries.GetById;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Subscriptions
 {
@@ -15,10 +17,12 @@ namespace Nasteafy.Endpoints.Subscriptions
                 var response = await sender.Send(new GetSubscriptionByIdQuery(Id), ct);
 
                 if (response.IsFailed)
-                    return Results.BadRequest(response.Errors.Select(e => e.Message));
+                    return response.ToApiError();
 
                 return Results.Ok(response.Value);
-            });
+            })
+            .Produces<GetSubscriptionDto>(StatusCodes.Status200OK)
+            .Produces<ApiError>(StatusCodes.Status400BadRequest); 
         }
     }
 }

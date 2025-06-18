@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using Nasteafy.Application.Abstractions;
-using Nasteafy.Application.Abstractions.Data;
-using Nasteafy.Application.Abstractions.Data.Repositories;
+using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data.Repositories;
 
 namespace Nasteafy.Infrastructure.Persistence.Contexts
 {
@@ -12,6 +11,7 @@ namespace Nasteafy.Infrastructure.Persistence.Contexts
         public IUserRepository Users { get; }
         public IArtistRepository Artists { get; }
         public ITrackRepository Tracks { get; }
+        public IAlbumRepository Albums { get; }
         public IPlaylistRepository Playlists { get; }
         public ISubscriptionRepository Subscriptions { get; }
 
@@ -19,6 +19,7 @@ namespace Nasteafy.Infrastructure.Persistence.Contexts
             ITrackRepository tracks,
             IPlaylistRepository playlists,
             IArtistRepository artists,
+            IAlbumRepository albums,
             IUserRepository users,
             ISubscriptionRepository subscriptions)
         {
@@ -26,6 +27,7 @@ namespace Nasteafy.Infrastructure.Persistence.Contexts
             Tracks = tracks;
             Playlists = playlists;
             Artists = artists;
+            Albums = albums;
             Users = users;
             Subscriptions = subscriptions;
         }

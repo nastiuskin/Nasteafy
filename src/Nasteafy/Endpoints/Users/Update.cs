@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Users.Commands.Update;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Users
 {
@@ -11,22 +13,18 @@ namespace Nasteafy.Endpoints.Users
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            //routes.MapPut("api/users/profile", async ([FromForm] string? email, [FromForm] IFormFile? file, ISender sender, CancellationToken ct) =>
             routes.MapPut("api/users/profile", async ([FromForm] UpdateProfileCommand command, ISender sender, CancellationToken ct) =>
             {
-                //var command = new UpdateProfileCommand(email, file);
                 var response = await sender.Send(command, ct);
 
                 if (response.IsFailed)
-                    return Results.BadRequest(response.Errors.Select(e => e.Message));
+                    return response.ToApiError();
 
                 return Results.Ok();
-
             })
-            .Accepts<IFormFile>("multipart/form-data")
+            //.Accepts<IFormFile>("multipart/form-data")
             .Produces(StatusCodes.Status200OK)
-            .Produces<string>(StatusCodes.Status400BadRequest)
-            .DisableAntiforgery();
-        }   
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
+        }
     }
 }

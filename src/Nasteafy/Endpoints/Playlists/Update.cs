@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Playlists.Commands.Update;
+using Nasteafy.Extensions;
 using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists
@@ -11,22 +13,20 @@ namespace Nasteafy.Endpoints.Playlists
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            //routes.MapPut("api/playlists/{id:guid}", async ([FromForm] string? email, [FromForm] IFormFile? file, ISender sender, CancellationToken ct) =>
-            routes.MapPut("api/playlists/{id:guid}", async ([FromRoute] Guid id, [FromForm] UpdatePlaylistRequest request, ISender sender,
+            routes.MapPut("api/playlists/{id:guid}", async ([FromRoute] Guid id, [FromForm] UpdatePlaylistCommand request, ISender sender,
                 CancellationToken ct) =>
             {
-                var command = new UpdatePlaylistCommand(id, request.Title, request.CoverFile);
-                var response = await sender.Send(command, ct);
+                var response = await sender.Send(request, ct);
 
                 if (response.IsFailed)
-                    return Results.BadRequest(response.Errors.Select(e => e.Message));
+                    return response.ToApiError();
 
                 return Results.Ok();
             })
-            .Accepts<IFormFile>("multipart/form-data")
+            // .Accepts<IFormFile>("multipart/form-data")
             .Produces(StatusCodes.Status200OK)
-            .Produces<string>(StatusCodes.Status400BadRequest)
-            .DisableAntiforgery();
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
+            //.DisableAntiforgery();
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions;
+using Nasteafy.Application.Common.Abstractions.Data.Repositories;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Domain.Base;
 using Nasteafy.Infrastructure.Persistence.Contexts;
+using Nasteafy.Infrastructure.Persistence.Extensions;
+using System.Linq.Expressions;
 
 namespace Nasteafy.Infrastructure.Database.Repositories
 {
@@ -20,9 +23,9 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             await _dbSet.AddAsync(entity, ct);
         }
 
-        public async Task AddRange(IEnumerable<T> objModel, CancellationToken ct)
+        public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken ct)
         {
-            await _dbSet.AddRangeAsync(objModel, ct);
+            await _dbSet.AddRangeAsync(entities, ct);
         }
 
         public async Task<int> CountAsync(CancellationToken ct)
@@ -37,28 +40,55 @@ namespace Nasteafy.Infrastructure.Database.Repositories
                 _dbSet.Remove(entity);
         }
 
-        public async Task<bool> ExistsAsync(Guid id,CancellationToken ct)
+        public async Task<bool> ExistsAsync(Guid id, CancellationToken ct)
         {
-            var entity = await GetByIdAsync(id, ct);
-            return entity is not null;
-        }
-
-        public IQueryable<T> GetAll()
-        {
-            return _dbSet.AsNoTracking();
+            return await _dbSet.AnyAsync(x => x.Id == id);
         }
 
         public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
         {
             return await _dbSet
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
+
+        private IQueryable IncludeProperties(params Expression<Func<T, object>>[] includeProperties)
+        {
+            IQueryable<T> entities = _context.Set<T>();
+            foreach (var includeProperty in includeProperties)
+            {
+                entities = entities.Include(includeProperty);
+            }
+            return entities;
         }
 
         public Task UpdateAsync(T entity, CancellationToken ct)
         {
             _dbSet.Update(entity);
             return Task.CompletedTask;
+        }
+
+        public async Task<Application.Common.Models.PagedResult<T>> GetPagedResultAsync(PagedRequest request, CancellationToken ct = default)
+        {
+            var query = _dbSet.AsNoTracking();
+
+            return await query.ToPagedResultAsync(request, ct);
+        }
+
+        public async Task<T?> GetByIdWithIncludeAsync(Guid id, CancellationToken ct = default, params Expression<Func<T, object>>[] includes)
+        {
+            var query = _dbSet.AsQueryable();
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
+
+        public IQueryable<T> GetAll()
+        {
+            return _dbSet.AsQueryable();
         }
     }
 }

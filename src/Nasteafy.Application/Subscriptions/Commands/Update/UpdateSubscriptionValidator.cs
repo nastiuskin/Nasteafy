@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Nasteafy.Application.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data;
 
 namespace Nasteafy.Application.Subscriptions.Commands.Update
 {

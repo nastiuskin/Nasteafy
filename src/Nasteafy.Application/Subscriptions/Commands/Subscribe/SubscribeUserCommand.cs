@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
-using Nasteafy.Application.Abstractions.Auth;
-using Nasteafy.Application.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain.Entities.Subscriptions;
 using Nasteafy.Domain.Entities.Tracks;
 

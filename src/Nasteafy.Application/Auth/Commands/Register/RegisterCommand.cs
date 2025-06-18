@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
-using Nasteafy.Application.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Auth;
 
 namespace Nasteafy.Application.Auth.Commands.Register
 {

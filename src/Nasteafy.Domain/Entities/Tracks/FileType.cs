@@ -5,6 +5,7 @@
         UserAvatar,
         TrackCover,
         PlaylistCover,
+        AlbumCover,
         Audio,
         Other
     }

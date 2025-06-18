@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Nasteafy.Application.Abstractions.Auth;
-using Nasteafy.Application.Behaviors;
+using Nasteafy.Application.Common.Behaviors;
 using System.Reflection;
 
 namespace Nasteafy.Application.Extensions

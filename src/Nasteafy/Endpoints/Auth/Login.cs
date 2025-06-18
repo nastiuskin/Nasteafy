@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Auth.Commands.Login;
+using Nasteafy.Application.Common.Models;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Auth
 {
@@ -13,20 +15,21 @@ namespace Nasteafy.Endpoints.Auth
                 var response = await sender.Send(command, ct);
 
                 if (!response.IsSuccess)
-                    return Results.BadRequest(response.ErrorMessage);
+                    return response.ToApiError();
 
-                http.Cookies.Append("refreshToken", response.RefreshToken!, new CookieOptions
+                http.Cookies.Append("refreshToken", response.Value.RefreshToken!, new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, 
+                    Secure = true,
                     SameSite = SameSiteMode.None,
                     Expires = DateTimeOffset.UtcNow.AddDays(7)
                 });
 
-                return Results.Ok(response.AccessToken);
+                return Results.Ok(response.Value.AccessToken);
 
-            }).Produces<string>(StatusCodes.Status200OK)
-              .Produces<string>(StatusCodes.Status400BadRequest);
+            })
+              .Produces<string>(StatusCodes.Status200OK)
+              .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

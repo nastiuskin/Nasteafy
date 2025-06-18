@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
+using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Users.Queries.GetById;
+using Nasteafy.Extensions;
 using System.Web.Http;
 
 public sealed class GetUserProfileEndpoint : IEndpoint
@@ -13,10 +15,11 @@ public sealed class GetUserProfileEndpoint : IEndpoint
             var result = await sender.Send(new GetUserProfileQuery(), ct);
 
             if (result.IsFailed || result.Value is null)
-                return Results.NotFound("User not found");
+                return result.ToApiError();
 
             return Results.Ok(result.Value);
-        }).Produces<GetUserReponse>(StatusCodes.Status200OK)
-         .Produces<string>(StatusCodes.Status400BadRequest);
+        })
+        .Produces<GetUserReponse>(StatusCodes.Status200OK)
+        .Produces<ApiError>(StatusCodes.Status400BadRequest);
     }
 }

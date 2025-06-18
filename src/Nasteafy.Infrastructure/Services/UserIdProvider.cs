@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Nasteafy.Application.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Infrastructure.Constants;
 
 

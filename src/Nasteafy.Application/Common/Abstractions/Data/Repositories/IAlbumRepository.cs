@@ -1,0 +1,11 @@
+﻿using Nasteafy.Application.Common.Models;
+using Nasteafy.Domain.Entities.Tracks;
+
+namespace Nasteafy.Application.Common.Abstractions.Data.Repositories
+{
+    public interface IAlbumRepository : IGenericRepository<Album>
+    {
+        Task<PagedResult<Album>> GetByArtistIdAsync(Guid artistId, PagedRequest request, CancellationToken ct);
+    }
+}
+

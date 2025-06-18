@@ -4,10 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Minio;
-using Nasteafy.Application.Abstractions;
-using Nasteafy.Application.Abstractions.Auth;
-using Nasteafy.Application.Abstractions.Data;
-using Nasteafy.Application.Abstractions.Data.Repositories;
+using Nasteafy.Application.Common.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data.Repositories;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Database.Repositories;
 using Nasteafy.Infrastructure.Options;
@@ -57,12 +56,6 @@ namespace Nasteafy.Persistence.Database.Extensions
             return services;
         }
 
-        public static async Task SeedDataAsync(this IServiceProvider serviceProvider)
-        {
-            await RoleSeeder.SeedRolesAsync(serviceProvider);
-            await AdminSeeder.SeedAdminAsync(serviceProvider);
-        }
-
         public static IServiceCollection AddMinio(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<MinioOptions>(configuration.GetSection(MinioOptions.SectionName));
@@ -102,31 +95,6 @@ namespace Nasteafy.Persistence.Database.Extensions
 
             return services;
         }
-
-        //public static IServiceCollection AddFirebaseStorage(this IServiceCollection services, IConfiguration configuration)
-        //{
-        //    services.Configure<FirebaseStorageOptions>(configuration.GetSection("FirebaseOptions"));
-
-        //    services.AddSingleton(provider =>
-        //    {
-        //        var options = provider.GetRequiredService<IOptions<FirebaseStorageOptions>>().Value;
-
-        //        if (FirebaseApp.DefaultInstance == null)
-        //        {
-        //            FirebaseApp.Create(new AppOptions
-        //            {
-        //                Credential = GoogleCredential.FromFile(options.CredentialsPath)
-        //            });
-        //        }
-
-        //        var credential = GoogleCredential.FromFile(options.CredentialsPath);
-        //        return StorageClient.Create(credential);
-        //    });
-
-        //    services.AddSingleton<IFileStorageService, FirebaseStorageService>();
-
-        //    return services;
-        //}
     }
 }
 

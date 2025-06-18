@@ -1,9 +1,13 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
-using Nasteafy.Application.Users.Queries.GetPlaylists;
+using Nasteafy.Application.Common.Models;
+using Nasteafy.Application.Playlists.Queries.GetByUserId;
+using Nasteafy.Extensions;
+using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists
 {
+    [Authorize]
     public sealed class GetUserPlaylistsEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
@@ -13,12 +17,12 @@ namespace Nasteafy.Endpoints.Playlists
                 var result = await sender.Send(new GetUserPlaylistsQuery(), ct);
 
                 if (result.IsFailed)
-                    return Results.BadRequest(result.Errors.First().Message);
+                    return result.ToApiError();
 
                 return Results.Ok(result.Value);
             })
             .Produces<GetUserPlaylistsResponse>(StatusCodes.Status200OK)
-            .WithTags("Playlists");
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

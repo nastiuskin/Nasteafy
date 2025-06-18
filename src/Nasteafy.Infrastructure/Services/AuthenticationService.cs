@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions.Auth;
+using Nasteafy.Application.Auth.Commands.Login;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Constants;
 using System.Data;
@@ -34,15 +35,15 @@ namespace Nasteafy.Infrastructure.Services
             return Result.Ok();
         }
 
-        public async Task<AuthResult> PasswordSignInAsync(string userName, string password)
+        public async Task<Result<AuthResponse>> PasswordSignInAsync(string email, string password)
         {
-            var user = await userManager.FindByNameAsync(userName);
+            var user = await userManager.FindByEmailAsync(email);
             if (user == null)
-                return AuthResult.Failure("User not found");
+                return Result.Fail("User not found");
 
             var result = await signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
             if (!result.Succeeded)
-                return AuthResult.Failure("Invalid username or password");
+                return Result.Fail("Invalid username or password");
 
             var roles = await userManager.GetRolesAsync(user);
 
@@ -62,19 +63,19 @@ namespace Nasteafy.Infrastructure.Services
             user.RefreshToken = refreshToken;
             await userManager.UpdateAsync(user);
 
-            return AuthResult.Success(accessToken, refreshToken.Token);
+            return Result.Ok(new AuthResponse(accessToken, refreshToken.Token));
         }
 
-        public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
+        public async Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken)
         {
             var user = await userManager.Users
                 .FirstOrDefaultAsync(u => u.RefreshToken != null && u.RefreshToken.Token == refreshToken);
 
             if (user is null)
-                return AuthResult.Failure("Invalid refresh token");
+                return Result.Fail("Invalid refresh token");
 
             if (user.RefreshToken!.IsExpired)
-                return AuthResult.Failure("Refresh token expired");
+                return Result.Fail("Refresh token expired");
 
             var roles = await userManager.GetRolesAsync(user);
 
@@ -93,19 +94,19 @@ namespace Nasteafy.Infrastructure.Services
 
             await userManager.UpdateAsync(user);
 
-            return AuthResult.Success(newAccessToken, refreshToken);
+            return Result.Ok(new AuthResponse(newAccessToken, refreshToken));
         }
 
-        public async Task<Result> RegisterAsync(string userName, string password)
+        public async Task<Result> RegisterAsync(string email, string password)
         {
-            var existingUser = await userManager.FindByNameAsync(userName);
+            var existingUser = await userManager.FindByEmailAsync(email);
             if (existingUser is not null)
                 return Result.Fail("User already exists");
 
             var user = new User
             {
-                Email = userName,
-                UserName = userName,
+                Email = email,
+                UserName = email,
                 Playlists = [],
                 UserSubscriptions = []
             };

@@ -3,15 +3,16 @@
     public class MinioOptions
     {
         public const string SectionName = "MinioOptions";
-        public string Endpoint { get; set; }
-        public string AccessKey { get; set; }
-        public string SecretKey { get; set; }
-        public BucketNames Buckets { get; set; }
+        public  required string Endpoint { get; set; }
+        public required string AccessKey { get; set; }
+        public required string SecretKey { get; set; }
+        public required BucketSettings Image { get; set; }
+        public required BucketSettings Audio { get; set; } 
 
-        public class BucketNames
+        public class BucketSettings
         {
-            public string Audio { get; set; }
-            public string Image { get; set; }
+            public string Name { get; set; } = default!;
+            public string[] AllowedExtensions { get; set; } = [];
         }
     }
 }

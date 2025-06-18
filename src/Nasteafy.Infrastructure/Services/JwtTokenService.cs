@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Nasteafy.Application.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Options;
 using System.IdentityModel.Tokens.Jwt;

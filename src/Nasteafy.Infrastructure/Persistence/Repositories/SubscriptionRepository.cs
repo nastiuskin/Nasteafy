@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions.Data.Repositories;
+using Nasteafy.Application.Common.Abstractions.Data.Repositories;
 using Nasteafy.Domain.Entities.Subscriptions;
 using Nasteafy.Infrastructure.Persistence.Contexts;
 
@@ -15,14 +15,14 @@ namespace Nasteafy.Infrastructure.Database.Repositories
                 .FirstOrDefaultAsync(us => us.UserId == userId && us.EndDate > DateTime.UtcNow, ct);
         }
 
-        public async Task CancelActiveSubscriptionAsync(Guid userId, CancellationToken ct)
-        {
-            var subscription = await GetActiveSubscriptionAsync(userId, ct);
-            if (subscription is null)
-                throw new InvalidOperationException("No active subscription to cancel.");
+        //public async Task CancelActiveSubscriptionAsync(Guid userId, CancellationToken ct)
+        //{
+        //    var subscription = await GetActiveSubscriptionAsync(userId, ct);
+        //    if (subscription is null)
+        //        throw new InvalidOperationException("No active subscription to cancel.");
 
-            subscription.EndDate = DateTime.UtcNow;
-        }
+        //    subscription.EndDate = DateTime.UtcNow;
+        //}
 
         public async Task<Subscription?> GetByTypeAsync(SubscriptionType subscriptionType, CancellationToken ct)
         {

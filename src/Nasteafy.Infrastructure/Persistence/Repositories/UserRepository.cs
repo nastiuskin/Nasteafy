@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Nasteafy.Application.Abstractions;
+using Nasteafy.Application.Common.Abstractions.Data.Repositories;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Persistence.Contexts;
 
@@ -13,9 +13,10 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         {
             return await _context.Users
                 .AsNoTracking()
+                .Where(u => u.Id == userId)
                 .Include(u => u.UserSubscriptions)
-                .ThenInclude(x => x.Subscription)
-                .FirstOrDefaultAsync(u => u.Id == userId, ct);
+                    .ThenInclude(x => x.Subscription)
+                .FirstOrDefaultAsync(ct);
         }
     }
 }

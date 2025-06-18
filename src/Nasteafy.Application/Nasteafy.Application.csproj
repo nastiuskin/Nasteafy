@@ -22,11 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Albums\Queries\GetById\" />
+    <Folder Include="Albums\Queries\GetAllByArtistId\" />
     <Folder Include="Artists\Commands\Create\" />
     <Folder Include="Artists\Commands\Delete\" />
     <Folder Include="Artists\Commands\Update\" />
     <Folder Include="Artists\Queries\GetById\" />
-    <Folder Include="Albums\" />
   </ItemGroup>
 
 </Project>

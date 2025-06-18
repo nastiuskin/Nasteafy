@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
-using Nasteafy.Application.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Subscriptions.Queries.GetAll;
 
 namespace Nasteafy.Application.Subscriptions.Queries.GetById

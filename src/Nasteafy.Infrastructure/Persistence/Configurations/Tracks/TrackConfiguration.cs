@@ -20,9 +20,9 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
             builder.Property(x => x.Duration)
                 .IsRequired();
 
-            builder.Property(x => x.CoverUrl)
+            builder.Property(x => x.FilePath)
                 .HasMaxLength(255)
-                .IsRequired(false); 
+                .IsRequired(true); 
 
             builder.HasOne(x => x.Album)
                 .WithMany(a => a.Tracks)

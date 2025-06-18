@@ -1,12 +1,11 @@
 ﻿using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Nasteafy.Application.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Playlists.Commands.Update
 {
-    public record UpdatePlaylistRequest(string? Title, IFormFile? CoverFile) : IRequest<Result>;
     public record UpdatePlaylistCommand(Guid PlaylistId, string? Title, IFormFile? CoverFile) : IRequest<Result>;
 
     public class UpdatePlaylistCommandHandler : IRequestHandler<UpdatePlaylistCommand, Result>
@@ -34,13 +33,13 @@ namespace Nasteafy.Application.Playlists.Commands.Update
             {
                 await using var stream = request.CoverFile.OpenReadStream();
 
-                var objectKey = await _fileStorage.UploadFileAsync(
+                var result = await _fileStorage.UploadFileAsync(
                     stream,
                     request.CoverFile.FileName,
                     request.CoverFile.ContentType,
                     FileType.PlaylistCover);
 
-                playlist.CoverUrl = objectKey;
+                playlist.CoverUrl = result.Value;
 
                 await _unitOfWork.Playlists.UpdateAsync(playlist, ct);
             }

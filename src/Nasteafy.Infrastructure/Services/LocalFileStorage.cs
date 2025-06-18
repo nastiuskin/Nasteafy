@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Nasteafy.Application.Abstractions;
 
 public class LocalFileStorageService 
 {
