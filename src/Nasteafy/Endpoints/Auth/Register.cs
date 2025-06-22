@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Auth.Commands.Register;
+using Nasteafy.Application.Common.Models;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Auth
 {
@@ -13,10 +15,12 @@ namespace Nasteafy.Endpoints.Auth
                 var response = await sender.Send(command, ct);
 
                 if (!response.IsSuccess)
-                    return Results.BadRequest(response.Reasons.First().Message);
+                    return response.ToApiError();
 
-                return Results.Ok("Registration successful");
-            });
+                return Results.Ok();
+            })
+            .Produces(StatusCodes.Status200OK)
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

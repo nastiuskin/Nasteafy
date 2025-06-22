@@ -12,7 +12,7 @@ namespace Nasteafy.Application.Common.Abstractions.Data.Repositories
         Task<PagedResult<T>> GetPagedResultAsync(PagedRequest request, CancellationToken ct);
         Task AddAsync(T entity, CancellationToken ct);
         Task AddRangeAsync(IEnumerable<T> objModel, CancellationToken ct);
-        Task DeleteAsync(Guid id, CancellationToken ct);
+        Task DeleteAsync(T entity, CancellationToken ct);
         Task UpdateAsync(T entity, CancellationToken ct);
         Task<int> CountAsync(CancellationToken ct);
         Task<bool> ExistsAsync(Guid id, CancellationToken ct);

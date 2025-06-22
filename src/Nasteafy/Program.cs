@@ -14,9 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Divide entities by schemas
 
 builder.AddServices();
-
+builder.Services.AddAntiforgery();
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers();
+//builder.Services.AddAntiforgery();
 
 builder.Services.AddCors(options =>
 {
@@ -32,6 +33,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+await app.SeedData();
+
 app.MapEndpoints();
 
 if (app.Environment.IsDevelopment())
@@ -44,9 +47,12 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 
 app.UseAuthentication();
+app.UseAntiforgery();
 app.UseAuthorization();
+//app.UseAntiforgery();
 app.UseDbTransaction();
 app.UseGlobalExceptionHandling();
+app.UseRequestTimingMiddleware();
 
 await app.RunAsync();
 

@@ -5,9 +5,9 @@ namespace Nasteafy.Application.Common.Abstractions.Auth
 {
     public interface IAuthenticationService
     {
-        Task<Result<AuthResponse>> PasswordSignInAsync(string userName, string password);
-        Task<Result> RegisterAsync(string userName, string password);
+        Task<Result<AuthResponse>> PasswordSignInAsync(string userName, string password, CancellationToken ct);
+        Task<Result<Guid>> RegisterAsync(string userName, string password);
         Task<Result> LogoutAsync();
-        Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken);
+        Task<Result<string>> RefreshTokenAsync(string refreshToken, CancellationToken ct);
     }
 }

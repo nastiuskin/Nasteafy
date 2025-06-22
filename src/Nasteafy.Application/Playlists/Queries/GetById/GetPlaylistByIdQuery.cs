@@ -22,7 +22,8 @@ namespace Nasteafy.Application.Playlists.Queries.GetById
             string? coverUrl = null;
             if (!string.IsNullOrEmpty(playlist.CoverUrl))
             {
-                coverUrl = await fileStorageService.GetFileUrlAsync(FileType.PlaylistCover, playlist.CoverUrl);
+                var result = await fileStorageService.GetFileUrlAsync(FileType.PlaylistCover, playlist.CoverUrl);
+                coverUrl = result.Value;
             }
 
             var playlistDto = new UserPlaylistDto(

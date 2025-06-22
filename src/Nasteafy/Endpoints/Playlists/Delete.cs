@@ -2,7 +2,6 @@
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Playlists.Commands.Delete;
-using Nasteafy.Application.Playlists.Queries.GetByUserId;
 using Nasteafy.Extensions;
 using System.Web.Http;
 
@@ -23,7 +22,7 @@ namespace Nasteafy.Endpoints.Playlists
                 return Results.NoContent();
             })
             .Produces(StatusCodes.Status200OK)
-            .Produces<ApiError>(StatusCodes.Status400BadRequest); 
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

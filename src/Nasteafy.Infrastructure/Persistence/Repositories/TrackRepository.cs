@@ -43,9 +43,14 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         public async Task<PagedResult<Track>> GetByPlaylistIdAsync(Guid playlistId, PagedRequest req, CancellationToken ct)
         {
             var query = _context.PlaylistTracks
-                .AsNoTracking()
-                .Where(x => x.PlaylistId == playlistId)
-                .Select(x => x.Track);
+             .AsNoTracking()
+             .Where(x => x.PlaylistId == playlistId)
+             .Include(x => x.Track)                            
+                 .ThenInclude(t => t.ArtistTracks)             
+                     .ThenInclude(at => at.Artist)  
+              .Include(x => x.Track)
+                .ThenInclude(x => x.Album)
+             .Select(x => x.Track);
 
             return await query.ToPagedResultAsync(req, ct);
         }

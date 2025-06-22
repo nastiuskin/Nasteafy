@@ -6,6 +6,7 @@
         {
             await AdminSeeder.SeedAdminAsync(serviceProvider);
             await RoleSeeder.SeedRolesAsync(serviceProvider);
+            await SubscriptionsSeeder.SeedAsync(serviceProvider);
         }
     }
 }

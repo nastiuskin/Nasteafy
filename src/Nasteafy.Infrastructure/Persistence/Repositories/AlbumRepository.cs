@@ -14,11 +14,11 @@ namespace Nasteafy.Infrastructure.Persistence.Repositories
 
         public async Task<PagedResult<Album>> GetByArtistIdAsync(Guid artistId, PagedRequest request, CancellationToken ct)
         {
-            var query = _context.AlbumArtists
-              .AsNoTracking()
-              .Where(x => x.ArtistId == artistId)
-                .Include(x => x.Artist)
-               .Select(x => x.Album);
+            var query = _context.Albums
+                .AsNoTracking()
+                .Where(album => album.AlbumArtists.Any(aa => aa.ArtistId == artistId))
+                .Include(album => album.AlbumArtists)
+                    .ThenInclude(aa => aa.Artist);
 
             return await query.ToPagedResultAsync(request, ct);
         }

@@ -33,17 +33,16 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             return await _dbSet.CountAsync(ct);
         }
 
-        public async Task DeleteAsync(Guid id, CancellationToken ct)
+        public async Task DeleteAsync(T entity, CancellationToken ct)
         {
-            var entity = await GetByIdAsync(id, ct);
             if (entity != null)
-                _dbSet.Remove(entity);
+                 _dbSet.Remove(entity);
         }
 
         public async Task<bool> ExistsAsync(Guid id, CancellationToken ct)
         {
             return await _dbSet.AnyAsync(x => x.Id == id);
-        }
+        }   
 
         public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
         {

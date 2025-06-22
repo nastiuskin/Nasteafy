@@ -6,10 +6,10 @@ using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Users.Queries.GetById;
 
-public record GetUserProfileQuery : IRequest<Result<GetUserReponse?>>;
+public record GetUserProfileQuery : IRequest<Result<GetUserResponse?>>;
 
 public class GetUserProfileQueryHandler
-    : IRequestHandler<GetUserProfileQuery, Result<GetUserReponse?>>
+    : IRequestHandler<GetUserProfileQuery, Result<GetUserResponse?>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IFileStorageService _fileStorageService;
@@ -23,13 +23,13 @@ public class GetUserProfileQueryHandler
         _fileStorageService = fileStorage;
         _userIdProvider = userIdProvider;
     }
-    public async Task<Result<GetUserReponse?>> Handle(GetUserProfileQuery request, CancellationToken ct)
+    public async Task<Result<GetUserResponse?>> Handle(GetUserProfileQuery request, CancellationToken ct)
     {
         var userId = _userIdProvider.GetUserId();
         if (userId is null || userId == Guid.Empty)
             return Result.Fail("UserId not found");
 
-        var user = await _unitOfWork.Users.GetByIdAsync(userId.Value, ct);
+        var user = await _unitOfWork.Users.GetWithSubscriptionsAsync(userId.Value, ct);
         if (user is null)
             return Result.Fail("User not found");
 
@@ -43,10 +43,16 @@ public class GetUserProfileQueryHandler
             avatarUrl = result.Value;
         }
 
-        return new GetUserReponse(
+        var subscription = user.UserSubscriptions
+            .Where(x => x.EndDate > DateTime.UtcNow)
+            .Select(x => x.Subscription)
+            .FirstOrDefault();
+
+        return new GetUserResponse(
             user.Email!,
             user.UserName!,
-            avatarUrl
+            avatarUrl,
+            subscription?.Type
         );
     }
 }

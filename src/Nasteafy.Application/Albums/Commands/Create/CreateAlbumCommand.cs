@@ -8,7 +8,10 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Albums.Commands.Create
 {
-    public record CreateAlbumCommand(string Title, IFormFile? CoverFile, DateTime ReleaseDate, List<Guid> Artists) : IRequest<Result<Guid>>;
+    public record CreateAlbumCommand(string Title,
+        IFormFile? CoverFile,
+        DateTime ReleaseDate,
+        List<Guid> Artists) : IRequest<Result<Guid>>;
 
     public class CreateAlbumCommandHandler(IUnitOfWork unitOfWork,
          IFileStorageService fileStorageService)
@@ -44,7 +47,7 @@ namespace Nasteafy.Application.Albums.Commands.Create
             {
                 Id = albumId,
                 Title = request.Title,
-                ReleaseDate = request.ReleaseDate,
+                ReleaseDate = request.ReleaseDate.ToUniversalTime(),
                 CoverUrl = coverUrl,
                 AlbumArtists = artistIds.Select(artistId => new AlbumArtist
                 {

@@ -7,7 +7,7 @@ using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Users.Commands.Update
 {
-    public record UpdateProfileCommand(string? Email, string? UserName, IFormFile? AvatarFile) : IRequest<Result>;
+    public record UpdateProfileCommand(string Email, string UserName, IFormFile AvatarFile) : IRequest<Result>;
 
     public class UpdateProfileCommandHandler : IRequestHandler<UpdateProfileCommand, Result>
     {
@@ -50,11 +50,10 @@ namespace Nasteafy.Application.Users.Commands.Update
                     request.AvatarFile.ContentType,
                     FileType.UserAvatar);
 
-                user.AvatarUrl = result.Value;
-
-                await _unitOfWork.Users.UpdateAsync(user, ct);
+                user.AvatarUrl = result.IsSuccess ? result.Value : null;
             }
 
+            await _unitOfWork.Users.UpdateAsync(user, ct);
             await _unitOfWork.SaveChangesAsync(ct);
             return Result.Ok();
         }

@@ -12,6 +12,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         public async Task<UserSubscription?> GetActiveSubscriptionAsync(Guid userId, CancellationToken ct)
         {
             return await _context.Set<UserSubscription>()
+                .Include(x => x.Subscription)
                 .FirstOrDefaultAsync(us => us.UserId == userId && us.EndDate > DateTime.UtcNow, ct);
         }
 

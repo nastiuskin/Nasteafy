@@ -40,9 +40,9 @@ namespace Nasteafy.Application.Playlists.Commands.Update
                     FileType.PlaylistCover);
 
                 playlist.CoverUrl = result.Value;
-
-                await _unitOfWork.Playlists.UpdateAsync(playlist, ct);
             }
+
+            await _unitOfWork.Playlists.UpdateAsync(playlist, ct);
 
             await _unitOfWork.SaveChangesAsync(ct);
             return Result.Ok();

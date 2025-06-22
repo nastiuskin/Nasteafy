@@ -5,20 +5,12 @@ namespace Nasteafy.Application.Subscriptions.Queries.GetById
 {
     public class GetByIdSubscriptionQueryValidator : AbstractValidator<GetSubscriptionByIdQuery>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
         public GetByIdSubscriptionQueryValidator(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
-
             RuleFor(x => x.SubscriptionId)
                .NotEmpty().WithMessage("Subscription Id should not be empty.")
-               .MustAsync(SubscriptionExists)
+               .MustAsync(unitOfWork.Subscriptions.ExistsAsync)
                .WithMessage("Subscription with given Id does not exist.");
-        }
-        private async Task<bool> SubscriptionExists(Guid subscriptionId, CancellationToken ct)
-        {
-            return await _unitOfWork.Subscriptions.ExistsAsync(subscriptionId, ct);
         }
     }
 }

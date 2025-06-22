@@ -22,7 +22,8 @@ namespace Nasteafy.Endpoints.Users
 
                 return Results.Ok();
             })
-            //.Accepts<IFormFile>("multipart/form-data")
+            .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
             .Produces(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }

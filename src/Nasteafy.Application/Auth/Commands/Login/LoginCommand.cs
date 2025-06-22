@@ -11,7 +11,7 @@ namespace Nasteafy.Application.Auth.Commands.Login
     {
         public async Task<Result<AuthResponse>> Handle(LoginCommand request, CancellationToken ct)
         {
-            return await authenticationService.PasswordSignInAsync(request.Email, request.Password);
+            return await authenticationService.PasswordSignInAsync(request.Email, request.Password, ct);
         }
     }
 }

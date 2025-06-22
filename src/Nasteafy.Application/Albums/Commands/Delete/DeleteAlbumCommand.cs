@@ -22,7 +22,7 @@ namespace Nasteafy.Application.Albums.Commands.Delete
             if (!string.IsNullOrEmpty(album.CoverUrl))
                 await fileStorageService.DeleteFileAsync(FileType.AlbumCover, album.CoverUrl);
 
-            await unitOfWork.Playlists.DeleteAsync(request.AlbumId, ct);
+            await unitOfWork.Albums.DeleteAsync(album, ct);
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();

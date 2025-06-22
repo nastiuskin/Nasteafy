@@ -24,11 +24,10 @@ namespace Nasteafy.Infrastructure.Database.Repositories
              .Where(a => ids.Contains(a.Id));
         }
 
-        public async Task<PagedResult<Artist>> GetAllArtistsIncludeUsers(PagedRequest request, CancellationToken ct)
+        public async Task<PagedResult<Artist>> GetAllArtists(PagedRequest request, CancellationToken ct)
         {
             var query = _context.Artists
-                .AsNoTracking()
-                    .Include(x => x.User);
+                .AsNoTracking();
 
             return await query.ToPagedResultAsync(request, ct);
         }

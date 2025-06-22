@@ -20,15 +20,7 @@ namespace Nasteafy.Endpoints.Auth
                 if (!result.IsSuccess)
                     return result.ToApiError();
 
-                response.Cookies.Append("refreshToken", result.Value.RefreshToken!, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                });
-
-                return Results.Ok(result.Value.AccessToken);
+                return Results.Ok(result.Value);
             })
             .Produces<string>(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nasteafy.Domain.Entities.Tracks;
-using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Persistence.Constants;
 
 namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
@@ -18,10 +17,17 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
                 .HasMaxLength(100)
                 .IsRequired();
 
+            builder.Property(x => x.AvatarUrl)
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            builder.Property(x => x.CreatedByAdmin)
+                .HasDefaultValue(false);
+
             builder.HasOne(a => a.User)
             .WithOne()
             .HasForeignKey<Artist>(a => a.UserId)
-            .OnDelete(DeleteBehavior.Cascade); //maybe restrict
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

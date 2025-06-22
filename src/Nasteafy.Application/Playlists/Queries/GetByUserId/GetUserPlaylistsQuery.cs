@@ -34,7 +34,7 @@ namespace Nasteafy.Application.Playlists.Queries.GetByUserId
                 playlistDtos.Add(new UserPlaylistDto(
                     p.Id,
                     p.Title,
-                    coverUrl,
+                    coverUrl?.Value,
                     p.PlaylistTracks.Count));
             }
 

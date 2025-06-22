@@ -12,6 +12,7 @@ using Nasteafy.Infrastructure.Database.Repositories;
 using Nasteafy.Infrastructure.Options;
 using Nasteafy.Infrastructure.Persistence.Contexts;
 using Nasteafy.Infrastructure.Persistence.DataSeed;
+using Nasteafy.Infrastructure.Persistence.Repositories;
 using Nasteafy.Infrastructure.Services;
 
 namespace Nasteafy.Persistence.Database.Extensions
@@ -82,6 +83,7 @@ namespace Nasteafy.Persistence.Database.Extensions
             services.AddScoped<IPlaylistRepository, PlaylistRepository>();
             services.AddScoped<IArtistRepository, ArtistRepository>();
             services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+            services.AddScoped<IAlbumRepository, AlbumRepository>();
 
             return services;
         }

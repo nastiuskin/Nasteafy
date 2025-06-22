@@ -8,12 +8,20 @@ namespace Nasteafy.Endpoints.Auth
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/auth/logout", async (ISender sender, CancellationToken ct) =>
+            routes.MapPost("api/auth/logout", async (ISender sender, HttpResponse http, CancellationToken ct) =>
             {
                 var response = await sender.Send(new LogoutCommand(), ct);
 
                 if (!response.IsSuccess)
                     return Results.BadRequest(response.Reasons.First().Message);
+
+                http.Cookies.Delete("refreshToken", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Path = "/", 
+                });
 
                 return Results.Ok();
             });

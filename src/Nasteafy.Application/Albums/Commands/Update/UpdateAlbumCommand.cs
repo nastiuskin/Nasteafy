@@ -23,14 +23,14 @@ namespace Nasteafy.Application.Albums.Commands.Update
 
         public async Task<Result> Handle(UpdateAlbumCommand request, CancellationToken ct)
         {
-            var playlist = await _unitOfWork.Albums
+            var album = await _unitOfWork.Albums
                 .GetByIdAsync(request.AlbumId, ct);
 
-            if (playlist == null) 
+            if (album == null) 
                 return Result.Fail("Album not found");
 
             if (!string.IsNullOrWhiteSpace(request.Title))
-                playlist.Title = request.Title;
+                album.Title = request.Title;
 
             if (request.CoverFile != null || request?.CoverFile?.Length > 0)
             {
@@ -42,15 +42,13 @@ namespace Nasteafy.Application.Albums.Commands.Update
                     request.CoverFile.ContentType,
                     FileType.PlaylistCover);
 
-                playlist.CoverUrl = result.Value;
-
-                await _unitOfWork.Playlists.UpdateAsync(playlist, ct);
+                album.CoverUrl = result.Value;
             }
 
+            await _unitOfWork.Albums.UpdateAsync(album, ct);
             await _unitOfWork.SaveChangesAsync(ct);
             return Result.Ok();
         }
     }
 }
 
-}

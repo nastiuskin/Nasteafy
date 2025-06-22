@@ -258,12 +258,21 @@ namespace Nasteafy.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("CreatedByAdmin")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -326,12 +335,13 @@ namespace Nasteafy.Persistence.Migrations
                     b.Property<Guid?>("AlbumId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CoverUrl")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("interval");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -527,8 +537,7 @@ namespace Nasteafy.Persistence.Migrations
                     b.HasOne("Nasteafy.Domain.Entities.Users.User", "User")
                         .WithOne()
                         .HasForeignKey("Nasteafy.Domain.Entities.Tracks.Artist", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });

@@ -12,16 +12,16 @@ namespace Nasteafy.Endpoints.Playlists
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/playlists", async (ISender sender, CancellationToken ct) =>
+            routes.MapGet("api/playlists", async (ISender sender, [AsParameters] PagedRequest pagedRequest, CancellationToken ct) =>
             {
-                var result = await sender.Send(new GetUserPlaylistsQuery(), ct);
+                var result = await sender.Send(new GetUserPlaylistsQuery(pagedRequest), ct);
 
                 if (result.IsFailed)
                     return result.ToApiError();
 
                 return Results.Ok(result.Value);
             })
-            .Produces<GetUserPlaylistsResponse>(StatusCodes.Status200OK)
+            .Produces<PagedResult<UserPlaylistDto>>(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }

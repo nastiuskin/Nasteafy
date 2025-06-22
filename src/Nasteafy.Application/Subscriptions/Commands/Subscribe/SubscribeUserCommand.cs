@@ -10,7 +10,6 @@ namespace Nasteafy.Application.Subscriptions.Commands
     public record SubscribeUserCommand(Guid SubscriptionId)
         : IRequest<Result>;
 
-
     public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork, IUserIdProvider userProvider)
         : IRequestHandler<SubscribeUserCommand, Result>
     {
@@ -39,13 +38,19 @@ namespace Nasteafy.Application.Subscriptions.Commands
 
             if (subscription.Type == SubscriptionType.Artist)
             {
-                var artist = new Artist
+                var alreadyArtist = await unitOfWork.Artists.ExistsByUserIdAsync(user!.Id, ct);
+                if (!alreadyArtist)
                 {
-                    UserId = user!.Id,
-                    Name = user!.Email!,
-                    AlbumArtists = [],
-                    ArtistTracks = [],
-                };
+                    var artist = new Artist
+                    {
+                        UserId = user.Id,
+                        Name = user.Email!,
+                        AvatarUrl = user.AvatarUrl,
+                        AlbumArtists = [],
+                        ArtistTracks = [],
+                    };
+                    await unitOfWork.Artists.AddAsync(artist, ct);
+                }
             }
 
             var now = DateTime.UtcNow;

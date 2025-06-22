@@ -19,7 +19,7 @@ public sealed class GetUserProfileEndpoint : IEndpoint
 
             return Results.Ok(result.Value);
         })
-        .Produces<GetUserReponse>(StatusCodes.Status200OK)
+        .Produces<GetUserResponse>(StatusCodes.Status200OK)
         .Produces<ApiError>(StatusCodes.Status400BadRequest);
     }
 }

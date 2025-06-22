@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Auth.Commands.Login;
 using Nasteafy.Application.Common.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Constants;
 using System.Data;
@@ -14,8 +15,8 @@ namespace Nasteafy.Infrastructure.Services
     public class AuthenticationService(
      SignInManager<User> signInManager,
      UserManager<User> userManager,
+     IUnitOfWork unitOfWork,
      IJwtTokenService jwtTokenService,
-     IHttpContextAccessor httpContextAccessor,
      IUserIdProvider userProvider) : IAuthenticationService
     {
         public async Task<Result> LogoutAsync()
@@ -30,12 +31,10 @@ namespace Nasteafy.Infrastructure.Services
             user.RefreshToken = null;
             await userManager.UpdateAsync(user);
 
-            httpContextAccessor.HttpContext?.Response.Cookies.Delete("refreshToken");
-
             return Result.Ok();
         }
 
-        public async Task<Result<AuthResponse>> PasswordSignInAsync(string email, string password)
+        public async Task<Result<AuthResponse>> PasswordSignInAsync(string email, string password, CancellationToken ct)
         {
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
@@ -47,10 +46,14 @@ namespace Nasteafy.Infrastructure.Services
 
             var roles = await userManager.GetRolesAsync(user);
 
+            var subscription = await unitOfWork.Subscriptions
+                .GetActiveSubscriptionAsync(user.Id, ct);
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimsConstants.UserId, user.Id.ToString()),
                 new Claim(ClaimsConstants.Email, user.Email ?? string.Empty),
+                new Claim(ClaimsConstants.SubscriptionType, subscription?.Subscription?.Type.Name ?? string.Empty)
             };
             foreach (var role in roles)
             {
@@ -66,7 +69,7 @@ namespace Nasteafy.Infrastructure.Services
             return Result.Ok(new AuthResponse(accessToken, refreshToken.Token));
         }
 
-        public async Task<Result<AuthResponse>> RefreshTokenAsync(string refreshToken)
+        public async Task<Result<string>> RefreshTokenAsync(string refreshToken, CancellationToken ct)
         {
             var user = await userManager.Users
                 .FirstOrDefaultAsync(u => u.RefreshToken != null && u.RefreshToken.Token == refreshToken);
@@ -79,10 +82,14 @@ namespace Nasteafy.Infrastructure.Services
 
             var roles = await userManager.GetRolesAsync(user);
 
+            var subscription = await unitOfWork.Subscriptions
+             .GetActiveSubscriptionAsync(user.Id, ct);
+
             var claims = new List<Claim>
             {
                 new Claim(ClaimsConstants.UserId, user.Id.ToString()),
                 new Claim(ClaimsConstants.Email, user.Email ?? string.Empty),
+                new Claim(ClaimsConstants.SubscriptionType, subscription?.Subscription?.Type.Name ?? string.Empty)
             };
 
             foreach (var role in roles)
@@ -94,17 +101,20 @@ namespace Nasteafy.Infrastructure.Services
 
             await userManager.UpdateAsync(user);
 
-            return Result.Ok(new AuthResponse(newAccessToken, refreshToken));
+            return Result.Ok(newAccessToken);
         }
 
-        public async Task<Result> RegisterAsync(string email, string password)
+        public async Task<Result<Guid>> RegisterAsync(string email, string password)
         {
             var existingUser = await userManager.FindByEmailAsync(email);
             if (existingUser is not null)
                 return Result.Fail("User already exists");
 
+            var userId = Guid.NewGuid();
+
             var user = new User
             {
+                Id = userId,
                 Email = email,
                 UserName = email,
                 Playlists = [],
@@ -119,7 +129,7 @@ namespace Nasteafy.Infrastructure.Services
             if (!roleAssignResult.Succeeded)
                 return Result.Fail(string.Join(", ", roleAssignResult.Errors.Select(e => e.Description)));
 
-            return Result.Ok();
+            return Result.Ok(userId);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Nasteafy.Application.Tracks.Commands.Create
                 Title = request.Title,
                 Duration = request.Duration,
                 FilePath = uploadResult.Value,
-                AlbumId = request.AlbumId,
+                AlbumId = request.AlbumId ?? null,
                 ArtistTracks = artistIds
                     .Select(artist => new ArtistTrack
                     {

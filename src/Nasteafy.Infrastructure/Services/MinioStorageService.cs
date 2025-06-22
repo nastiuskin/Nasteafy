@@ -31,6 +31,9 @@ public class MinioStorageService(
                 await minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
             }
 
+            //TEST
+            Console.WriteLine($"Bucket: {bucketName}, Object: {fullKey}, ContentType: {contentType}, Stream: {stream?.Length}");
+
             await minioClient.PutObjectAsync(new PutObjectArgs()
                 .WithBucket(bucketName)
                 .WithObject(fullKey)
@@ -52,11 +55,11 @@ public class MinioStorageService(
     {
         return fileType switch
         {
-            FileType.Audio => (options.Value.Audio.Name, options.Value.Audio.AllowedExtensions, "audio"),
-            FileType.UserAvatar => (options.Value.Image.Name, options.Value.Image.AllowedExtensions, "avatars"),
-            FileType.TrackCover => (options.Value.Image.Name, options.Value.Image.AllowedExtensions, "tracks"),
-            FileType.PlaylistCover => (options.Value.Image.Name, options.Value.Image.AllowedExtensions, "playlists"),
-            FileType.AlbumCover => (options.Value.Image.Name, options.Value.Image.AllowedExtensions, "albums"),
+            FileType.Audio => (options.Value.Buckets.Audio.Name, options.Value.Buckets.Audio.AllowedExtensions, "audio"),
+            FileType.UserAvatar => (options.Value.Buckets.Image.Name, options.Value.Buckets.Image.AllowedExtensions, "avatars"),
+            FileType.TrackCover => (options.Value.Buckets.Image.Name, options.Value.Buckets.Image.AllowedExtensions, "tracks"),
+            FileType.PlaylistCover => (options.Value.Buckets.Image.Name, options.Value.Buckets.Image.AllowedExtensions, "playlists"),
+            FileType.AlbumCover => (options.Value.Buckets.Image.Name, options.Value.Buckets.Image.AllowedExtensions, "albums"),
             _ => throw new InvalidOperationException($"Unsupported file type: {fileType}")
         };
     }
@@ -66,7 +69,7 @@ public class MinioStorageService(
         if (string.IsNullOrEmpty(objectKey))
             return Result.Fail("Failed to get file");
 
-        var bucketName = type == FileType.Audio ? options.Value.Audio.Name : options.Value.Image.Name;
+        var bucketName = type == FileType.Audio ? options.Value.Buckets.Audio.Name : options.Value.Buckets.Image.Name;
 
         try
         {

@@ -5,9 +5,11 @@ using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Playlists.Queries.GetById;
 using Nasteafy.Application.Playlists.Queries.GetByUserId;
 using Nasteafy.Extensions;
+using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists
 {
+    [Authorize]
     public sealed class GetPlaylistByIdEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)

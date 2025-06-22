@@ -7,10 +7,14 @@ namespace Nasteafy.Extensions
     {
         public static IResult ToApiError(this Result result)
         {
+            var errorMessage = result.Errors.Any()
+                ? string.Join("; ", result.Errors.Select(e => e.Message))
+                : "Unknown error occurred.";
+
             var error = new ApiError
             {
                 StatusCode = StatusCodes.Status400BadRequest,
-                ErrorMessage = string.Join("; ", result.Errors.Select(e => e.Message))
+                ErrorMessage = errorMessage
             };
 
             return Results.Json(error, statusCode: StatusCodes.Status400BadRequest);
@@ -21,15 +25,17 @@ namespace Nasteafy.Extensions
             if (result.IsSuccess && result.Value is not null)
                 return Results.Ok(result.Value);
 
-            var status = result.Value is null ? StatusCodes.Status404NotFound : StatusCodes.Status400BadRequest;
+            var errorMessage = result.Errors.Any()
+                ? string.Join("; ", result.Errors.Select(e => e.Message))
+                : "Unknown error occurred.";
 
             var error = new ApiError
             {
-                StatusCode = status,
-                ErrorMessage = string.Join("; ", result.Errors.Select(e => e.Message))
+                StatusCode = StatusCodes.Status400BadRequest,
+                ErrorMessage = errorMessage
             };
 
-            return Results.Json(error, statusCode: status);
+            return Results.Json(error, statusCode: StatusCodes.Status400BadRequest);
         }
     }   
 }
