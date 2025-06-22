@@ -6,35 +6,33 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Tracks.Commands.AddTrack
 {
-    public record AddTrackToPlaylistCommand(Guid PlaylistId, Guid TrackId) : IRequest<Result>;
+    public record AddTrackToPlaylistCommand(Guid PlaylistId, Guid TrackId)
+        : IRequest<Result>;
 
-    public class AddTrackToPlaylistCommandHandler : IRequestHandler<AddTrackToPlaylistCommand, Result>
+    public class AddTrackToPlaylistCommandHandler(
+        IUnitOfWork unitOfWork,
+        IUserIdProvider userProvider)
+            : IRequestHandler<AddTrackToPlaylistCommand, Result>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IUserIdProvider _userProvider;
-
-        public AddTrackToPlaylistCommandHandler(IUnitOfWork unitOfWork, IUserIdProvider userProvider)
-        {
-            _unitOfWork = unitOfWork;
-            _userProvider = userProvider;
-        }
-
         public async Task<Result> Handle(AddTrackToPlaylistCommand request, CancellationToken ct)
         {
-            var userId = _userProvider.GetUserId();
+            var userId = userProvider.GetUserId();
             if (userId == null || userId == Guid.Empty)
-                return Result.Fail("User not authenticated");
+                return Result.Fail("User not authenticated")
+                    .LogIfFailed<AddTrackToPlaylistCommandHandler>();
 
-            var playlist = await _unitOfWork.Playlists.GetByIdWithTracks(request.PlaylistId, ct);
+            var playlist = await unitOfWork.Playlists.GetByIdWithTracks(request.PlaylistId, ct);
             if (playlist is null)
                 return Result.Fail("Playlist not found");
 
             if (playlist.UserId != userId)
-                return Result.Fail("You do not have permission to modify this playlist");
+                return Result.Fail("You do not have permission to modify this playlist")
+                    .LogIfFailed<AddTrackToPlaylistCommandHandler>();
 
             var alreadyExists = playlist.PlaylistTracks.Any(pt => pt.TrackId == request.TrackId);
             if (alreadyExists)
-                return Result.Fail("Track is already in the playlist");
+                return Result.Fail("Track is already in the playlist")
+                     .LogIfFailed<AddTrackToPlaylistCommandHandler>();
 
             var nextOrder = playlist.PlaylistTracks.Any()
                 ? playlist.PlaylistTracks.Max(pt => pt.Order) + 1
@@ -47,7 +45,7 @@ namespace Nasteafy.Application.Tracks.Commands.AddTrack
                 Order = nextOrder
             });
 
-            await _unitOfWork.SaveChangesAsync(ct);
+            await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();
         }

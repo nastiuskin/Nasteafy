@@ -7,7 +7,7 @@ namespace Nasteafy.Application.Albums.Queries.GetById
 {
     public record GetAlbumByIdQuery(Guid AlbumId) : IRequest<Result<AlbumDto>>;
 
-    public class GetPlaylistByIdQueryHandler(IUnitOfWork unitOfWork,
+    public class GetAlbumByIdQueryHandler(IUnitOfWork unitOfWork,
         IFileStorageService fileStorageService)
        : IRequestHandler<GetAlbumByIdQuery, Result<AlbumDto>>
     {
@@ -20,7 +20,8 @@ namespace Nasteafy.Application.Albums.Queries.GetById
                 x => x.AlbumArtists.Select(at => at.Artist));
 
             if (album is null)
-                return Result.Fail("Album not found");
+                return Result.Fail("Album not found")
+                    .LogIfFailed<GetAlbumByIdQueryHandler>();
 
             string? coverUrl = null;
             if (!string.IsNullOrEmpty(album.CoverUrl))

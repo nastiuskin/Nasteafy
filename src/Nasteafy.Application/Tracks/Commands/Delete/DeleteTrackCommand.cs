@@ -17,7 +17,8 @@ namespace Nasteafy.Application.Tracks.Commands.Delete
                 .GetByIdAsync(request.TrackId, ct);
 
             if (track == null)
-                return Result.Fail("Track not found");
+                return Result.Fail("Track not found")
+                    .LogIfFailed<DeleteTrackCommandHandler>();
 
             if (!string.IsNullOrEmpty(track.FilePath))
                 await fileStorageService.DeleteFileAsync(FileType.Audio, track.FilePath);

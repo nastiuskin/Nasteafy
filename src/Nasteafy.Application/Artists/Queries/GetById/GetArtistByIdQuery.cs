@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Nasteafy.Application.Artists.Commands.Delete;
 using Nasteafy.Application.Artists.Queries.GetAll;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
@@ -18,7 +19,8 @@ namespace Nasteafy.Application.Artists.Queries.GetById
                 .GetByIdAsync(request.ArtistId, ct);
 
             if (artist is null)
-                return Result.Fail("Artist not found.");
+                return Result.Fail("Artist not found.")
+                    .LogIfFailed<GetArtistByIdQueryHandler>(); 
 
             var avatarUrl = !string.IsNullOrEmpty(artist.AvatarUrl)
                     ? await fileStorageService.GetFileUrlAsync(FileType.UserAvatar, artist.AvatarUrl)

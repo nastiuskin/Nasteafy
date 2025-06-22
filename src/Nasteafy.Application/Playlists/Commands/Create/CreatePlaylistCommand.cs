@@ -24,7 +24,8 @@ namespace Nasteafy.Application.Playlists.Commands.Create
             var userId = _userProvider.GetUserId();
 
             if (userId == null || userId == Guid.Empty)
-                return Result.Fail("UserId not found");
+                return Result.Fail("UserId not found")
+                    .LogIfFailed<CreatePlaylistCommandHandler>();
 
             var playlist = new Playlist
             {

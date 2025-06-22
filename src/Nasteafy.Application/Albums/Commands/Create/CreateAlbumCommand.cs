@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Nasteafy.Application.Artists.Commands.Delete;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 using Nasteafy.Domain.Entities.Tracks;
@@ -25,7 +26,8 @@ namespace Nasteafy.Application.Albums.Commands.Create
               .ToListAsync(ct);
 
             if (artistIds.Count != request.Artists.Count)
-                return Result.Fail("Some of the specified artists were not found.");
+                return Result.Fail("Some of the specified artists were not found.")
+                    .LogIfFailed<CreateAlbumCommandHandler>(); 
 
             string? coverUrl = null;
 

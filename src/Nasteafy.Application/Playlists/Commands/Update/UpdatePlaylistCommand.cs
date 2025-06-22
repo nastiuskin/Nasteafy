@@ -24,7 +24,8 @@ namespace Nasteafy.Application.Playlists.Commands.Update
         public async Task<Result> Handle(UpdatePlaylistCommand request, CancellationToken ct)
         {
             var playlist = await _unitOfWork.Playlists.GetByIdAsync(request.PlaylistId, ct);
-            if (playlist == null) return Result.Fail("Playlist not found");
+            if (playlist == null) return Result.Fail("Playlist not found")
+                    .LogIfFailed<UpdatePlaylistCommandHandler>();
 
             if (!string.IsNullOrWhiteSpace(request.Title))
                 playlist.Title = request.Title;

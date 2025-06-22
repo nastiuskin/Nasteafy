@@ -30,7 +30,8 @@ namespace Nasteafy.Application.Tracks.Queries.GetById
 
 
             if (track is null)
-                return Result.Fail("Track not found");
+                return Result.Fail("Track not found")
+                    .LogIfFailed<GetTrackByIdQueryHandler>();
 
             var trackDto = new GetTrackDto(
                  track.Id,

@@ -22,18 +22,21 @@ namespace Nasteafy.Application.Tracks.Commands.RemoveFromPlaylist
         {
             var userId = _userProvider.GetUserId();
             if (userId == null || userId == Guid.Empty)
-                return Result.Fail("User not authenticated");
+                return Result.Fail("User not authenticated")
+                    .LogIfFailed<RemoveTrackFromPlaylistCommandHandler>();
 
             var playlist = await _unitOfWork.Playlists.GetByIdWithTracks(request.PlaylistId, ct);
             if (playlist is null)
                 return Result.Fail("Playlist not found");
 
             if (playlist.UserId != userId)
-                return Result.Fail("You do not have permission to modify this playlist");
+                return Result.Fail("You do not have permission to modify this playlist")
+                    .LogIfFailed<RemoveTrackFromPlaylistCommandHandler>();
 
             var track = playlist.PlaylistTracks.FirstOrDefault(pt => pt.TrackId == request.TrackId);
             if (track is null)
-                return Result.Fail("Track is not in the playlist");
+                return Result.Fail("Track is not in the playlist")
+                    .LogIfFailed<RemoveTrackFromPlaylistCommandHandler>();
 
             playlist.PlaylistTracks.Remove(track);
 

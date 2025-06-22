@@ -14,6 +14,7 @@ namespace Nasteafy.Application.Extensions
             {
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+                cfg.AddOpenBehavior(typeof(ResultFailureLoggingBehavior<,>));
             });
 
             services.AddValidatorsFromAssembly(assembly);

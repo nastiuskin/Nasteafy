@@ -1,6 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Nasteafy.Application.Artists.Commands.Delete;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 
@@ -27,7 +28,8 @@ namespace Nasteafy.Application.Albums.Commands.Update
                 .GetByIdAsync(request.AlbumId, ct);
 
             if (album == null) 
-                return Result.Fail("Album not found");
+                return Result.Fail("Album not found")
+                    .LogIfFailed<UpdateAlbumCommandHandler>();
 
             if (!string.IsNullOrWhiteSpace(request.Title))
                 album.Title = request.Title;

@@ -8,43 +8,40 @@ namespace Nasteafy.Application.Users.Queries.GetById;
 
 public record GetUserProfileQuery : IRequest<Result<GetUserResponse?>>;
 
-public class GetUserProfileQueryHandler
-    : IRequestHandler<GetUserProfileQuery, Result<GetUserResponse?>>
+public class GetUserProfileQueryHandler(
+    IUnitOfWork unitOfWork,
+    IFileStorageService fileStorageService,
+    IUserIdProvider userIdProvider)
+        : IRequestHandler<GetUserProfileQuery, Result<GetUserResponse?>>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IFileStorageService _fileStorageService;
-    private readonly IUserIdProvider _userIdProvider;
-
-    public GetUserProfileQueryHandler(IUnitOfWork unitOfWork,
-        IFileStorageService fileStorage,
-        IUserIdProvider userIdProvider)
-    {
-        _unitOfWork = unitOfWork;
-        _fileStorageService = fileStorage;
-        _userIdProvider = userIdProvider;
-    }
     public async Task<Result<GetUserResponse?>> Handle(GetUserProfileQuery request, CancellationToken ct)
     {
-        var userId = _userIdProvider.GetUserId();
+        var userId = userIdProvider.GetUserId();
         if (userId is null || userId == Guid.Empty)
-            return Result.Fail("UserId not found");
+        {
+            return Result.Fail("UserId not found")
+                .LogIfFailed<GetUserProfileQuery>();
+        }
 
-        var user = await _unitOfWork.Users.GetWithSubscriptionsAsync(userId.Value, ct);
+        var user = await unitOfWork.Users.GetByIdWithSubscriptionsAsync(userId.Value, ct);
         if (user is null)
-            return Result.Fail("User not found");
+        {
+            return Result.Fail("User not found")
+                 .LogIfFailed<GetUserProfileQuery>();
+        }
 
         string? avatarUrl = null;
 
         if (!string.IsNullOrEmpty(user.AvatarUrl))
         {
-            var result = await _fileStorageService.GetFileUrlAsync(FileType.UserAvatar,
+            var result = await fileStorageService.GetFileUrlAsync(FileType.UserAvatar,
                 objectKey: user.AvatarUrl);
 
-            avatarUrl = result.Value;
+            avatarUrl = result.IsSuccess ? result.Value : null;
         }
 
         var subscription = user.UserSubscriptions
-            .Where(x => x.EndDate > DateTime.UtcNow)
+            .Where(x => x.EndDate >= DateTime.UtcNow)
             .Select(x => x.Subscription)
             .FirstOrDefault();
 

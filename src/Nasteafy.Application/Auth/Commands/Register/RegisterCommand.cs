@@ -22,7 +22,8 @@ namespace Nasteafy.Application.Auth.Commands.Register
 
             var user = await unitOfWork.Users.GetByIdAsync(registerResult.Value, ct);
             if (user is null)
-                return Result.Fail("User not found.");
+                return Result.Fail("User not found.")
+                    .LogIfFailed<RegisterCommandHandler>();
 
             var subscription = await unitOfWork.Subscriptions.GetByTypeAsync(SubscriptionType.Free, ct);
             if (subscription != null)

@@ -37,5 +37,19 @@ namespace Nasteafy.Extensions
 
             return Results.Json(error, statusCode: StatusCodes.Status400BadRequest);
         }
-    }   
+
+        public static Result LogError(this Result result, ILogger logger)
+        {
+            if (result.IsFailed)
+            {
+                var message = result.Errors.Any()
+                    ? string.Join("; ", result.Errors.Select(e => e.Message))
+                    : "Unknown failure";
+
+                logger.LogError("Result failed: {Error}", message);
+            }
+
+            return result;
+        }
+    }
 }

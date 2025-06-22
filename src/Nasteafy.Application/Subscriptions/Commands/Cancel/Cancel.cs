@@ -2,6 +2,7 @@
 using MediatR;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Tracks.Commands.AddTrack;
 
 namespace Nasteafy.Application.Subscriptions.Commands.Cancel
 {
@@ -17,7 +18,8 @@ namespace Nasteafy.Application.Subscriptions.Commands.Cancel
             var userId = userProvider.GetUserId();
 
             if (userId == null  || userId == Guid.Empty)
-                return Result.Fail("UserId not found");
+                return Result.Fail("UserId not found")
+                     .LogIfFailed<CancelSubscriptionCommandHandler>(); 
 
             ///await unitOfWork.Subscriptions.CancelActiveSubscriptionAsync(userId.Value, ct);
             await unitOfWork.SaveChangesAsync(ct);

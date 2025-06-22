@@ -18,10 +18,11 @@ namespace Nasteafy.Application.Subscriptions.Commands
             var userId = userProvider.GetUserId();
 
             if (userId == null  || userId == Guid.Empty)
-                return Result.Fail("UserId not found");
+                return Result.Fail("UserId not found")
+                    .LogIfFailed<SubscribeUserCommandHandler>();
 
             var user = await unitOfWork.Users
-                .GetWithSubscriptionsAsync(userId.Value, ct);
+                .GetByIdWithSubscriptionsAsync(userId.Value, ct);
 
             var subscription = await unitOfWork.Subscriptions.GetByIdAsync(command.SubscriptionId, ct);
 
@@ -32,7 +33,8 @@ namespace Nasteafy.Application.Subscriptions.Commands
 
                 if (alreadyActivated)
                 {
-                    return Result.Fail("Trial subscription can be activated only once.");
+                    return Result.Fail("Trial subscription can be activated only once.")
+                        .LogIfFailed<SubscribeUserCommandHandler>();
                 }
             }
 

@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Nasteafy.Application.Artists.Commands.Delete;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 
@@ -17,7 +18,8 @@ namespace Nasteafy.Application.Albums.Commands.Delete
                 .GetByIdAsync(request.AlbumId, ct);
 
             if (album == null)
-                return Result.Fail("Album not found");
+                return Result.Fail("Album not found")
+                    .LogIfFailed<DeletePlaylistCommandHandler>();
 
             if (!string.IsNullOrEmpty(album.CoverUrl))
                 await fileStorageService.DeleteFileAsync(FileType.AlbumCover, album.CoverUrl);

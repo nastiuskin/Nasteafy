@@ -17,7 +17,8 @@ namespace Nasteafy.Application.Playlists.Queries.GetById
             var playlist = await unitOfWork.Playlists.GetByIdWithTracks(req.PlaylistId, ct);
 
             if (playlist is null)
-                return Result.Fail("Playlist not found");
+                return Result.Fail("Playlist not found")
+                    .LogIfFailed<GetPlaylistByIdQueryHandler>();
 
             string? coverUrl = null;
             if (!string.IsNullOrEmpty(playlist.CoverUrl))

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,8 +39,7 @@ namespace Nasteafy.Persistence.Database.Extensions
 
         private static IServiceCollection AddIdentity(this IServiceCollection services)
         {
-            services
-                .AddIdentity<User, IdentityRole<Guid>>(options =>
+            services.AddIdentity<User, IdentityRole<Guid>>(options =>
                 {
                     options.Password.RequiredLength = 8;
                     options.Password.RequireDigit = false;
@@ -94,7 +94,7 @@ namespace Nasteafy.Persistence.Database.Extensions
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUserIdProvider, UserIdProvider>();
             services.AddScoped<IFileStorageService, MinioStorageService>();
-
+            services.AddScoped<IResultLogger, ResultLogger>();
             return services;
         }
     }

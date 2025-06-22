@@ -9,7 +9,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
     {
         public UserRepository(DatabaseContext context) : base(context) { }
 
-        public async Task<User?> GetWithSubscriptionsAsync(Guid userId, CancellationToken ct = default)
+        public async Task<User?> GetByIdWithSubscriptionsAsync(Guid userId, CancellationToken ct = default)
         {
             return await _context.Users
                 .AsNoTracking()

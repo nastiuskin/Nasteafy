@@ -20,13 +20,15 @@ namespace Nasteafy.Application.Artists.Commands.Delete
                 );
 
             if (artist is null)
-                return Result.Fail("Artist not found.");
+                return Result.Fail("Artist not found.")
+                    .LogIfFailed<DeleteArtistCommandHandler>();
 
             bool hasTracks = artist.ArtistTracks.Any();
             bool hasAlbums = artist.AlbumArtists.Any();
 
             if (hasTracks || hasAlbums)
-                return Result.Fail("Cannot delete artist with associated tracks or albums.");
+                return Result.Fail("Cannot delete artist with associated tracks or albums.")
+                    .LogIfFailed<DeleteArtistCommandHandler>();
 
             await unitOfWork.Artists.DeleteAsync(artist, ct);
             await unitOfWork.SaveChangesAsync(ct);

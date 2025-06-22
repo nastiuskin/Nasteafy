@@ -17,7 +17,8 @@ namespace Nasteafy.Application.Playlists.Commands.Delete
                 .GetByIdAsync(request.PlaylistId, ct);
 
             if (playlist == null)
-                return Result.Fail("Playlist not found");
+                return Result.Fail("Playlist not found")
+                    .LogIfFailed<DeletePlaylistCommandHandler>();
 
             if (!string.IsNullOrEmpty(playlist.CoverUrl))
                 await fileStorageService.DeleteFileAsync(FileType.PlaylistCover, playlist.CoverUrl);
