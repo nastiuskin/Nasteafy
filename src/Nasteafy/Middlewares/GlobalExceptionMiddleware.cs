@@ -25,10 +25,12 @@ namespace Nasteafy.Application.Exceptions
             {
                 _logger.LogError(ex, "Validation errors occurred.");
 
-                var message = string.Join("; ", ex.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+                var firstError = ex.Errors.FirstOrDefault();
+                var message = firstError is null
+                    ? "Validation failed"
+                    : $"{firstError.ErrorMessage}";
 
-                await WriteApiErrorAsync(context,StatusCodes.Status400BadRequest,
-                    $"Validation failed: {message}");
+                await WriteApiErrorAsync(context,StatusCodes.Status400BadRequest, $"{message}");
             }
             catch (Exception ex)
             {

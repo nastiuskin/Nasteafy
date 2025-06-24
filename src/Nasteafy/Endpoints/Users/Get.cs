@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Users.Queries.GetById;
@@ -7,7 +8,6 @@ using System.Web.Http;
 
 public sealed class GetUserProfileEndpoint : IEndpoint
 {
-    [Authorize]
     public void MapEndpoint(IEndpointRouteBuilder routes)
     {
         routes.MapGet("api/users/profile", async (ISender sender, CancellationToken ct) =>
@@ -19,6 +19,7 @@ public sealed class GetUserProfileEndpoint : IEndpoint
 
             return Results.Ok(result.Value);
         })
+        .RequireAuthorization()
         .Produces<GetUserResponse>(StatusCodes.Status200OK)
         .Produces<ApiError>(StatusCodes.Status400BadRequest);
     }

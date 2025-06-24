@@ -7,7 +7,6 @@ using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Artists
 {
-    // [Authorize(Roles = "Admin")]
     public sealed class CreatArtistEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
@@ -21,6 +20,7 @@ namespace Nasteafy.Endpoints.Artists
 
                 return Results.Ok(result.Value);
             })
+            .RequireAuthorization("AdminOnly")
             .DisableAntiforgery()
             .Produces<Guid>(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);

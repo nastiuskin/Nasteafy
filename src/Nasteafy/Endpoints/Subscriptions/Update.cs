@@ -3,13 +3,11 @@ using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Subscriptions.Commands.Update;
 using Nasteafy.Extensions;
-using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Subscriptions
 {
     public sealed class UpdateSubscriptionEndpoint : IEndpoint
     {
-        [Authorize(Roles = "Admin")]
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
             routes.MapPut("api/subscriptions", async (UpdateSubscriptionCommand req, ISender sender, CancellationToken ct) =>
@@ -21,8 +19,9 @@ namespace Nasteafy.Endpoints.Subscriptions
 
                 return Results.Ok();
             })
+            .RequireAuthorization("AdminOnly")
             .Produces(StatusCodes.Status200OK)
-            .Produces<ApiError>(StatusCodes.Status400BadRequest); 
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

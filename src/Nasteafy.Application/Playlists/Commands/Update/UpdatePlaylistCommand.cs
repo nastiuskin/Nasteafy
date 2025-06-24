@@ -30,7 +30,7 @@ namespace Nasteafy.Application.Playlists.Commands.Update
             if (!string.IsNullOrWhiteSpace(request.Title))
                 playlist.Title = request.Title;
 
-            if (request.CoverFile != null || request?.CoverFile?.Length > 0)
+            if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {
                 await using var stream = request.CoverFile.OpenReadStream();
 

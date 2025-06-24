@@ -7,7 +7,6 @@ using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists
 {
-    [Authorize]
     public sealed class DeletePlaylistEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
@@ -21,6 +20,7 @@ namespace Nasteafy.Endpoints.Playlists
 
                 return Results.NoContent();
             })
+            .RequireAuthorization()
             .Produces(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }

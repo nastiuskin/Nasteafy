@@ -13,9 +13,15 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
-    loggerConfiguration.WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter());
-    //loggerConfiguration.WriteTo.Console();
+    //loggerConfiguration.WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter());
+    loggerConfiguration.WriteTo.Console();
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
 });
 
 // Add application also
@@ -33,13 +39,6 @@ builder.Services.AddAntiforgery();
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers();
 //builder.Services.AddAntiforgery();
-
-var logger = builder.Services.BuildServiceProvider().GetRequiredService<IResultLogger>();
-
-Result.Setup(settings =>
-{
-    settings.Logger = logger;
-});
 
 builder.Services.AddCors(options =>
 {
@@ -66,15 +65,21 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 }
 
+//var logger = app.Services.GetRequiredService<IResultLogger>();
+//Result.Setup(settings =>
+//{
+//    settings.Logger = logger;
+//});
+
 app.UseCors();
 
-app.UseAuthentication();
-app.UseAntiforgery();
-app.UseAuthorization();
-//app.UseAntiforgery();
-app.UseDbTransaction();
-app.UseGlobalExceptionHandling();
+app.UseGlobalExceptionHandling(); 
 app.UseRequestTimingMiddleware();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseDbTransaction();
+
+app.UseFluentResultsLogger();
 
 await app.RunAsync();
 

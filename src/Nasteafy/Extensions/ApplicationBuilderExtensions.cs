@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Nasteafy.Abstractions;
-using Nasteafy.Infrastructure.Database;
 using Nasteafy.Infrastructure.Persistence.Contexts;
 
 namespace Nasteafy.Extensions
@@ -29,6 +28,6 @@ namespace Nasteafy.Extensions
 
             using DatabaseContext dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             dbContext.Database.Migrate();
-        }   
+        }
     }
 }

@@ -9,7 +9,6 @@ using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists
 {
-    [Authorize]
     public sealed class GetPlaylistByIdEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
@@ -23,6 +22,7 @@ namespace Nasteafy.Endpoints.Playlists
 
                 return Results.Ok(response.Value);
             })
+            .RequireAuthorization()
             .Produces<UserPlaylistDto>(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }

@@ -1,5 +1,4 @@
 ﻿using FluentResults;
-using Google.Api;
 using Microsoft.Extensions.Logging;
 
 public class ResultLogger : IResultLogger
@@ -20,7 +19,6 @@ public class ResultLogger : IResultLogger
 
     public void Log<TContext>(string content, ResultBase result, LogLevel logLevel)
     {
-        var contextName = typeof(TContext).Name;
         var logger = _loggerFactory.CreateLogger(typeof(TContext));
         var reasons = string.Join("; ", result.Reasons.Select(r => r.Message));
         logger.Log(logLevel,

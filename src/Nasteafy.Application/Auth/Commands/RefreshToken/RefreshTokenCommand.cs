@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using MediatR;
-using Nasteafy.Application.Auth.Commands.Login;
 using Nasteafy.Application.Common.Abstractions.Auth;
 
 namespace Nasteafy.Application.Auth.Commands.RefreshToken
@@ -13,6 +12,6 @@ namespace Nasteafy.Application.Auth.Commands.RefreshToken
         public async Task<Result<string>> Handle(RefreshTokenCommand request, CancellationToken ct)
         {
             return await authService.RefreshTokenAsync(request.RefreshToken, ct);
-        }   
+        }
     }
 }

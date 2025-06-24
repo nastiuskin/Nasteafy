@@ -8,7 +8,6 @@ using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists
 {
-    [Authorize]
     public sealed class UpdatePlaylistEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
@@ -23,10 +22,11 @@ namespace Nasteafy.Endpoints.Playlists
 
                 return Results.Ok();
             })
-            // .Accepts<IFormFile>("multipart/form-data")
+            .RequireAuthorization()
+            .Accepts<IFormFile>("multipart/form-data")
             .Produces(StatusCodes.Status200OK)
-            .Produces<ApiError>(StatusCodes.Status400BadRequest);
-            //.DisableAntiforgery();
+            .Produces<ApiError>(StatusCodes.Status400BadRequest)
+            .DisableAntiforgery();
         }
     }
 }

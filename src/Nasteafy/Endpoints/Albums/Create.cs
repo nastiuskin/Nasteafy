@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Albums.Commands.Create;
@@ -20,6 +21,7 @@ namespace Nasteafy.Endpoints.Albums
 
                 return Results.Ok(result.Value);
             })
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin,Artist" })
             .Accepts<IFormFile>("multipart/form-data")
             .DisableAntiforgery()
             .Produces<Guid>(StatusCodes.Status200OK)

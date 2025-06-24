@@ -19,6 +19,7 @@ namespace Nasteafy.Endpoints.Playlists
 
                 return Results.Ok(result.Value);
             })
+            .RequireAuthorization()
             .Produces<Guid>(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }

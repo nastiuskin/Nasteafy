@@ -15,5 +15,4 @@ namespace Nasteafy.Application.Albums.Commands.Delete
                 .WithMessage("Album does not exist.");
         }
     }
-
 }

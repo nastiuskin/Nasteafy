@@ -21,6 +21,7 @@ namespace Nasteafy.Endpoints.Artists
 
                 return Results.NoContent();
             })
+            .RequireAuthorization("AdminOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }

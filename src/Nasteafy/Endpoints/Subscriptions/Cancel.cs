@@ -2,15 +2,12 @@
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Subscriptions.Commands.Cancel;
-using Nasteafy.Application.Subscriptions.Queries.GetAll;
 using Nasteafy.Extensions;
-using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Subscriptions
 {
     public sealed class CancelSubscriptionEndpoint : IEndpoint
     {
-        [Authorize]
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
             routes.MapPost("api/subscriptions/cancel", async (ISender sender, CancellationToken ct) =>
@@ -23,7 +20,7 @@ namespace Nasteafy.Endpoints.Subscriptions
                 return Results.Ok();
             })
             .Produces(StatusCodes.Status200OK)
-            .Produces<ApiError>(StatusCodes.Status400BadRequest); 
+            .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }
     }
 }

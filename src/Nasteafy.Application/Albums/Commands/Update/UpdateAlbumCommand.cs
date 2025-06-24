@@ -34,7 +34,7 @@ namespace Nasteafy.Application.Albums.Commands.Update
             if (!string.IsNullOrWhiteSpace(request.Title))
                 album.Title = request.Title;
 
-            if (request.CoverFile != null || request?.CoverFile?.Length > 0)
+            if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {
                 await using var stream = request.CoverFile.OpenReadStream();
 
@@ -42,7 +42,7 @@ namespace Nasteafy.Application.Albums.Commands.Update
                     stream,
                     request.CoverFile.FileName,
                     request.CoverFile.ContentType,
-                    FileType.PlaylistCover);
+                    FileType.AlbumCover);
 
                 album.CoverUrl = result.Value;
             }

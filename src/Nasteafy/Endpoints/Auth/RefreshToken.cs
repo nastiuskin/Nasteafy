@@ -12,8 +12,9 @@ namespace Nasteafy.Endpoints.Auth
         {
             routes.MapPost("api/auth/refresh", async (HttpResponse response, HttpRequest request, ISender sender, CancellationToken ct) =>
             {
-                if (!request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
-                    return Results.Unauthorized();
+                if (!request.Cookies.TryGetValue("refreshToken", out var refreshToken) 
+                    || string.IsNullOrWhiteSpace(refreshToken))
+                        return Results.Unauthorized();
 
                 var result = await sender.Send(new RefreshTokenCommand(refreshToken), ct);
 

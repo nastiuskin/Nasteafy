@@ -19,6 +19,7 @@ namespace Nasteafy.Endpoints.Subscriptions
 
                 return Results.Ok();
             })
+            .RequireAuthorization()
             .Produces(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
         }

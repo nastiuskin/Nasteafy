@@ -8,7 +8,8 @@ namespace Nasteafy.Application.Albums.Commands.Create
         public CreateAlbumCommandValidator(IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.Title)
-             .NotEmpty();
+             .NotEmpty()
+             .WithMessage("Album title is required.");
 
             RuleFor(x => x.ReleaseDate)
              .NotEmpty()

@@ -8,7 +8,6 @@ using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Users
 {
-    [Authorize]
     public sealed class UpdateUserProfileEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
@@ -22,6 +21,7 @@ namespace Nasteafy.Endpoints.Users
 
                 return Results.Ok();
             })
+            .RequireAuthorization()
             .DisableAntiforgery()
             .Accepts<IFormFile>("multipart/form-data")
             .Produces(StatusCodes.Status200OK)

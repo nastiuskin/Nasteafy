@@ -23,7 +23,7 @@ namespace Nasteafy.Application.Artists.Commands.Create
                 CreatedByAdmin = true
             };
 
-            if (request.ArtistPhoto != null || request?.ArtistPhoto?.Length > 0)
+            if (request.ArtistPhoto != null && request?.ArtistPhoto?.Length > 0)
             {
                 await using var stream = request.ArtistPhoto.OpenReadStream();
 

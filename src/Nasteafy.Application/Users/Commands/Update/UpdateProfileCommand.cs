@@ -1,21 +1,23 @@
 ﻿using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Users.Commands.Update
 {
-    public record UpdateProfileCommand(string? Email, string? UserName, IFormFile? AvatarFile)
-        : IRequest<Result>;
+    public class UpdateProfileCommand : IRequest<Result>
+    {
+        public string? Email { get; init; }
+        public string? UserName { get; init; }
+        public IFormFile? AvatarFile { get; init; }
+    }
 
     public class UpdateProfileCommandHandler(
         IUnitOfWork unitOfWork,
         IUserIdProvider userProvider,
-        IFileStorageService fileStorage,
-        ILogger<UpdateProfileCommandHandler> logger)
+        IFileStorageService fileStorage)
             : IRequestHandler<UpdateProfileCommand, Result>
     {
         public async Task<Result> Handle(UpdateProfileCommand request, CancellationToken ct)
@@ -40,7 +42,7 @@ namespace Nasteafy.Application.Users.Commands.Update
             if (!string.IsNullOrEmpty(request.UserName))
                 user.UserName = request.UserName;
 
-            if (request.AvatarFile != null || request?.AvatarFile?.Length > 0)
+            if (request.AvatarFile != null && request?.AvatarFile?.Length > 0)
             {
                 await using var stream = request.AvatarFile.OpenReadStream();
 

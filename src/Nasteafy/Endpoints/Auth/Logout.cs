@@ -24,7 +24,8 @@ namespace Nasteafy.Endpoints.Auth
                 });
 
                 return Results.Ok();
-            });
+            })
+            .RequireAuthorization();
         }
     }
 }

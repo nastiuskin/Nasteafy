@@ -79,11 +79,11 @@ namespace Nasteafy.Infrastructure.Services
 
             if (user is null)
                 return Result.Fail("Invalid refresh token")
-                    .LogIfFailed<AuthenticationService>(); ;
+                    .LogIfFailed<AuthenticationService>(); 
 
             if (user.RefreshToken!.IsExpired)
                 return Result.Fail("Refresh token expired")
-                    .LogIfFailed<AuthenticationService>(); ;
+                    .LogIfFailed<AuthenticationService>(); 
 
             var roles = await userManager.GetRolesAsync(user);
 
@@ -104,8 +104,6 @@ namespace Nasteafy.Infrastructure.Services
 
             var newAccessToken = jwtTokenService.GenerateAccessToken(claims);
 
-            await userManager.UpdateAsync(user);
-
             return Result.Ok(newAccessToken);
         }
 
@@ -116,11 +114,8 @@ namespace Nasteafy.Infrastructure.Services
                 return Result.Fail("User already exists")
                     .LogIfFailed<AuthenticationService>();
 
-            var userId = Guid.NewGuid();
-
             var user = new User
             {
-                Id = userId,
                 Email = email,
                 UserName = email,
                 Playlists = [],
@@ -137,7 +132,7 @@ namespace Nasteafy.Infrastructure.Services
                 return Result.Fail(string.Join(", ", roleAssignResult.Errors.Select(e => e.Description)))
                     .LogIfFailed<AuthenticationService>();
 
-            return Result.Ok(userId);
+            return Result.Ok(user.Id);
         }
     }
 }

@@ -22,7 +22,8 @@ namespace Nasteafy.Endpoints.Tracks
 
                 return Results.Ok();
             })
-            //.Accepts<IFormFile>("multipart/form-data")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin,Artist" })
+            .Accepts<IFormFile>("multipart/form-data")
             .DisableAntiforgery()
             .Produces(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);
