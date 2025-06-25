@@ -92,7 +92,7 @@ namespace Nasteafy.Persistence.Database.Extensions
         {
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
-            services.AddScoped<IUserIdProvider, UserIdProvider>();
+            services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
             services.AddScoped<IFileStorageService, MinioStorageService>();
             services.AddScoped<IResultLogger, ResultLogger>();
             return services;

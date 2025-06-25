@@ -9,11 +9,11 @@ import { AuthProvider } from './contexts/AuthContext';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-    <AudioPlayerProvider>
     <AuthProvider>
+    <AudioPlayerProvider>
         <App />
-        </AuthProvider>
     </AudioPlayerProvider>
+    </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

@@ -6,18 +6,17 @@ namespace Nasteafy.Extensions
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder MapEndpoints(
-          this WebApplication app,
-          RouteGroupBuilder? routeGroupBuilder = null)
+        public static IApplicationBuilder MapEndpoints(this IApplicationBuilder app)
         {
-            IEnumerable<IEndpoint> endpoints = app.Services.GetRequiredService<IEnumerable<IEndpoint>>();
+            var endpoints = app.ApplicationServices.GetRequiredService<IEnumerable<IEndpoint>>();
 
-            IEndpointRouteBuilder builder = routeGroupBuilder is null ? app : routeGroupBuilder;
-
-            foreach (IEndpoint endpoint in endpoints)
+            app.UseEndpoints(builder =>
             {
-                endpoint.MapEndpoint(builder);
-            }
+                foreach (var endpoint in endpoints)
+                {
+                    endpoint.MapEndpoint(builder);
+                }
+            });
 
             return app;
         }

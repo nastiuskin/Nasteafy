@@ -7,7 +7,7 @@ using MockQueryable;
 using Nasteafy.Domain.Entities.Subscriptions;
 using AutoFixture.AutoMoq;
 
-namespace Nasteafy.Application.Tests.UnitTests.Subscriptions.Queries
+namespace Nasteafy.Application.Tests.Subscriptions.Queries
 {
     public class GetAllSubscriptionsQueryHandlerTests
     {

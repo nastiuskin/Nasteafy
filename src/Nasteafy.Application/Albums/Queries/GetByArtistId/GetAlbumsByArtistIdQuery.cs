@@ -7,16 +7,17 @@ using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Albums.Queries.GetByArtistId
 {
-    public record GetByArtistIdQuery(Guid ArtistId, PagedRequest PagedRequest) : IRequest<Result<PagedResult<AlbumDto>>>;
+    public record GetAlbumsByArtistIdQuery(Guid ArtistId, PagedRequest PagedRequest) 
+        : IRequest<Result<PagedResult<AlbumDto>>>;
 
     public class GetByArtistIdQueryHandler(
    IUnitOfWork unitOfWork,
    IFileStorageService fileStorageService)
-        : IRequestHandler<GetByArtistIdQuery, Result<PagedResult<AlbumDto>>>
+        : IRequestHandler<GetAlbumsByArtistIdQuery, Result<PagedResult<AlbumDto>>>
     {
-        public async Task<Result<PagedResult<AlbumDto>>> Handle(GetByArtistIdQuery query, CancellationToken ct)
+        public async Task<Result<PagedResult<AlbumDto>>> Handle(GetAlbumsByArtistIdQuery query, CancellationToken ct)
         {
-            var albums = await unitOfWork.Albums.GetByArtistIdAsync(query.ArtistId, query.PagedRequest, ct);
+            var albums = await unitOfWork.Albums.GetAlbumsByArtistIdAsync(query.ArtistId, query.PagedRequest, ct);
 
             var albumDtos = new List<AlbumDto>();
 

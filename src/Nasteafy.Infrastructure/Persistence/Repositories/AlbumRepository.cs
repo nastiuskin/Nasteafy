@@ -12,7 +12,7 @@ namespace Nasteafy.Infrastructure.Persistence.Repositories
     {
         public AlbumRepository(DatabaseContext context) : base(context) { }
 
-        public async Task<PagedResult<Album>> GetByArtistIdAsync(Guid artistId, PagedRequest request, CancellationToken ct)
+        public async Task<PagedResult<Album>> GetAlbumsByArtistIdAsync(Guid artistId, PagedRequest request, CancellationToken ct)
         {
             var query = _context.Albums
                 .AsNoTracking()

@@ -7,7 +7,12 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Artists.Commands.Create
 {
-    public record CreateArtistCommand(string Name, IFormFile? ArtistPhoto) : IRequest<Result<Guid>>;
+
+    public class CreateArtistCommand : IRequest<Result<Guid>>
+    {
+        public required string Name { get; init; }
+        public IFormFile? ArtistPhoto { get; init; }
+    }
 
     public class CreateArtistCommandHandler(IUnitOfWork unitOfWork, 
         IFileStorageService fileStorageService)
@@ -18,8 +23,6 @@ namespace Nasteafy.Application.Artists.Commands.Create
             var artist = new Artist
             {
                 Name = request.Name.Trim(),
-                AlbumArtists = [],
-                ArtistTracks = [],
                 CreatedByAdmin = true
             };
 

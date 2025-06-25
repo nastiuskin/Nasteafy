@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Nasteafy.Infrastructure\Nasteafy.Infrastructure.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo(&quot;Nasteafy.Tests.Integration&quot;)" />
+	</ItemGroup>
+
 </Project>

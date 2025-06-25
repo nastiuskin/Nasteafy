@@ -11,7 +11,7 @@ public record GetUserProfileQuery : IRequest<Result<GetUserResponse?>>;
 public class GetUserProfileQueryHandler(
     IUnitOfWork unitOfWork,
     IFileStorageService fileStorageService,
-    IUserIdProvider userIdProvider)
+    ICurrentUserProvider userIdProvider)
         : IRequestHandler<GetUserProfileQuery, Result<GetUserResponse?>>
 {
     public async Task<Result<GetUserResponse?>> Handle(GetUserProfileQuery request, CancellationToken ct)

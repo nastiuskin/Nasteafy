@@ -1,9 +1,7 @@
 using Nasteafy.Extensions;
 using Nasteafy.Persistence.Database.Extensions;
-using System.Reflection;
 using Serilog;
-using Google.Cloud.Firestore.V1;
-using FluentResults;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +11,6 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
-    //loggerConfiguration.WriteTo.Console(new Serilog.Formatting.Compact.CompactJsonFormatter());
     loggerConfiguration.WriteTo.Console();
     loggerConfiguration.ReadFrom.Configuration(context.Configuration);
 });
@@ -24,18 +21,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin"));
 });
 
-// Add application also
-// Add persistence layer and here   
-// Add fluent validation https://docs.fluentvalidation.net/en/latest/
-// Add auth
-// Add global exception handler
-// Add transactions
-// Check/Add Migrations
-// Divide entities by schemas
-
-
 builder.AddServices();
-builder.Services.AddAntiforgery();
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 builder.Services.AddControllers();
 //builder.Services.AddAntiforgery();
@@ -45,10 +31,10 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173") 
+            .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); 
+            .AllowCredentials();
     });
 });
 
@@ -56,9 +42,7 @@ var app = builder.Build();
 
 await app.SeedData();
 
-app.MapEndpoints();
-
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
 {
     app.UseSwaggerWithUi();
 
@@ -71,15 +55,22 @@ if (app.Environment.IsDevelopment())
 //    settings.Logger = logger;
 //});
 
-app.UseCors();
-
-app.UseGlobalExceptionHandling(); 
+app.UseRouting();                  
+app.UseCors();                      
+app.UseGlobalExceptionHandling();  
 app.UseRequestTimingMiddleware();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseDbTransaction();
+app.MapEndpoints();
+
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.UseDbTransaction();
+}
 
 app.UseFluentResultsLogger();
 
 await app.RunAsync();
+
+public partial class Program { }
 

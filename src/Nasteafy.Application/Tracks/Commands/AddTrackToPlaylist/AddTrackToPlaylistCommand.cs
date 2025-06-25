@@ -11,7 +11,7 @@ namespace Nasteafy.Application.Tracks.Commands.AddTrack
 
     public class AddTrackToPlaylistCommandHandler(
         IUnitOfWork unitOfWork,
-        IUserIdProvider userProvider)
+        ICurrentUserProvider userProvider)
             : IRequestHandler<AddTrackToPlaylistCommand, Result>
     {
         public async Task<Result> Handle(AddTrackToPlaylistCommand request, CancellationToken ct)

@@ -10,9 +10,9 @@ namespace Nasteafy.Application.Tracks.Commands.RemoveFromPlaylist
     public class RemoveTrackFromPlaylistCommandHandler : IRequestHandler<RemoveTrackFromPlaylistCommand, Result>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUserIdProvider _userProvider;
+        private readonly ICurrentUserProvider _userProvider;
 
-        public RemoveTrackFromPlaylistCommandHandler(IUnitOfWork unitOfWork, IUserIdProvider userProvider)
+        public RemoveTrackFromPlaylistCommandHandler(IUnitOfWork unitOfWork, ICurrentUserProvider userProvider)
         {
             _unitOfWork = unitOfWork;
             _userProvider = userProvider;

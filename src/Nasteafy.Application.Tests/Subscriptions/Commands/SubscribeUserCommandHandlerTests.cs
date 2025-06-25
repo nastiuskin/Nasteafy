@@ -8,13 +8,13 @@ using Nasteafy.Domain.Entities.Subscriptions;
 using Nasteafy.Domain.Entities.Tracks;
 using Nasteafy.Domain.Entities.Users;
 
-namespace Nasteafy.Application.Tests.UnitTests.Subscriptions.Commands
+namespace Nasteafy.Application.Tests.Subscriptions.Commands
 {
     public class SubscribeUserCommandHandlerTests
     {
         private readonly IFixture _fixture;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-        private readonly Mock<IUserIdProvider> _userIdProviderMock;
+        private readonly Mock<ICurrentUserProvider> _userIdProviderMock;
         private readonly SubscribeUserCommandHandler _handler;
         public SubscribeUserCommandHandlerTests()
         {
@@ -28,7 +28,7 @@ namespace Nasteafy.Application.Tests.UnitTests.Subscriptions.Commands
             _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
 
             _unitOfWorkMock = _fixture.Freeze<Mock<IUnitOfWork>>();
-            _userIdProviderMock = _fixture.Freeze<Mock<IUserIdProvider>>();
+            _userIdProviderMock = _fixture.Freeze<Mock<ICurrentUserProvider>>();
             _handler = new SubscribeUserCommandHandler(_unitOfWorkMock.Object, _userIdProviderMock.Object);
         }
 

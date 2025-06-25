@@ -10,7 +10,7 @@ namespace Nasteafy.Application.Subscriptions.Commands
     public record SubscribeUserCommand(Guid SubscriptionId)
         : IRequest<Result>;
 
-    public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork, IUserIdProvider userProvider)
+    public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork, ICurrentUserProvider userProvider)
         : IRequestHandler<SubscribeUserCommand, Result>
     {
         public async Task<Result> Handle(SubscribeUserCommand command, CancellationToken ct)

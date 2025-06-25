@@ -13,12 +13,6 @@ namespace Nasteafy.Middlewares
 
         public async Task InvokeAsync(HttpContext context, IUnitOfWork unitOfWork)
         {
-            //if (context.Request.Method.Equals("GET", StringComparison.CurrentCultureIgnoreCase))
-            //{
-            //    await _next(context);
-            //    return;
-            //}
-
             await using var transaction = await unitOfWork.BeginTransactionAsync();
 
             try

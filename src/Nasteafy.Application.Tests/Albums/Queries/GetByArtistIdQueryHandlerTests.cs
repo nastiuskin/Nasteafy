@@ -9,7 +9,7 @@ using Nasteafy.Domain.Entities.Tracks;
 using Nasteafy.Domain.Entities;
 using Nasteafy.Domain;
 
-namespace Nasteafy.Application.Tests.UnitTests.Albums.Queries
+namespace Nasteafy.Application.Tests.Albums.Queries
 {
     public class GetByArtistIdQueryHandlerTests
     {
@@ -69,14 +69,14 @@ namespace Nasteafy.Application.Tests.UnitTests.Albums.Queries
             };
 
             _unitOfWorkMock.Setup(u =>
-                u.Albums.GetByArtistIdAsync(It.IsAny<Guid>(), It.IsAny<PagedRequest>(), default))
+                u.Albums.GetAlbumsByArtistIdAsync(It.IsAny<Guid>(), It.IsAny<PagedRequest>(), default))
                 .ReturnsAsync(pagedAlbums);
 
             _fileStorageServiceMock.Setup(f =>
                 f.GetFileUrlAsync(FileType.AlbumCover, album.CoverUrl))
                 .ReturnsAsync(Result.Ok("urlcik"));
 
-            var query = new GetByArtistIdQuery(Guid.NewGuid(), new PagedRequest { PageNumber = 1, PageSize = 10 });
+            var query = new GetAlbumsByArtistIdQuery(Guid.NewGuid(), new PagedRequest { PageNumber = 1, PageSize = 10 });
 
             // Act
             var result = await _handler.Handle(query, default);

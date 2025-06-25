@@ -5,7 +5,7 @@ using Nasteafy.Infrastructure.Constants;
 
 namespace Nasteafy.Infrastructure.Services
 {
-    public class UserIdProvider(IHttpContextAccessor httpContextAccessor) : IUserIdProvider
+    public class CurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
     {
         public Guid? GetUserId()
         {

@@ -6,7 +6,7 @@ using Nasteafy.Application.Common.Abstractions.Data.Repositories;
 using Nasteafy.Domain;
 using Nasteafy.Domain.Entities.Tracks;
 
-namespace Nasteafy.Application.Tests.UnitTests.Albums.Commands
+namespace Nasteafy.Application.Tests.Albums.Commands
 {
     public class DeleteAlbumCommandHandlerTests
     {

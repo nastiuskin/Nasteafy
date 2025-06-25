@@ -21,7 +21,7 @@ namespace Nasteafy.Endpoints.Albums
 
                 return Results.Ok(result.Value);
             })
-            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin,Artist" })
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Admin, Artist" })
             .Accepts<IFormFile>("multipart/form-data")
             .DisableAntiforgery()
             .Produces<Guid>(StatusCodes.Status200OK)

@@ -17,7 +17,7 @@ namespace Nasteafy.Infrastructure.Services
      UserManager<User> userManager,
      IUnitOfWork unitOfWork,
      IJwtTokenService jwtTokenService,
-     IUserIdProvider userProvider) : IAuthenticationService
+     ICurrentUserProvider userProvider) : IAuthenticationService
     {
         public async Task<Result> LogoutAsync()
         {

@@ -1,6 +1,6 @@
 ﻿namespace Nasteafy.Application.Common.Abstractions.Auth
 {
-    public interface IUserIdProvider
+    public interface ICurrentUserProvider
     {
         Guid? GetUserId();
     }

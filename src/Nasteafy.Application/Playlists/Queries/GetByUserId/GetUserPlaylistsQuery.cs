@@ -12,7 +12,7 @@ namespace Nasteafy.Application.Playlists.Queries.GetByUserId
     public class GetUserPlaylistsQueryHandler(
      IUnitOfWork unitOfWork,
      IFileStorageService fileStorageService,
-     IUserIdProvider userProvider)
+     ICurrentUserProvider userProvider)
      : IRequestHandler<GetUserPlaylistsQuery, Result<PagedResult<UserPlaylistDto>>>
     {
         public async Task<Result<PagedResult<UserPlaylistDto>>> Handle(GetUserPlaylistsQuery query, CancellationToken ct)

@@ -5,7 +5,7 @@ using Nasteafy.Application.Common.Abstractions.Data.Repositories;
 using Nasteafy.Application.Subscriptions.Queries.GetById;
 using Nasteafy.Domain.Entities.Subscriptions;
 
-namespace Nasteafy.Application.Tests.UnitTests.Subscriptions.Queries
+namespace Nasteafy.Application.Tests.Subscriptions.Queries
 {
     public class GetSubscriptionByIdQueryHandlerTests
     {

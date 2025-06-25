@@ -15,8 +15,7 @@ namespace Nasteafy.Infrastructure.Persistence.Extensions
             PagedRequest request,
             CancellationToken ct = default) where T : IEntity
         {
-            query = query
-                .OrderBy(x => x.Id);
+            query = query.OrderBy(x => x.Id);
 
             var totalItems = await query.CountAsync(ct);
 

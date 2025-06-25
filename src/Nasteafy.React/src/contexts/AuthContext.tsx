@@ -89,19 +89,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setAccessToken(null);
           setIsAuthenticated(false);
           setUser(null);
+          navigate("/login");
         }
       } catch {
         setAccessTokenHeader(null);
         setAccessToken(null);
         setIsAuthenticated(false);
         setUser(null);
+        navigate("/login");
       } finally {
         setIsAuthReady(true);
       }
     };
 
     tryRefresh();
-  }, []);
+  }, [accessToken]);
 
  return (
   <AuthContext.Provider
@@ -115,7 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logout,
     }}
   >
-    {children} 
+   {isAuthReady ? children : null}
   </AuthContext.Provider>
 );
 }

@@ -12,9 +12,14 @@ namespace Nasteafy.Extensions
         {
             builder.Services
                 .AddInfrastructure(builder.Configuration)
-                .AddJwtAuthentication(builder.Configuration)
+                //.AddJwtAuthentication(builder.Configuration)
                 .AddApplication()
                 .AddSwagger();
+
+            if (!builder.Environment.IsEnvironment("Testing"))
+            {
+                builder.Services.AddJwtAuthentication(builder.Configuration);
+            }
         }
 
         public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)

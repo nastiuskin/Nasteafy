@@ -27,7 +27,7 @@ namespace Nasteafy.Application.Common.Behaviors
                 if (failures.Count > 0)
                     throw new ValidationException(failures);
             }
-            return await next().ConfigureAwait(false);
+            return await next(cancellationToken).ConfigureAwait(false);
         }
     }
 }

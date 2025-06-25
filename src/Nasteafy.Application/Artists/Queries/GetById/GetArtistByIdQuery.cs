@@ -15,8 +15,7 @@ namespace Nasteafy.Application.Artists.Queries.GetById
     {
         public async Task<Result<ArtistDto>> Handle(GetArtistByIdQuery request, CancellationToken ct)
         {
-            var artist = await unitOfWork.Artists
-                .GetByIdAsync(request.ArtistId, ct);
+            var artist = await unitOfWork.Artists.GetByIdAsync(request.ArtistId, ct);
 
             if (artist is null)
                 return Result.Fail("Artist not found.")

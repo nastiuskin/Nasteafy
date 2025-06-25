@@ -3,7 +3,7 @@ using Nasteafy.Application.Common.Abstractions.Data;
 
 namespace Nasteafy.Application.Albums.Queries.GetByArtistId
 {
-    public class GetByArtistIdQueryValidator : AbstractValidator<GetByArtistIdQuery>
+    public class GetByArtistIdQueryValidator : AbstractValidator<GetAlbumsByArtistIdQuery>
     {
         public GetByArtistIdQueryValidator(IUnitOfWork unitOfWork)
         {

@@ -8,7 +8,7 @@ using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Albums
 {
-    public sealed class GetByArtistIdEndpoint : IEndpoint
+    public sealed class GetAlbumByArtistIdEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
@@ -16,7 +16,7 @@ namespace Nasteafy.Endpoints.Albums
                 [AsParameters] PagedRequest pagedRequest,
                 ISender sender, CancellationToken ct) =>
             {
-                var response = await sender.Send(new GetByArtistIdQuery(artistId, pagedRequest), ct);
+                var response = await sender.Send(new GetAlbumsByArtistIdQuery(artistId, pagedRequest), ct);
 
                 if (response.IsFailed)
                     return response.ToApiError();

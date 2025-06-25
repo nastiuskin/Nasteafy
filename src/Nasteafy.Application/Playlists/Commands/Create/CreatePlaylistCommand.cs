@@ -11,9 +11,9 @@ namespace Nasteafy.Application.Playlists.Commands.Create
     public class CreatePlaylistCommandHandler : IRequestHandler<CreatePlaylistCommand, Result<Guid>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IUserIdProvider _userProvider;
+        private readonly ICurrentUserProvider _userProvider;
 
-        public CreatePlaylistCommandHandler(IUnitOfWork unitOfWork, IUserIdProvider userProvider)
+        public CreatePlaylistCommandHandler(IUnitOfWork unitOfWork, ICurrentUserProvider userProvider)
         {
             _unitOfWork = unitOfWork;
             _userProvider = userProvider;
@@ -30,7 +30,7 @@ namespace Nasteafy.Application.Playlists.Commands.Create
             var playlist = new Playlist
             {
                 Title = request.Title,
-                UserId = userId ?? Guid.Empty,
+                UserId = userId.Value,
                 PlaylistTracks = new List<PlaylistTrack>()
             };
 

@@ -16,7 +16,7 @@ namespace Nasteafy.Application.Users.Commands.Update
 
     public class UpdateProfileCommandHandler(
         IUnitOfWork unitOfWork,
-        IUserIdProvider userProvider,
+        ICurrentUserProvider userProvider,
         IFileStorageService fileStorage)
             : IRequestHandler<UpdateProfileCommand, Result>
     {

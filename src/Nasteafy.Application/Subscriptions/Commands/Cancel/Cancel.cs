@@ -10,7 +10,7 @@ namespace Nasteafy.Application.Subscriptions.Commands.Cancel
 
     public class CancelSubscriptionCommandHandler(
         IUnitOfWork unitOfWork,
-        IUserIdProvider userProvider)
+        ICurrentUserProvider userProvider)
         : IRequestHandler<CancelActiveSubscriptionCommand, Result>
     {
         public async Task<Result> Handle(CancelActiveSubscriptionCommand request, CancellationToken ct)
