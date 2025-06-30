@@ -16,8 +16,7 @@ public class GetTracksByArtistIdQueryHandler(IUnitOfWork unitOfWork,
 {
     public async Task<Result<PagedResult<GetTrackDto>>> Handle(GetTracksByArtistIdQuery request, CancellationToken ct)
     {
-        var tracks = await unitOfWork.Tracks
-            .GetByArtistIdAsync(request.ArtistId, request.PagedRequest, ct);
+        var tracks = await unitOfWork.Tracks.GetByArtistIdAsync(request.ArtistId, request.PagedRequest, ct);
 
         var trackDtos = new List<GetTrackDto>();
 

@@ -18,24 +18,18 @@ namespace Nasteafy.Application.Subscriptions.Commands
             var userId = userProvider.GetUserId();
 
             if (userId == null  || userId == Guid.Empty)
-                return Result.Fail("UserId not found")
-                    .LogIfFailed<SubscribeUserCommandHandler>();
+                return Result.Fail("UserId not found").Log<SubscribeUserCommandHandler>();
 
-            var user = await unitOfWork.Users
-                .GetByIdWithSubscriptionsAsync(userId.Value, ct);
+            var user = await unitOfWork.Users.GetByIdWithSubscriptionsAsync(userId.Value, ct);
 
             var subscription = await unitOfWork.Subscriptions.GetByIdAsync(command.SubscriptionId, ct);
 
             if (subscription!.Type == SubscriptionType.Trial)
             {
-                bool alreadyActivated = user!.UserSubscriptions
-                    .Any(us => us.Subscription.Type == SubscriptionType.Trial);
+                bool alreadyActivated = user!.UserSubscriptions.Any(us => us.Subscription.Type == SubscriptionType.Trial);
 
                 if (alreadyActivated)
-                {
-                    return Result.Fail("Trial subscription can be activated only once.")
-                        .LogIfFailed<SubscribeUserCommandHandler>();
-                }
+                    return Result.Fail("Trial subscription can be activated only once.").Log<SubscribeUserCommandHandler>();
             }
 
             if (subscription.Type == SubscriptionType.Artist)
@@ -48,8 +42,6 @@ namespace Nasteafy.Application.Subscriptions.Commands
                         UserId = user.Id,
                         Name = user.Email!,
                         AvatarUrl = user.AvatarUrl,
-                        AlbumArtists = [],
-                        ArtistTracks = [],
                     };
                     await unitOfWork.Artists.AddAsync(artist, ct);
                 }
@@ -71,7 +63,6 @@ namespace Nasteafy.Application.Subscriptions.Commands
             };
 
             user.UserSubscriptions.Add(newUserSubscription);
-
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();

@@ -24,11 +24,9 @@ namespace Nasteafy.Application.Playlists.Commands.Update
         public async Task<Result> Handle(UpdatePlaylistCommand request, CancellationToken ct)
         {
             var playlist = await _unitOfWork.Playlists.GetByIdAsync(request.PlaylistId, ct);
-            if (playlist == null) return Result.Fail("Playlist not found")
-                    .LogIfFailed<UpdatePlaylistCommandHandler>();
 
             if (!string.IsNullOrWhiteSpace(request.Title))
-                playlist.Title = request.Title;
+                playlist!.Title = request.Title;
 
             if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {
@@ -40,10 +38,10 @@ namespace Nasteafy.Application.Playlists.Commands.Update
                     request.CoverFile.ContentType,
                     FileType.PlaylistCover);
 
-                playlist.CoverUrl = result.Value;
+                playlist!.CoverUrl = result.Value;
             }
 
-            await _unitOfWork.Playlists.UpdateAsync(playlist, ct);
+            await _unitOfWork.Playlists.UpdateAsync(playlist!, ct);
 
             await _unitOfWork.SaveChangesAsync(ct);
             return Result.Ok();

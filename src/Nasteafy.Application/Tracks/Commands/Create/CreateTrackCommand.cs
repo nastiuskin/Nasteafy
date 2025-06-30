@@ -27,8 +27,7 @@ namespace Nasteafy.Application.Tracks.Commands.Create
                 .ToListAsync(ct);
 
             if (artistIds.Count != request.ArtistIds.Count)
-                return Result.Fail("Some of the specified artists were not found.")
-                    .LogIfFailed<CreateTrackCommandHandler>();
+                return Result.Fail("Some of the specified artists were not found.").Log<CreateTrackCommandHandler>();
 
             await using var stream = request.File.OpenReadStream();
             var uploadResult = await _fileStorage.UploadFileAsync(
@@ -38,8 +37,7 @@ namespace Nasteafy.Application.Tracks.Commands.Create
                 FileType.Audio);
 
             if (!uploadResult.IsSuccess)
-                return Result.Fail("Failed to upload file")
-                    .LogIfFailed<CreateTrackCommandHandler>();
+                return Result.Fail("Failed to upload file").Log<CreateTrackCommandHandler>();
 
             var trackId = Guid.NewGuid();
 
@@ -56,8 +54,7 @@ namespace Nasteafy.Application.Tracks.Commands.Create
                         TrackId = trackId,
                         ArtistId = artist
                     })
-                    .ToList(),
-                PlaylistTracks = []
+                    .ToList()
             };
 
             await unitOfWork.Tracks.AddAsync(track, ct);

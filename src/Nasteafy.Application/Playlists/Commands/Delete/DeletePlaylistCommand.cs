@@ -12,15 +12,9 @@ namespace Nasteafy.Application.Playlists.Commands.Delete
     {
         public async Task<Result> Handle(DeletePlaylistCommand request, CancellationToken ct)
         {
-            var playlist = await unitOfWork
-                .Playlists
-                .GetByIdAsync(request.PlaylistId, ct);
+            var playlist = await unitOfWork.Playlists.GetByIdAsync(request.PlaylistId, ct);
 
-            if (playlist == null)
-                return Result.Fail("Playlist not found")
-                    .LogIfFailed<DeletePlaylistCommandHandler>();
-
-            if (!string.IsNullOrEmpty(playlist.CoverUrl))
+            if (!string.IsNullOrEmpty(playlist!.CoverUrl))
                 await fileStorageService.DeleteFileAsync(FileType.PlaylistCover, playlist.CoverUrl);
 
             await unitOfWork.Playlists.DeleteAsync(playlist, ct);

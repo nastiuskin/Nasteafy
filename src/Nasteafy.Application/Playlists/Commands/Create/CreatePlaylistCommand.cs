@@ -24,14 +24,12 @@ namespace Nasteafy.Application.Playlists.Commands.Create
             var userId = _userProvider.GetUserId();
 
             if (userId == null || userId == Guid.Empty)
-                return Result.Fail("UserId not found")
-                    .LogIfFailed<CreatePlaylistCommandHandler>();
+                return Result.Fail("UserId not found").Log<CreatePlaylistCommandHandler>();
 
             var playlist = new Playlist
             {
                 Title = request.Title,
                 UserId = userId.Value,
-                PlaylistTracks = new List<PlaylistTrack>()
             };
 
             await _unitOfWork.Playlists.AddAsync(playlist, cancellationToken);

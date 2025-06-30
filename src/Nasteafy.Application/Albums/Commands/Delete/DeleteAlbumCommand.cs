@@ -13,15 +13,9 @@ namespace Nasteafy.Application.Albums.Commands.Delete
     {
         public async Task<Result> Handle(DeleteAlbumCommand request, CancellationToken ct)
         {
-            var album = await unitOfWork
-                .Albums
-                .GetByIdAsync(request.AlbumId, ct);
+            var album = await unitOfWork.Albums.GetByIdAsync(request.AlbumId, ct);
 
-            if (album == null)
-                return Result.Fail("Album not found")
-                    .LogIfFailed<DeletePlaylistCommandHandler>();
-
-            if (!string.IsNullOrEmpty(album.CoverUrl))
+            if (!string.IsNullOrEmpty(album!.CoverUrl))
                 await fileStorageService.DeleteFileAsync(FileType.AlbumCover, album.CoverUrl);
 
             await unitOfWork.Albums.DeleteAsync(album, ct);

@@ -9,8 +9,8 @@ public class DeletePlaylistCommandValidator : AbstractValidator<DeletePlaylistCo
 
         RuleFor(x => x.PlaylistId)
             .NotEmpty()
-            .WithMessage("Playlist ID must not be empty.")
+                .WithMessage("Playlist ID must not be empty.")
             .MustAsync(unitOfWork.Playlists.ExistsAsync)
-            .WithMessage("Playlist does not exist.");
+                .WithMessage("Playlist does not exist.");
     }
 }

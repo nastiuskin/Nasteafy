@@ -27,12 +27,8 @@ namespace Nasteafy.Application.Albums.Commands.Update
             var album = await _unitOfWork.Albums
                 .GetByIdAsync(request.AlbumId, ct);
 
-            if (album == null) 
-                return Result.Fail("Album not found")
-                    .LogIfFailed<UpdateAlbumCommandHandler>();
-
             if (!string.IsNullOrWhiteSpace(request.Title))
-                album.Title = request.Title;
+                album!.Title = request.Title;
 
             if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {
@@ -44,10 +40,10 @@ namespace Nasteafy.Application.Albums.Commands.Update
                     request.CoverFile.ContentType,
                     FileType.AlbumCover);
 
-                album.CoverUrl = result.Value;
+                album!.CoverUrl = result.Value;
             }
 
-            await _unitOfWork.Albums.UpdateAsync(album, ct);
+            await _unitOfWork.Albums.UpdateAsync(album!, ct);
             await _unitOfWork.SaveChangesAsync(ct);
             return Result.Ok();
         }

@@ -1,8 +1,10 @@
 ﻿using FluentResults;
 using MediatR;
-using Nasteafy.Application.Common.Abstractions.Auth;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain.Entities.Subscriptions;
+using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Auth.Commands.Register
 {
@@ -10,20 +12,35 @@ namespace Nasteafy.Application.Auth.Commands.Register
 
     public class RegisterCommandHandler(
         IUnitOfWork unitOfWork,
-        IAuthenticationService authenticationService)
+        UserManager<User> userManager)
         : IRequestHandler<RegisterCommand, Result>
     {
         public async Task<Result> Handle(RegisterCommand request, CancellationToken ct)
         {
-            var registerResult = await authenticationService.RegisterAsync(request.Email, request.Password);
+            var existingUser = await userManager.FindByEmailAsync(request.Email);
 
-            if (registerResult.IsFailed)
-                return Result.Fail(registerResult.Errors);
+            if (existingUser is not null)
+                return Result.Fail("User already exists").Log<AuthenticationService>();
 
-            var user = await unitOfWork.Users.GetByIdAsync(registerResult.Value, ct);
-            if (user is null)
-                return Result.Fail("User not found.")
-                    .LogIfFailed<RegisterCommandHandler>();
+            var user = new User
+            {
+                Email = request.Email,
+                UserName =  request.Email,
+            };
+
+            var result = await userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                return Result.Fail(string.Join(", ", result.Errors.Select(e => e.Description)))
+                   .Log<AuthenticationService>();
+            }
+
+            var roleAssignResult = await userManager.AddToRoleAsync(user, UserRole.User.ToString());
+            if (!roleAssignResult.Succeeded)
+            {
+                return Result.Fail(string.Join(", ", roleAssignResult.Errors.Select(e => e.Description)))
+                    .Log<AuthenticationService>();
+            }
 
             var subscription = await unitOfWork.Subscriptions.GetByTypeAsync(SubscriptionType.Free, ct);
             if (subscription != null)

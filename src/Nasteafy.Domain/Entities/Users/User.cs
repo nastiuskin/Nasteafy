@@ -10,7 +10,7 @@ namespace Nasteafy.Domain.Entities.Users
         public string? AvatarUrl { get; set; }
         public RefreshToken? RefreshToken { get; set; }
 
-        public required virtual ICollection<Playlist> Playlists { get; set; }
-        public required virtual ICollection<UserSubscription> UserSubscriptions { get; set; }
+        public virtual ICollection<Playlist> Playlists { get; set; } = [];
+        public virtual ICollection<UserSubscription> UserSubscriptions { get; set; } = [];
     }
 }

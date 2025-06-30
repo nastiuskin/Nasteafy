@@ -18,8 +18,7 @@ namespace Nasteafy.Application.Tracks.Queries.GetByPlaylistId
     {
         public async Task<Result<PagedResult<GetTrackDto>>> Handle(GetTracksByPlaylistIdQuery request, CancellationToken ct)
         {
-            var tracks = await unitOfWork.Tracks
-                .GetByPlaylistIdAsync(request.PlaylistId, request.PagedRequest, ct);
+            var tracks = await unitOfWork.Tracks.GetByPlaylistIdAsync(request.PlaylistId, request.PagedRequest, ct);
 
             var trackDtos = new List<GetTrackDto>();
 

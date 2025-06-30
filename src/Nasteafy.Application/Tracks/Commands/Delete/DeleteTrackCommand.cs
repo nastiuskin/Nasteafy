@@ -12,15 +12,9 @@ namespace Nasteafy.Application.Tracks.Commands.Delete
     {
         public async Task<Result> Handle(DeleteTrackCommand request, CancellationToken ct)
         {
-            var track = await unitOfWork
-                .Tracks
-                .GetByIdAsync(request.TrackId, ct);
+            var track = await unitOfWork.Tracks.GetByIdAsync(request.TrackId, ct);
 
-            if (track == null)
-                return Result.Fail("Track not found")
-                    .LogIfFailed<DeleteTrackCommandHandler>();
-
-            if (!string.IsNullOrEmpty(track.FilePath))
+            if (!string.IsNullOrEmpty(track!.FilePath))
                 await fileStorageService.DeleteFileAsync(FileType.Audio, track.FilePath);
 
             await unitOfWork.Tracks.DeleteAsync(track, ct);

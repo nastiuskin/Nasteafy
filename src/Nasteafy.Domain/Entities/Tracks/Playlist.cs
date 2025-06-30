@@ -11,7 +11,7 @@ namespace Nasteafy.Domain.Entities.Tracks
         public User User { get; set; }
         public required Guid UserId { get; set; }
 
-        public required virtual ICollection<PlaylistTrack> PlaylistTracks { get; set; }
+        public virtual ICollection<PlaylistTrack> PlaylistTracks { get; set; } = [];
     }
 }
 

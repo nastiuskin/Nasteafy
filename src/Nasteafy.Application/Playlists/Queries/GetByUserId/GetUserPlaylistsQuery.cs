@@ -19,8 +19,7 @@ namespace Nasteafy.Application.Playlists.Queries.GetByUserId
         {
             var userId = userProvider.GetUserId();
             if (userId == null  || userId == Guid.Empty)
-                return Result.Fail("UserId not found")
-                    .LogIfFailed<GetUserPlaylistsQueryHandler>();
+                return Result.Fail("UserId not found").Log<GetUserPlaylistsQueryHandler>();
 
             var playlists = await unitOfWork.Playlists.GetByUserIdAsync(userId.Value, query.PagedRequest, ct);
 

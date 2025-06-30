@@ -8,7 +8,7 @@ namespace Nasteafy.Domain.Entities.Tracks
         public required string Title { get; set; }
         public string? CoverUrl { get; set; }
 
-        public required virtual ICollection<AlbumArtist> AlbumArtists { get; set; }
-        public required virtual ICollection<Track> Tracks { get; set; }
+        public virtual ICollection<AlbumArtist> AlbumArtists { get; set; } = [];
+        public virtual ICollection<Track> Tracks { get; set; } = [];
     }
 }

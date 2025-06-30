@@ -21,26 +21,17 @@ namespace Nasteafy.Application.Tracks.Commands.RemoveFromPlaylist
         public async Task<Result> Handle(RemoveTrackFromPlaylistCommand request, CancellationToken ct)
         {
             var userId = _userProvider.GetUserId();
+
             if (userId == null || userId == Guid.Empty)
-                return Result.Fail("User not authenticated")
-                    .LogIfFailed<RemoveTrackFromPlaylistCommandHandler>();
+                return Result.Fail("User not authenticated").Log<RemoveTrackFromPlaylistCommandHandler>();
 
             var playlist = await _unitOfWork.Playlists.GetByIdWithTracks(request.PlaylistId, ct);
-            if (playlist is null)
-                return Result.Fail("Playlist not found");
 
-            if (playlist.UserId != userId)
-                return Result.Fail("You do not have permission to modify this playlist")
-                    .LogIfFailed<RemoveTrackFromPlaylistCommandHandler>();
+            var track = playlist!.PlaylistTracks.FirstOrDefault(pt => pt.TrackId == request.TrackId);
 
-            var track = playlist.PlaylistTracks.FirstOrDefault(pt => pt.TrackId == request.TrackId);
-            if (track is null)
-                return Result.Fail("Track is not in the playlist")
-                    .LogIfFailed<RemoveTrackFromPlaylistCommandHandler>();
+            playlist.PlaylistTracks.Remove(track!);
 
-            playlist.PlaylistTracks.Remove(track);
-
-            foreach (var playlistTrack in playlist.PlaylistTracks.Where(x => x.Order > track.Order))
+            foreach (var playlistTrack in playlist.PlaylistTracks.Where(x => x.Order > track!.Order))
             {
                 playlistTrack.Order--;
             }

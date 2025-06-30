@@ -18,8 +18,7 @@ public class MinioStorageService(
 
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
         if (!allowedExtensions.Contains(extension))
-            Result.Fail($"Extension '{extension}' is not allowed for file type '{fileType}'.")
-                .LogIfFailed<MinioStorageService>();
+            Result.Fail($"Extension '{extension}' is not allowed for file type '{fileType}'.").Log<MinioStorageService>();         
 
         objectKey ??= Guid.NewGuid() + extension;
         var fullKey = $"{prefix}/{objectKey}";
@@ -45,8 +44,7 @@ public class MinioStorageService(
         catch (Exception ex)
         {
             logger.LogError(ex.Message);
-            return Result.Fail("Failed to upload file. Please try again later")
-                   .LogIfFailed<MinioStorageService>();
+            return Result.Fail("Failed to upload file. Please try again later");
         }
     }
 
@@ -66,23 +64,23 @@ public class MinioStorageService(
     public async Task<Result<string>> GetFileUrlAsync(FileType type, string? objectKey)
     {
         if (string.IsNullOrEmpty(objectKey))
-            return Result.Fail("Failed to get file").LogIfFailed<MinioStorageService>();
+            return Result.Fail("Failed to get file").Log<MinioStorageService>();
 
         var bucketName = type == FileType.Audio ? options.Value.Buckets.Audio.Name : options.Value.Buckets.Image.Name;
 
         try
         {
             var fileUrl = await minioClient.PresignedGetObjectAsync(new PresignedGetObjectArgs()
-            .WithBucket(bucketName)
-            .WithObject(objectKey)
-            .WithExpiry(3600));
+                .WithBucket(bucketName)
+                .WithObject(objectKey)
+                .WithExpiry(3600));
 
             return Result.Ok(fileUrl);
         }
         catch (Exception ex)
         {
             logger.LogError(ex.Message);
-            return Result.Fail("Failed to get file").LogIfFailed<MinioStorageService>();
+            return Result.Fail("Failed to get file");
         }
     }
 
@@ -101,7 +99,7 @@ public class MinioStorageService(
         {
 
             logger.LogError(ex.Message);
-            return Result.Fail("Failed to delete file").LogIfFailed<MinioStorageService>();
+            return Result.Fail("Failed to delete file");
         }
     }
 }

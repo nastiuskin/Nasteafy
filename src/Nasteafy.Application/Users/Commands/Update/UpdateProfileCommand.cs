@@ -24,17 +24,11 @@ namespace Nasteafy.Application.Users.Commands.Update
         {
             var userId = userProvider.GetUserId();
             if (userId == null  || userId == Guid.Empty)
-            {
-                return Result.Fail("UserId not found")
-                    .LogIfFailed<UpdateProfileCommandHandler>();
-            }
+                return Result.Fail("UserId not found").Log<UpdateProfileCommandHandler>();
 
             var user = await unitOfWork.Users.GetByIdAsync(userId.Value, ct);
             if (user == null)
-            {
-                return Result.Fail("User not found")
-                   .LogIfFailed<UpdateProfileCommandHandler>();
-            }
+                return Result.Fail("User not found").Log<UpdateProfileCommandHandler>();
 
             if (!string.IsNullOrWhiteSpace(request.Email))
                 user.Email = request.Email;

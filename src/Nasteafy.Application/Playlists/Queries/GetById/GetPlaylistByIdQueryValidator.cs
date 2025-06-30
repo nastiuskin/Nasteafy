@@ -13,9 +13,10 @@ namespace Nasteafy.Application.Playlists.Queries.GetById
             _unitOfWork = unitOfWork;
 
             RuleFor(x => x.PlaylistId)
-               .NotEmpty().WithMessage("Playlist Id should not be empty.")
+               .NotEmpty()
+                    .WithMessage("Playlist Id should not be empty.")
                .MustAsync(_unitOfWork.Playlists.ExistsAsync)
-               .WithMessage("Playlist with given Id does not exist.");
+                    .WithMessage("Playlist with given Id does not exist.");
         }
     }
 }

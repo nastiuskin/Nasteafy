@@ -26,8 +26,7 @@ namespace Nasteafy.Application.Albums.Commands.Create
               .ToListAsync(ct);
 
             if (artistIds.Count != request.Artists.Count)
-                return Result.Fail("Some of the specified artists were not found.")
-                    .LogIfFailed<CreateAlbumCommandHandler>();
+                return Result.Fail("Some of the specified artists were not found.").Log<CreateAlbumCommandHandler>();
 
             string? coverUrl = null;
 
@@ -56,7 +55,6 @@ namespace Nasteafy.Application.Albums.Commands.Create
                     AlbumId = albumId,
                     ArtistId = artistId
                 }).ToList(),
-                Tracks = []
             };
 
             await unitOfWork.Albums.AddAsync(album, ct);

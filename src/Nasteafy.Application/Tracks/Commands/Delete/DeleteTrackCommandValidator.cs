@@ -9,9 +9,9 @@ namespace Nasteafy.Application.Tracks.Commands.Delete
         {
             RuleFor(x => x.TrackId)
               .NotEmpty()
-              .WithMessage("Track ID must not be empty.")
+                .WithMessage("Track ID must not be empty.")
               .MustAsync(unitOfWork.Tracks.ExistsAsync)
-              .WithMessage("Track does not exist.");
+                .WithMessage("Track does not exist.");
         }
     }
 }

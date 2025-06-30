@@ -5,7 +5,6 @@ using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 
 namespace Nasteafy.Infrastructure.Services
 {
@@ -37,13 +36,9 @@ namespace Nasteafy.Infrastructure.Services
 
         public RefreshToken GenerateRefreshToken()
         {
-            var randomNumber = new byte[32];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
+            var token = Guid.NewGuid().ToString();
 
-            var refreshToken = RefreshToken.CreateNew(
-                Convert.ToBase64String(randomNumber),
-                TimeSpan.FromDays(jwtOptions.RefreshTokenExpirationDays));
+            var refreshToken = RefreshToken.CreateNew(token, TimeSpan.FromDays(jwtOptions.RefreshTokenExpirationDays));
             return refreshToken;
         }
     }
