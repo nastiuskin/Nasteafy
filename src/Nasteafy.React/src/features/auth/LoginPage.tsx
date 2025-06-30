@@ -40,16 +40,14 @@ export default function Login() {
     <div className="flex justify-center items-center min-h-screen bg-black text-white">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-neutral-900 p-8 rounded-2xl w-full max-w-md shadow-lg space-y-6"
-      >
+        className="bg-neutral-900 p-8 rounded-2xl w-full max-w-md shadow-lg space-y-6">
         <h2 className="text-2xl font-bold text-center">Login to Nasteafy</h2>
-
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
             id="email"
             type="email"
-            placeholder="you@example.com"
+            placeholder="you@gmail.com"
             {...register("email")}
           />
           {errors.email && (

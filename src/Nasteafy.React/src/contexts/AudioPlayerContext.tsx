@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
-interface AudioPlayerContextProps {
+type AudioPlayerContextProps = {
   currentUrl: string | null;
   playTrack: (
     url: string,
@@ -54,24 +54,24 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     }
   };
 
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
+  // useEffect(() => {
+  //   const audio = audioRef.current;
+  //   if (!audio) return;
 
-    const handleEnded = () => setIsPlaying(false);
-    const handlePause = () => setIsPlaying(false);
-    const handlePlay = () => setIsPlaying(true);
+  //   const handleEnded = () => setIsPlaying(false);
+  //   const handlePause = () => setIsPlaying(false);
+  //   const handlePlay = () => setIsPlaying(true);
 
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("pause", handlePause);
-    audio.addEventListener("play", handlePlay);
+  //   audio.addEventListener("ended", handleEnded);
+  //   audio.addEventListener("pause", handlePause);
+  //   audio.addEventListener("play", handlePlay);
 
-    return () => {
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("play", handlePlay);
-    };
-  }, []);
+  //   return () => {
+  //     audio.removeEventListener("ended", handleEnded);
+  //     audio.removeEventListener("pause", handlePause);
+  //     audio.removeEventListener("play", handlePlay);
+  //   };
+  // }, []);
 
   return (
    <AudioPlayerContext.Provider

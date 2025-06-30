@@ -3,7 +3,7 @@ import { AuthContext } from "../contexts/AuthContext";
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  const { user, isAuthenticated } = context;
+  const { user, isAuthenticated} = context;
 
   const role = user?.userRole;
   const isAdmin = role === "Admin";

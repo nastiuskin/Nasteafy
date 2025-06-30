@@ -140,12 +140,10 @@ export default function ProfilePage() {
                   type="file"
                   accept="image/*"
                   onChange={handleAvatarChange}
-                  className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
-                />
+                  className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"/>
                 <label
                   htmlFor="avatar-upload"
-                  className="block bg-neutral-700 text-white py-2 px-4 rounded cursor-pointer text-center"
-                >
+                  className="block bg-neutral-700 text-white py-2 px-4 rounded cursor-pointer text-center">
                   Choose a file
                 </label>
               </div>
@@ -160,8 +158,7 @@ export default function ProfilePage() {
               id="email"
               type="email"
               {...register("email")}
-              className="mt-2 bg-neutral-800 text-white border-none"
-            />
+              className="mt-2 bg-neutral-800 text-white border-none"/>
             {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
 
@@ -173,16 +170,14 @@ export default function ProfilePage() {
               id="userName"
               type="text"
               {...register("userName")}
-              className="mt-2 bg-neutral-800 text-white border-none"
-            />
+              className="mt-2 bg-neutral-800 text-white border-none"/>
             {errors.userName && <p className="text-sm text-red-500">{errors.userName.message}</p>}
           </div>
 
           <div className="flex justify-end">
             <Button
               className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 text-sm rounded-full transition-all"
-              onClick={handleSubmit(onSubmit)}
-            >
+              onClick={handleSubmit(onSubmit)}>
               Save changes
             </Button>
           </div>

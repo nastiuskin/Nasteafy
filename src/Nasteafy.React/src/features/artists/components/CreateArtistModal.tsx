@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../compo
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 
-interface Props {
+type CreateAritstProps =  {
   open: boolean;
   setOpen: (open: boolean) => void;
   onCreated: () => void;
@@ -21,7 +21,7 @@ const CreateArtistSchema = z.object({
 
 type CreateArtistFormData = z.infer<typeof CreateArtistSchema>;
 
-export default function CreateArtistModal({ open, setOpen, onCreated }: Props) {
+export default function CreateArtistModal({ open, setOpen, onCreated }: CreateAritstProps) {
   const { accessToken } = useAuth();
 
   const {

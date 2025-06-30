@@ -1,14 +1,14 @@
 import {
   useState,
-  useEffect,
   createContext,
   type ReactNode,
+  useEffect,
 } from "react";
 import { decodeToken, type UserType } from "../helpers/decodeToken";
 import { handleApiError } from "../helpers/handleApiError";
 import { authService } from "../services/AuthService";
-import { client, setAccessTokenHeader } from "../api/ApiClientProvider";
 import { useNavigate } from "react-router-dom";
+import { client } from "../api/ApiClientProvider";
 
 export type AuthContextType = {    
   accessToken: string | null;
@@ -36,9 +36,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const token = await authService.login(email, password);
       if (!token) return false;
 
+      localStorage.setItem("accessToken", token);
       setAccessToken(token);
       setIsAuthenticated(true);
-      setAccessTokenHeader(token);
 
       const decoded = decodeToken(token);
       if (!decoded) return false;
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       handleApiError(error);
     } finally {
-      setAccessTokenHeader(null);
+      localStorage.removeItem("accessToken");
       setAccessToken(null);
       setIsAuthenticated(false);
       setUser(null);
@@ -72,38 +72,44 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-    const tryRefresh = async () => {
-      try {
-        const token = await authService.refresh();
-        if (token) {
-          setAccessTokenHeader(token);
-          setAccessToken(token);
-          setIsAuthenticated(true);
+  const tryInit = async () => {
+    const token = localStorage.getItem("accessToken");
 
-          const decoded = decodeToken(token);
-          if (decoded) {
-            setUser(decoded);
-          }
-        } else {
-          setAccessTokenHeader(null);
+    if (token) {
+      const decoded = decodeToken(token);
+      if (decoded) {
+        setAccessToken(token);
+        setIsAuthenticated(true);
+
+        try {
+          const profile = await client.profileGET();
+          setUser({
+            ...decoded,
+            userName: profile.userName,
+            avatarUrl: profile.avatarUrl,
+          });
+        } catch (error) {
+          handleApiError(error);
           setAccessToken(null);
           setIsAuthenticated(false);
           setUser(null);
-          navigate("/login");
+          //navigate("/login");
         }
-      } catch {
-        setAccessTokenHeader(null);
-        setAccessToken(null);
-        setIsAuthenticated(false);
-        setUser(null);
-        navigate("/login");
-      } finally {
         setIsAuthReady(true);
+        return;
       }
-    };
+    }
+    else{
+      setAccessToken(null);
+      setIsAuthenticated(false);
+      setUser(null);
+      //navigate("/login");
+      setIsAuthReady(true);
+    }
+  };
 
-    tryRefresh();
-  }, [accessToken]);
+  tryInit();
+}, []);
 
  return (
   <AuthContext.Provider

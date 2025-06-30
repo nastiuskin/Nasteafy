@@ -22,12 +22,10 @@ namespace Nasteafy.Infrastructure.Services
         public async Task<Result> LogoutAsync()
         {
             var userId = userProvider.GetUserId();
-            var user = await userManager.Users
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
-                return Result.Fail("Unauthorized")
-                    .LogIfFailed<AuthenticationService>();
+                return Result.Fail("Unauthorized").Log<AuthenticationService>();
 
             user.RefreshToken = null;
             await userManager.UpdateAsync(user);
@@ -39,13 +37,11 @@ namespace Nasteafy.Infrastructure.Services
         {
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
-                return Result.Fail("User not found")
-                    .LogIfFailed<AuthenticationService>(); ;
+                return Result.Fail("User not found").Log<AuthenticationService>(); 
 
             var result = await signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
             if (!result.Succeeded)
-                return Result.Fail("Invalid username or password")
-                    .LogIfFailed<AuthenticationService>(); 
+                return Result.Fail("Invalid username or password").Log<AuthenticationService>(); 
 
             var roles = await userManager.GetRolesAsync(user);
 
@@ -78,17 +74,14 @@ namespace Nasteafy.Infrastructure.Services
                 .FirstOrDefaultAsync(u => u.RefreshToken != null && u.RefreshToken.Token == refreshToken);
 
             if (user is null)
-                return Result.Fail("Invalid refresh token")
-                    .LogIfFailed<AuthenticationService>(); 
+                return Result.Fail("Invalid refresh token").Log<AuthenticationService>(); 
 
             if (user.RefreshToken!.IsExpired)
-                return Result.Fail("Refresh token expired")
-                    .LogIfFailed<AuthenticationService>(); 
+                return Result.Fail("Refresh token expired").Log<AuthenticationService>(); 
 
             var roles = await userManager.GetRolesAsync(user);
 
-            var subscription = await unitOfWork.Subscriptions
-             .GetActiveSubscriptionAsync(user.Id, ct);
+            var subscription = await unitOfWork.Subscriptions.GetActiveSubscriptionAsync(user.Id, ct);
 
             var claims = new List<Claim>
             {
@@ -110,9 +103,9 @@ namespace Nasteafy.Infrastructure.Services
         public async Task<Result<Guid>> RegisterAsync(string email, string password)
         {
             var existingUser = await userManager.FindByEmailAsync(email);
+
             if (existingUser is not null)
-                return Result.Fail("User already exists")
-                    .LogIfFailed<AuthenticationService>();
+                return Result.Fail("User already exists").Log<AuthenticationService>();
 
             var user = new User
             {
@@ -124,13 +117,17 @@ namespace Nasteafy.Infrastructure.Services
 
             var result = await userManager.CreateAsync(user, password);
             if (!result.Succeeded)
+            {
                 return Result.Fail(string.Join(", ", result.Errors.Select(e => e.Description)))
-                    .LogIfFailed<AuthenticationService>();
+                   .Log<AuthenticationService>();
+            }               
 
-            var roleAssignResult = await userManager.AddToRoleAsync(user, "User");
+            var roleAssignResult = await userManager.AddToRoleAsync(user, UserRole.User.ToString());
             if (!roleAssignResult.Succeeded)
+            {
                 return Result.Fail(string.Join(", ", roleAssignResult.Errors.Select(e => e.Description)))
-                    .LogIfFailed<AuthenticationService>();
+                    .Log<AuthenticationService>();
+            }                
 
             return Result.Ok(user.Id);
         }

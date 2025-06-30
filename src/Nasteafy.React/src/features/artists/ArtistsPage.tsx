@@ -49,8 +49,7 @@ export default function ArtistsPage() {
       fetchPage={fetchArtists}
       renderItem={(artist: ArtistDto) => <ArtistCard artist={artist} />}
       pageSize={18}
-      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-    />
+      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"/>
   </div>
 );
 }

@@ -6,6 +6,5 @@ export function handleApiError(error: unknown) {
     toast.error(error.errorMessage ?? "Something went wrong");
   } else {
     toast.error("Something went wrong");
-    console.error(error);
   }
 }

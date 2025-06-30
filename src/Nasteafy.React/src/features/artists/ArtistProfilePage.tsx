@@ -13,7 +13,6 @@ export default function ArtistProfilePage() {
   const { id } = useParams();
   const [artist, setArtist] = useState<ArtistDto | null>(null);
   const [open, setOpen] = useState(false);
-  const [albumToDelete, setAlbumToDelete] = useState<AlbumDto | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0); 
   const navigate = useNavigate();
@@ -64,45 +63,21 @@ export default function ArtistProfilePage() {
     setConfirmOpen(false);
   };
 
-  const handleDeleteAlbumClick = (album: AlbumDto) => {
-  setAlbumToDelete(album);
-};
-
-const handleConfirmDeleteAlbum = async () => {
-  if (!albumToDelete) return;
-  try {
-   // await client.albumsDELETE(albumToDelete.id);
-    toast.success("Album deleted");
-    setRefreshKey((k) => k + 1);
-  } catch (error) {
-    handleApiError(error);
-  } finally {
-    setAlbumToDelete(null);
-  }
-};
-
-const handleCancelDeleteAlbum = () => {
-  setAlbumToDelete(null);
-};
-
   if (!artist) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6">
       <div className="flex items-center gap-6 mb-8">
         <img
-          src={artist.avatarUrl || "/placeholder.jpg"}
+          src={artist.avatarUrl || ""}
           alt={artist.name}
-          className="w-32 h-32 object-cover rounded-full"
-        />
+          className="w-32 h-32 object-cover rounded-full"/>
         <div className="flex flex-col space-y-2	">
           <h1 className="text-3xl font-bold">{artist.name}</h1>
         <div className="flex justify-between items-center mb-6 gap-2">
         <Button onClick={() => setOpen(true)} className="bg-blue-600 hover:bg-blue-700 text-white">
           Add Album
         </Button>
-
-        
         <Button onClick={() => setConfirmOpen(true)} className="bg-red-600 hover:bg-red-700 text-white">
           Delete Artist
         </Button>
@@ -112,12 +87,11 @@ const handleCancelDeleteAlbum = () => {
           onConfirm={handleConfirmDeleteArtist}
           onCancel={handleCancelDeleteArtist}
           confirmText="Yes, Delete"
-          cancelText="No"
-        />
+          cancelText="No"/>
       )}
-      </div>
         </div>
       </div>
+    </div>
 
       <PaginatedList
         key={refreshKey} 
@@ -126,25 +100,21 @@ const handleCancelDeleteAlbum = () => {
         renderItem={(album: AlbumDto) => (
         <div
           key={album.id}
-          className="bg-neutral-800 p-3 rounded-lg flex flex-col h-full"
-        >
+          className="bg-neutral-800 p-3 rounded-lg flex flex-col h-full">
           <img
             src={album.coverUrl || ""}
             alt={album.title}
-            className="w-full h-32 object-cover rounded mb-2"
-          />
+            className="w-full h-32 object-cover rounded mb-2"/>
           <p className="text-sm mt-auto">{album.title}</p>
         </div>
       )}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
-      />
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"/>
 
       <CreateAlbumModal
         artistId={id!}
         open={open}
         onClose={() => setOpen(false)}
-        onCreated={() => setRefreshKey((prev) => prev + 1)}
-      />
+        onCreated={() => setRefreshKey((prev) => prev + 1)}/>
     </div>
   );
 }

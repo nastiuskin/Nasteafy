@@ -14,6 +14,7 @@ interface PaginatedListProps<T> {
     items: T[];
     totalPages: number;
   }>;
+  
 renderItem: (item: T, index: number) => React.ReactNode;
   pageSize?: number;
   className?: string;

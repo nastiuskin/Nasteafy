@@ -19,14 +19,14 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-interface Props {
+type CreateAlbumModalProps =  {
   artistId: string;
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
 }
 
-export default function CreateAlbumModal({ artistId, open, onClose, onCreated }: Props) {
+export default function CreateAlbumModal({ artistId, open, onClose, onCreated }: CreateAlbumModalProps) {
   const [loading, setLoading] = useState(false);
   const { accessToken } = useAuth();
   const [artists, setArtists] = useState<ArtistDto[]>([]);
@@ -136,8 +136,7 @@ export default function CreateAlbumModal({ artistId, open, onClose, onCreated }:
               id="extra-artists"
               multiple
               onChange={handleArtistSelect}
-              className="w-full bg-neutral-800 text-white border-none rounded px-2 py-2"
-            >
+              className="w-full bg-neutral-800 text-white border-none rounded px-2 py-2">
               {artists
                 .filter((a) => a.id !== artistId)
                 .map((artist) => (
