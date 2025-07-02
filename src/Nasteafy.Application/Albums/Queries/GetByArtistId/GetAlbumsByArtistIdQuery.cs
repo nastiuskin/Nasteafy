@@ -36,6 +36,7 @@ namespace Nasteafy.Application.Albums.Queries.GetByArtistId
                 albumDtos.Add(new AlbumDto(
                     a.Id,
                     a.Title,
+                    a.ReleaseDate,
                     coverUrl?.Value,
                     artistNames));
             }

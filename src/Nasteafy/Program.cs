@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Extensions;
 using Nasteafy.Persistence.Database.Extensions;
 using Serilog;
@@ -23,8 +24,6 @@ builder.Services.AddAuthorization(options =>
 
 builder.AddServices();
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
-builder.Services.AddControllers();
-//builder.Services.AddAntiforgery();
 
 builder.Services.AddCors(options =>
 {

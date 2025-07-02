@@ -91,7 +91,6 @@ namespace Nasteafy.Persistence.Database.Extensions
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IJwtTokenService, JwtTokenService>();
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
             services.AddScoped<IFileStorageService, MinioStorageService>();
             services.AddScoped<IResultLogger, ResultLogger>();

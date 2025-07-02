@@ -21,6 +21,7 @@ namespace Nasteafy.Endpoints.Artists
                 return Results.Ok(result.Value);
             })
             .RequireAuthorization("AdminOnly")
+            .Accepts<IFormFile>("multipart/form-data")
             .DisableAntiforgery()
             .Produces<Guid>(StatusCodes.Status200OK)
             .Produces<ApiError>(StatusCodes.Status400BadRequest);

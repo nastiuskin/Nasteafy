@@ -5,7 +5,7 @@ import { ArtistDto } from "../../api/apiClient";
 import PaginatedList from "../../components/Pagination";
 import ArtistCard from "./components/ArtistCard";
 import { useAuth } from "../../hooks/useAuth";
-import CreateArtistModal from "./components/CreateArtistModal";
+import CreateArtistModal, { type ArtistFormData } from "./components/CreateUpdateArtistModal";
 import { Button } from "../../components/ui/button";
 
 export default function ArtistsPage() {
@@ -26,6 +26,20 @@ export default function ArtistsPage() {
     }
   };
 
+  const handleCreateArtist = async (data: ArtistFormData) => {
+    try {
+      await client.artistsPOST(
+        data.name,
+        data.avatarFile
+          ? { data: data.avatarFile, fileName: data.avatarFile.name }
+          : null
+      );
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
+
  return (
   <div className="p-6">
     <div className="flex justify-between items-center mb-4 h-full">
@@ -38,7 +52,7 @@ export default function ArtistsPage() {
           <CreateArtistModal
             open={open}
             setOpen={setOpen}
-            onCreated={() => setRefreshKey((k) => k + 1)}
+            onSubmit={handleCreateArtist}
           />
         </div>
       )}

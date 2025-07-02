@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 
@@ -14,14 +15,13 @@ namespace Nasteafy.Application.Albums.Queries.GetById
         public async Task<Result<AlbumDto>> Handle(GetAlbumByIdQuery req, CancellationToken ct)
         {
             var album = await unitOfWork.Albums.GetByIdWithIncludeAsync(
-                req.AlbumId,
-                ct,
-                x => x.AlbumArtists,
-                x => x.AlbumArtists.Select(at => at.Artist));
+             req.AlbumId,
+             ct,
+             q => q.Include(x => x.AlbumArtists)
+                   .ThenInclude(at => at.Artist));
 
             if (album is null)
-                return Result.Fail("Album not found")
-                    .LogIfFailed<GetAlbumByIdQueryHandler>();
+                return Result.Fail("Album not found").Log<GetAlbumByIdQueryHandler>();
 
             string? coverUrl = null;
             if (!string.IsNullOrEmpty(album.CoverUrl))
@@ -33,6 +33,7 @@ namespace Nasteafy.Application.Albums.Queries.GetById
             var albumDto = new AlbumDto(
                 album.Id,
                 album.Title,
+                album.ReleaseDate,
                 coverUrl,
                 string.Join(", ", album.AlbumArtists.Select(at => at.Artist.Name)));
 

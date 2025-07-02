@@ -8,11 +8,13 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Albums.Commands.Create
 {
-    public record CreateAlbumCommand(
-        string Title,
-        IFormFile? CoverFile,
-        DateTime ReleaseDate,
-        List<Guid> Artists) : IRequest<Result<Guid>>;
+    public class CreateAlbumCommand : IRequest<Result<Guid>>
+    {
+        public required string Title { get; init; }
+        public IFormFile? CoverFile { get; init; }
+        public required DateTime  ReleaseDate { get; init; }
+        public List<Guid> Artists { get; init; } = [];
+    }
 
     public class CreateAlbumCommandHandler(IUnitOfWork unitOfWork,
          IFileStorageService fileStorageService)

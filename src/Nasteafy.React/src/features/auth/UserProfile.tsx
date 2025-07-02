@@ -10,7 +10,6 @@ import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
-import { handleApiError } from "../../helpers/handleApiError";
 import { client } from "../../api/ApiClientProvider";
 
 const schema = z.object({
@@ -21,7 +20,7 @@ const schema = z.object({
 type ProfileFormData = z.infer<typeof schema>;
 
 export default function ProfilePage() {
-  const { accessToken, user, setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(user?.avatarUrl || null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(!user);
@@ -74,25 +73,14 @@ export default function ProfilePage() {
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    const formData = new FormData();
-
-    formData.append("Email", data.email);
-    formData.append("UserName", data.userName);
-    if (avatarFile) {
-      formData.append("AvatarFile", avatarFile);
-    }
-
     try {
-      const response = await fetch("https://localhost:7041/api/users/profile", {
-        method: "PUT",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${accessToken || ""}`,
-        },
-        credentials: "include",
-      });
-
-        if (response.ok) {
+     await client.profilePUT(
+      data.email,
+      data.userName,
+      avatarFile
+        ? { data: avatarFile, fileName: avatarFile.name }
+        : null
+    );
       toast.success("Profile updated successfully");
 
       setUser({
@@ -101,11 +89,9 @@ export default function ProfilePage() {
       userName: data.userName,
       avatarUrl: avatarFile ? avatarUrl : user!.avatarUrl,
   });
-    } else {
-      toast.error("Failed to update profile");
-    }
   } catch (err) {
-    handleApiError(err);
+    toast.error("Failed to update profile");
+    //handleApiError(err);
   }
 };
 
@@ -117,72 +103,72 @@ export default function ProfilePage() {
     );
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh] px-4">
-      <Card className="w-full max-w-xl rounded-2xl shadow-2xl border border-neutral-800 bg-gradient-to-b from-neutral-900 to-neutral-950 text-white">
-        <CardContent className="p-8 space-y-8">
-          <h1 className="text-2xl font-semibold text-center">Profile Details</h1>
+   <div className="flex items-center justify-center min-h-[60vh] px-4">
+  <Card className="w-full max-w-xl rounded-2xl shadow-2xl border bg-card text-card-foreground border-border">
+    <CardContent className="p-8 space-y-8">
+      <h1 className="text-2xl font-semibold text-center">Profile Details</h1>
 
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            <Avatar className="w-28 h-28 border-4 border-neutral-700 shadow-md">
-              <AvatarImage src={avatarUrl || ""} alt="Avatar" className="object-cover" />
-              <AvatarFallback className="text-xl">
-                {user?.email?.[0]?.toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
+      <div className="flex flex-col sm:flex-row items-center gap-6">
+        <Avatar className="w-28 h-28 border-4 border-border shadow-md">
+          <AvatarImage src={avatarUrl || ""} alt="Avatar" className="object-cover" />
+          <AvatarFallback className="text-xl">
+            {user?.email?.[0]?.toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
 
-            <div className="w-full">
-              <Label htmlFor="avatar-upload" className="text-sm text-neutral-400">
-                Upload new photo
-              </Label>
-              <div className="relative mt-2">
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"/>
-                <label
-                  htmlFor="avatar-upload"
-                  className="block bg-neutral-700 text-white py-2 px-4 rounded cursor-pointer text-center">
-                  Choose a file
-                </label>
-              </div>
-            </div>
+        <div className="w-full">
+          <Label htmlFor="avatar-upload" className="text-sm text-muted-foreground">
+            Upload new photo
+          </Label>
+          <div className="relative mt-2">
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"/>
+            <label
+              htmlFor="avatar-upload"
+              className="block bg-secondary text-secondary-foreground py-2 px-4 rounded cursor-pointer text-center">
+              Choose a file
+            </label>
           </div>
+        </div>
+      </div>
 
-          <div>
-            <Label htmlFor="email" className="text-sm text-neutral-400">
-              Email address
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              {...register("email")}
-              className="mt-2 bg-neutral-800 text-white border-none"/>
-            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-          </div>
+      <div>
+        <Label htmlFor="email" className="text-sm text-muted-foreground">
+          Email address
+        </Label>
+        <Input
+          id="email"
+          type="email"
+          {...register("email")}
+          className="mt-2 bg-input text-foreground border"/>
+        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+      </div>
 
-          <div>
-            <Label htmlFor="userName" className="text-sm text-neutral-400">
-              UserName
-            </Label>
-            <Input
-              id="userName"
-              type="text"
-              {...register("userName")}
-              className="mt-2 bg-neutral-800 text-white border-none"/>
-            {errors.userName && <p className="text-sm text-red-500">{errors.userName.message}</p>}
-          </div>
+      <div>
+        <Label htmlFor="userName" className="text-sm text-muted-foreground">
+          UserName
+        </Label>
+        <Input
+          id="userName"
+          type="text"
+          {...register("userName")}
+          className="mt-2 bg-input text-foreground border"/>
+        {errors.userName && <p className="text-sm text-destructive">{errors.userName.message}</p>}
+      </div>
 
-          <div className="flex justify-end">
-            <Button
-              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 text-sm rounded-full transition-all"
-              onClick={handleSubmit(onSubmit)}>
-              Save changes
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      <div className="flex justify-end">
+        <Button
+          className="bg-primary text-primary-foreground hover:brightness-90 px-6 py-2 text-sm rounded-full transition-all"
+          onClick={handleSubmit(onSubmit)}>
+          Save changes
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+</div>
   );
 }

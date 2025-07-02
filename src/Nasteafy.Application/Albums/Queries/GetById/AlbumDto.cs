@@ -2,6 +2,7 @@
 {
     public record AlbumDto(Guid Id,
         string Title,
+        DateTime ReleaseDate,
         string? CoverUrl,
         string Artist);
 }

@@ -8,7 +8,7 @@ using Nasteafy.Domain;
 namespace Nasteafy.Application.Tracks.Queries.GetByAlbumId
 {
     public record GetTracksByAlbumIdQuery(Guid AlbumId, PagedRequest PagedRequest)
-          : IRequest<Result<PagedResult<GetTrackDto>>>;
+          : IRequest<Result<PagedResult<GetTrackDto>>>; 
 
     public class GetTracksByAlbumIdQueryHandler(IUnitOfWork unitOfWork,
         IFileStorageService fileStorageService)

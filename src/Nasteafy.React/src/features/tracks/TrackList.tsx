@@ -1,7 +1,7 @@
-import PaginatedList from "../../../components/Pagination";
-import type { GetTrackDto } from "../../../api/apiClient";
-import { client } from "../../../api/ApiClientProvider";
-import { useAudioPlayer } from "../../../contexts/AudioPlayerContext";
+import PaginatedList from "../../components/Pagination";
+import type { GetTrackDto } from "../../api/apiClient";
+import { client } from "../../api/ApiClientProvider";
+import { useAudioPlayer } from "../../contexts/AudioPlayerContext";
 import { Music, Pause, Play } from "lucide-react";
 
 export default function TrackList({ playlistId }: { playlistId: string }) {

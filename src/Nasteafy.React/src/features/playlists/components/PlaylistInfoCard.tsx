@@ -5,7 +5,7 @@ import { Card, CardContent } from "../../../components/ui/card";
 import { client } from "../../../api/ApiClientProvider";
 import { handleApiError } from "../../../helpers/handleApiError";
 import type { UserPlaylistDto } from "../../../api/apiClient";
-import TrackList from "./TrackList";
+import TrackList from "../../tracks/TrackList";
 
 export default function PlaylistInfoCard() {
   const { id } = useParams(); 

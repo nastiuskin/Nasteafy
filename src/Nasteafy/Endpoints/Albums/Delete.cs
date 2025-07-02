@@ -1,19 +1,18 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Nasteafy.Abstractions;
-using Nasteafy.Application.Artists.Commands.Delete;
+using Nasteafy.Application.Albums.Commands.Delete;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Extensions;
 
-namespace Nasteafy.Endpoints.Artists
+namespace Nasteafy.Endpoints.Albums
 {
-    public sealed class DeleteArtistEndpoint : IEndpoint
+    public sealed class DeleteAlbumEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/artists/{artistId:guid}", async (Guid artistId, ISender sender, CancellationToken ct) =>
+            routes.MapDelete("api/albums/{albumId:guid}", async (Guid albumId, ISender sender, CancellationToken ct) =>
             {
-                var result = await sender.Send(new DeleteArtistCommand(artistId), ct);
+                var result = await sender.Send(new DeleteAlbumCommand(albumId), ct);
 
                 if (result.IsFailed)
                     return result.ToApiError();
@@ -26,4 +25,3 @@ namespace Nasteafy.Endpoints.Artists
         }
     }
 }
-

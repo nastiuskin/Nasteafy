@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
 
@@ -7,18 +8,18 @@ namespace Nasteafy.Application.Tracks.Queries.GetById
 {
     public record GetTrackByIdQuery(Guid TrackId) : IRequest<Result<GetTrackDto>>;
 
-    public class GetTrackByIdQueryHandler(IUnitOfWork unitOfWork, 
+    public class GetTrackByIdQueryHandler(IUnitOfWork unitOfWork,
         IFileStorageService fileStorageService)
     : IRequestHandler<GetTrackByIdQuery, Result<GetTrackDto>>
     {
         public async Task<Result<GetTrackDto>> Handle(GetTrackByIdQuery request, CancellationToken ct)
         {
             var track = await unitOfWork.Tracks.GetByIdWithIncludeAsync(
-                request.TrackId,
-                ct,
-                x => x.ArtistTracks,
-                x => x.Album,
-                x => x.ArtistTracks.Select(at => at.Artist));
+                 request.TrackId,
+                 ct,
+                 q => q.Include(x => x.ArtistTracks)
+                         .ThenInclude(at => at.Artist)
+                     .Include(x => x.Album));
 
             var fileUrl = !string.IsNullOrEmpty(track?.FilePath)
                ? await fileStorageService.GetFileUrlAsync(FileType.Audio, track?.FilePath)

@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Data;
 
 namespace Nasteafy.Application.Artists.Commands.Delete
@@ -15,13 +16,12 @@ namespace Nasteafy.Application.Artists.Commands.Delete
                 .GetByIdWithIncludeAsync(
                     request.ArtistId,
                     ct,
-                    x => x.ArtistTracks,
-                    x => x.AlbumArtists
+                    x => x.Include(x => x.ArtistTracks)
+                        .Include(x => x.AlbumArtists)                   
                 );
 
             if (artist is null)
-                return Result.Fail("Artist not found.")
-                    .LogIfFailed<DeleteArtistCommandHandler>();
+                return Result.Fail("Artist not found.").Log<DeleteArtistCommandHandler>();
 
             bool hasTracks = artist.ArtistTracks.Any();
             bool hasAlbums = artist.AlbumArtists.Any();

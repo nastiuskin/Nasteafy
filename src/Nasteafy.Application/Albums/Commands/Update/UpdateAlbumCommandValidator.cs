@@ -10,7 +10,7 @@ namespace Nasteafy.Application.Albums.Commands.Update
             RuleFor(x => x.AlbumId)
                 .NotEmpty()
                     .WithMessage("AlbumId is required")
-                .MustAsync(unitOfWork.Playlists.ExistsAsync)
+                .MustAsync(unitOfWork.Albums.ExistsAsync)
                     .WithMessage("Album not found");
         }
     }

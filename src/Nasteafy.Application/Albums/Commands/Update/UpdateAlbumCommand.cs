@@ -1,13 +1,20 @@
 ﻿using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Nasteafy.Application.Artists.Commands.Delete;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
+using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Albums.Commands.Update
 {
-    public record UpdateAlbumCommand(Guid AlbumId, string? Title, IFormFile? CoverFile) : IRequest<Result>;
+    public class UpdateAlbumCommand : IRequest<Result>
+    {
+        [JsonIgnore]
+        public Guid AlbumId { get; set; }
+        public IFormFile? CoverFile { get; init; }
+        public DateTime ReleaseDate { get; init; }
+        public string? Title { get; init; } 
+    }
 
     public class UpdateAlbumCommandHandler : IRequestHandler<UpdateAlbumCommand, Result>
     {

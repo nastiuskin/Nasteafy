@@ -36,13 +36,13 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         public async Task DeleteAsync(T entity, CancellationToken ct)
         {
             if (entity != null)
-                 _dbSet.Remove(entity);
+                _dbSet.Remove(entity);
         }
 
         public async Task<bool> ExistsAsync(Guid id, CancellationToken ct)
         {
             return await _dbSet.AnyAsync(x => x.Id == id);
-        }   
+        }
 
         public async Task<T?> GetByIdAsync(Guid id, CancellationToken ct)
         {
@@ -73,14 +73,12 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             return await query.ToPagedResultAsync(request, ct);
         }
 
-        public async Task<T?> GetByIdWithIncludeAsync(Guid id, CancellationToken ct = default, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdWithIncludeAsync(Guid id, CancellationToken ct = default, Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             var query = _dbSet.AsQueryable();
 
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
+            if (include is not null)
+                query = include(query);
 
             return await query.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
