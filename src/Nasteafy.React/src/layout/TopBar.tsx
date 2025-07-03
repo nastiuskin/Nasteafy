@@ -30,27 +30,27 @@ export default function Topbar() {
   const navigate = useNavigate();
 
   const toggleTheme = () => {
-  const html = document.documentElement;
-  const isNowDark = !html.classList.contains("dark");
+    const html = document.documentElement;
+    const isNowDark = !html.classList.contains("dark");
 
-  if (isNowDark) {
-    html.classList.add("dark");
-    localStorage.setItem("theme", "dark");
-  } else {
-    html.classList.remove("dark");
-    localStorage.setItem("theme", "light");
-  }
+    if (isNowDark) {
+      html.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      html.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
 
-  setIsDark(isNowDark);
-};
+    setIsDark(isNowDark);
+  };
 
-return (
+  return (
     <>
       <div className="h-16 px-6 flex items-center justify-between bg-background border-b border-border">
         <input
           type="text"
           placeholder="Search..."
-          className="bg-muted text-foreground px-4 py-2 rounded w-1/2 placeholder:text-muted-foreground"/>
+          className="bg-muted text-foreground px-4 py-2 rounded w-1/2 placeholder:text-muted-foreground" />
 
         <div className="flex gap-4 items-center">
           <Button
@@ -69,7 +69,8 @@ return (
                   <AvatarImage
                     src={user?.avatarUrl || ""}
                     alt="Avatar"
-                    className="avatar"/>
+                    className="w-full h-full object-cover rounded-full"
+                  />
                   <AvatarFallback>
                     {user?.email?.[0]?.toUpperCase() || "U"}
                   </AvatarFallback>

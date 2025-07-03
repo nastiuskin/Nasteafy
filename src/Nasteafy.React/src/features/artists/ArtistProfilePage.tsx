@@ -10,6 +10,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import toast from "react-hot-toast";
 import { Pencil, User } from "lucide-react";
 import ArtistModal, { type ArtistFormData } from "./components/CreateUpdateArtistModal";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function ArtistProfilePage() {
   const { id } = useParams();
@@ -19,6 +20,7 @@ export default function ArtistProfilePage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const fetchArtist = async () => {
@@ -132,7 +134,7 @@ export default function ArtistProfilePage() {
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-4 flex-1">
           <h1 className="text-4xl font-extrabold text-foreground">{artist.name}</h1>
 
-          <div className="flex gap-2 flex-wrap justify-center sm:justify-start">
+          {isAdmin && (<div className="flex gap-2 flex-wrap justify-center sm:justify-start">
             <Button
               onClick={() => setOpen(true)}
               className="bg-primary text-primary-foreground hover:brightness-90"
@@ -145,7 +147,7 @@ export default function ArtistProfilePage() {
             >
               Delete Artist
             </Button>
-          </div>
+          </div>)}
         </div>
       </div>
 
@@ -163,6 +165,7 @@ export default function ArtistProfilePage() {
         key={refreshKey}
         fetchPage={fetchAlbums}
         pageSize={8}
+        emptyContent={<p className="text-muted-foreground text-sm">No albums yet</p>}
         renderItem={(album: AlbumDto) => (
           <Link
             to={`/albums/${album.id}`}
@@ -197,3 +200,4 @@ export default function ArtistProfilePage() {
     </div>
   );
 }
+

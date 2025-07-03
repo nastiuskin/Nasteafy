@@ -10,8 +10,15 @@ import { client } from "../../api/ApiClientProvider";
 const schema = z.object({
   title: z.string().min(1, "Track title is required"),
   file: z
-    .custom<File>((val) => val instanceof File, "Audio file is required")
-    .refine((file) => file?.type.startsWith("audio/"), "Only audio files allowed"),
+    .any()
+    .refine(
+      (files) => files instanceof FileList && files.length > 0,
+      "Audio file is required"
+    )
+    .refine(
+      (files) => files[0]?.type?.startsWith("audio/"),
+      "Only audio files allowed"
+    ),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -37,16 +44,19 @@ export default function UploadTrackModal({ open, setOpen, albumId, onUploaded }:
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-
+    const file = data.file[0];
+    const duration = await getAudioDuration(file);
     try {
-    //   await client.tracksPOST(
-    //     data.title,
-    //     {
-    //       data: data.file,
-    //       fileName: data.file.name,
-    //     },
-    //     [albumId]
-    //   );
+      await client.tracksPOST(
+        {
+          data: file,
+          fileName: file.name,
+        },
+        data.title,
+        duration,
+        albumId,
+        ["019793f5-699c-7d2f-8ad8-45daf35cb244"] //TEST
+      );
       reset();
       setOpen(false);
       onUploaded?.();
@@ -70,7 +80,9 @@ export default function UploadTrackModal({ open, setOpen, albumId, onUploaded }:
           </div>
           <div>
             <Input type="file" accept="audio/*" {...register("file")} />
-            {errors.file && <p className="text-sm text-red-500">{errors.file.message}</p>}
+            {typeof errors.file?.message === "string" && (
+              <p className="text-sm text-red-500">{errors.file.message}</p>
+            )}
           </div>
           <Button type="submit" disabled={loading}>
             Upload
@@ -79,4 +91,21 @@ export default function UploadTrackModal({ open, setOpen, albumId, onUploaded }:
       </DialogContent>
     </Dialog>
   );
+}
+
+async function getAudioDuration(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const audio = new Audio(URL.createObjectURL(file));
+    audio.addEventListener("loadedmetadata", () => {
+      const duration = audio.duration;
+      const hours = Math.floor(duration / 3600);
+      const minutes = Math.floor((duration % 3600) / 60);
+      const seconds = Math.floor(duration % 60);
+      resolve(
+        [hours, minutes, seconds]
+          .map((n) => String(n).padStart(2, "0"))
+          .join(":")
+      );
+    });
+  });
 }

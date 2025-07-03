@@ -15,7 +15,8 @@ namespace Nasteafy.Infrastructure.Database.Repositories
         {
             var query = _context.Tracks
                 .AsNoTracking()
-                .Where(x => x.AlbumId == albumId);
+                .Where(x => x.AlbumId == albumId)
+                .Include(x => x.Album);
 
             return await query.ToPagedResultAsync(req, ct);
         }

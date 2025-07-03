@@ -14,15 +14,17 @@ interface PaginatedListProps<T> {
     items: T[];
     totalPages: number;
   }>;
-  
-renderItem: (item: T, index: number) => React.ReactNode;
+
+  renderItem: (item: T, index: number) => React.ReactNode;
   pageSize?: number;
   className?: string;
+  emptyContent?: React.ReactNode;
 }
 
 export default function PaginatedList<T>({
   fetchPage,
   renderItem,
+  emptyContent,
   pageSize = 10,
   className,
 }: PaginatedListProps<T>) {
@@ -72,15 +74,17 @@ export default function PaginatedList<T>({
     return items;
   };
 
-    return (
+  return (
     <div className="flex flex-col gap-6">
       <div className={className}>
-        {items.map((item, index) => (
-      <div key={index}>{renderItem(item, index)}</div>
-      ))}
+        {items.length === 0
+          ? emptyContent ?? null
+          : items.map((item, index) => (
+            <div key={index}>{renderItem(item, index)}</div>
+          ))}
       </div>
 
-      {totalPages && totalPages > 1 && (
+      {items.length > 0 && totalPages && totalPages > 1 && (
         <div className="flex justify-center">
           <Pagination>
             <PaginationContent>

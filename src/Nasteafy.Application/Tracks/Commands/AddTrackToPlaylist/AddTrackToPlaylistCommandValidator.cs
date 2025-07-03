@@ -4,24 +4,14 @@ using Nasteafy.Application.Tracks.Commands.AddTrack;
 
 public class AddTrackToPlaylistCommandValidator : AbstractValidator<AddTrackToPlaylistCommand>
 {
-    private readonly IUnitOfWork _unitOfWork;
-
     public AddTrackToPlaylistCommandValidator(IUnitOfWork unitOfWork)
     {
-        _unitOfWork = unitOfWork;
-
         RuleFor(x => x.PlaylistId)
             .NotEmpty().WithMessage("Playlist ID must not be empty.")
-            .MustAsync(PlaylistExistsAsync).WithMessage("Playlist does not exist.");
+            .MustAsync(unitOfWork.Playlists.ExistsAsync).WithMessage("Playlist does not exist.");
 
         RuleFor(x => x.TrackId)
             .NotEmpty().WithMessage("Track ID must not be empty.")
-            .MustAsync(TrackExistsAsync).WithMessage("Track does not exist.");
+            .MustAsync(unitOfWork.Tracks.ExistsAsync).WithMessage("Track does not exist.");
     }
-
-    private async Task<bool> PlaylistExistsAsync(Guid playlistId, CancellationToken ct) =>
-        await _unitOfWork.Playlists.ExistsAsync(playlistId, ct);
-
-    private async Task<bool> TrackExistsAsync(Guid trackId, CancellationToken ct) =>
-        await _unitOfWork.Tracks.ExistsAsync(trackId, ct);
 }

@@ -40,7 +40,7 @@ export default function PlaylistsPage() {
         renderItem={(pl: UserPlaylistDto) => (
           <PlaylistCard key={pl.id} playlist={pl} />
         )}
-        pageSize={10}
+        pageSize={9}
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
       />
     </div>

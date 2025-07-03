@@ -1,52 +1,43 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import type { AlbumDto, GetTrackDto } from "../../api/apiClient";
+import type { AlbumDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
-import { Music, Pencil } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import type { AlbumFormData } from "./components/CreateUpdateAlbumModal";
 import CreateUpdateAlbumModal from "./components/CreateUpdateAlbumModal";
 import toast from "react-hot-toast";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import UploadTrackModal from "../tracks/UploadTrackModal";
+import TrackList from "../tracks/TrackList";
 
 export default function AlbumPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id: albumId } = useParams<{ id: string }>();
   const [album, setAlbum] = useState<AlbumDto | null>(null);
-  const [tracks, setTracks] = useState<GetTrackDto[]>([]);
-  const [open, setOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!id) return;
+    if (!albumId) return;
 
     const fetchAlbum = async () => {
       try {
-        const data = await client.albumsGET2(id);
+        const data = await client.albumsGET2(albumId);
         setAlbum(data);
       } catch (error) {
         handleApiError(error);
       }
     };
 
-    const fetchTracks = async (page: number, pageSize: number) => {
-      try {
-        const response = await client.tracksGET(id!, page, pageSize);
-        setTracks(response.items ?? []);
-      } catch (error) {
-        handleApiError(error);
-      }
-    };
-
     fetchAlbum();
-    fetchTracks(1, 100);
-  }, [id]);
+  }, [albumId]);
 
   const handleUpdateAlbum = async (data: AlbumFormData) => {
     if (!album) return;
@@ -68,12 +59,27 @@ export default function AlbumPage() {
     }
   };
 
+  const fetchTracksForAlbum = async (page: number, pageSize: number) => {
+    try {
+      if (!albumId) {
+        return { items: [], totalPages: 1 };
+      }
+      const result = await client.tracksGET(albumId!, page, pageSize);
+      return {
+        items: result.items ?? [],
+        totalPages: result.totalPages ?? 1,
+      }
+    } catch (error) {
+      handleApiError(error)
+      return { items: [], totalPages: 1 };;
+    }
+  };
+
   const handleDeleteAlbum = async () => {
     try {
       await client.albumsDELETE(album?.id!);
       toast("Album deleted");
-      setAlbum(null);
-      window.history.back();
+      navigate(-1);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -81,10 +87,16 @@ export default function AlbumPage() {
     }
   };
 
-  const handleCancelDeleteAlbum = () => {
-    setConfirmOpen(false);
+  const handleDeleteTrack = async (trackId: string) => {
+    try {
+      await client.tracksDELETE(trackId);
+      toast("Track deleted");
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setConfirmOpen(false);
+    }
   };
-
 
   if (!album) return <div className="p-6">Loading album...</div>;
 
@@ -124,11 +136,11 @@ export default function AlbumPage() {
           </p>
           {isAdmin && (
             <div className="flex gap-2 flex-wrap">
-             <Button
-              onClick={() => setUploadOpen(true)}
-              className="bg-primary text-primary-foreground hover:brightness-90">
-              Add Track
-            </Button>
+              <Button
+                onClick={() => setUploadOpen(true)}
+                className="bg-primary text-primary-foreground hover:brightness-90">
+                Add Track
+              </Button>
               <Button
                 onClick={() => setConfirmOpen(true)}
                 variant="destructive">
@@ -139,22 +151,24 @@ export default function AlbumPage() {
         </div>
       </div>
 
-      <div className="space-y-2">
-        {tracks.length === 0 ? (
-          <p className="text-muted-foreground flex items-center gap-2">
-            <Music className="w-4 h-4" /> No tracks found.
-          </p>
-        ) : (
-          tracks.map((track) => (
-            <div
-              key={track.id}
-              className="border border-border rounded p-3 text-foreground bg-card shadow-sm"
-            >
-              {track.title}
-            </div>
-          ))
-        )}
-      </div>
+      {albumId && (
+        <TrackList
+          key={refreshKey}
+          fetchTracks={fetchTracksForAlbum}
+          renderActions={(track) =>
+            isAdmin && (
+              <Button
+                variant="ghost"
+                size="icon"
+                title="Delete track"
+                onClick={() => setTrackToDelete(track.id!)}
+              >
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            )
+          }
+        />
+      )}
 
       {isAdmin && editOpen && (
         <CreateUpdateAlbumModal
@@ -175,7 +189,7 @@ export default function AlbumPage() {
         <ConfirmDialog
           message="Are you sure you want to delete this album?"
           onConfirm={handleDeleteAlbum}
-          onCancel={handleCancelDeleteAlbum}
+          onCancel={() => setConfirmOpen(false)}
           confirmText="Yes, Delete"
           cancelText="No"
         />
@@ -188,14 +202,24 @@ export default function AlbumPage() {
           albumId={album.id!}
           onUploaded={() => {
             toast.success("Track uploaded");
-            setOpen(false);
-            client.tracksGET(album.id!, 1, 100).then((res) => {
-              setTracks(res.items ?? []);
-            });
+            setRefreshKey((k) => k + 1);
           }}
         />
       )}
 
+      {trackToDelete && (
+        <ConfirmDialog
+          message="Are you sure you want to delete this track?"
+          onConfirm={async () => {
+            await handleDeleteTrack(trackToDelete);
+            setTrackToDelete(null);
+            setRefreshKey((k) => k + 1);
+          }}
+          onCancel={() => setTrackToDelete(null)}
+          confirmText="Yes, Delete"
+          cancelText="No"
+        />
+      )}
     </div>
   );
 }

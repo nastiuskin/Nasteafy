@@ -34,7 +34,19 @@ export interface IClient {
     /**
      * @return OK
      */
+    tracksDELETE(trackId: string): Promise<void>;
+    /**
+     * @return OK
+     */
     tracksGET(albumId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @param track (optional) 
+     * @param title (optional) 
+     * @param duration (optional) 
+     * @param artistIds (optional) 
+     * @return OK
+     */
+    tracksPOST2(albumId: string, track: FileParameter | null | undefined, title: string | null | undefined, duration: string | undefined, artistIds: string[] | null | undefined): Promise<string>;
     /**
      * @return OK
      */
@@ -373,6 +385,63 @@ export class Client implements IClient {
     /**
      * @return OK
      */
+    tracksDELETE(trackId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/tracks/{trackId}";
+        if (trackId === undefined || trackId === null)
+            throw new Error("The parameter 'trackId' must be defined.");
+        url_ = url_.replace("{trackId}", encodeURIComponent("" + trackId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTracksDELETE(_response);
+        });
+    }
+
+    protected processTracksDELETE(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     tracksGET(albumId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/albums/{albumId}/tracks?";
         if (albumId === undefined || albumId === null)
@@ -437,6 +506,85 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
+    }
+
+    /**
+     * @param track (optional) 
+     * @param title (optional) 
+     * @param duration (optional) 
+     * @param artistIds (optional) 
+     * @return OK
+     */
+    tracksPOST2(albumId: string, track: FileParameter | null | undefined, title: string | null | undefined, duration: string | undefined, artistIds: string[] | null | undefined, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/albums/{albumId}/tracks";
+        if (albumId === undefined || albumId === null)
+            throw new Error("The parameter 'albumId' must be defined.");
+        url_ = url_.replace("{albumId}", encodeURIComponent("" + albumId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (track !== null && track !== undefined)
+            content_.append("track", track.data, track.fileName ? track.fileName : "track");
+        if (title !== null && title !== undefined)
+            content_.append("title", title.toString());
+        if (duration === null || duration === undefined)
+            throw new Error("The parameter 'duration' cannot be null.");
+        else
+            content_.append("duration", duration.toString());
+        if (artistIds !== null && artistIds !== undefined)
+            artistIds.forEach(item_ => content_.append("artistIds", item_.toString()));
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTracksPOST2(_response);
+        });
+    }
+
+    protected processTracksPOST2(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
     }
 
     /**
@@ -3067,6 +3215,62 @@ export interface IGetSubscriptionDto {
     name?: string | undefined;
     description?: string | undefined;
     price?: number;
+}
+
+export class AddTrackToAlbumCommand implements IAddTrackToAlbumCommand {
+    track?: string | undefined;
+    title?: string | undefined;
+    duration?: string;
+    artistIds?: string[] | undefined;
+
+    constructor(data?: IAddTrackToAlbumCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.track = _data["track"];
+            this.title = _data["title"];
+            this.duration = _data["duration"];
+            if (Array.isArray(_data["artistIds"])) {
+                this.artistIds = [] as any;
+                for (let item of _data["artistIds"])
+                    this.artistIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): AddTrackToAlbumCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddTrackToAlbumCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["track"] = this.track;
+        data["title"] = this.title;
+        data["duration"] = this.duration;
+        if (Array.isArray(this.artistIds)) {
+            data["artistIds"] = [];
+            for (let item of this.artistIds)
+                data["artistIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IAddTrackToAlbumCommand {
+    track?: string | undefined;
+    title?: string | undefined;
+    duration?: string;
+    artistIds?: string[] | undefined;
 }
 
 export class CreateTrackCommand implements ICreateTrackCommand {
