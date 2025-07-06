@@ -22,7 +22,7 @@ export function decodeToken(token: string): UserType | null {
       id: decoded.sub, 
       email: decoded.email,
       userRole: role,
-      subscriptionType: decoded.subscriptionType ?? null
+      subscriptionType: decoded.subscription ?? null
     };
   } catch (error) {
     console.error("Token decode error:", error);

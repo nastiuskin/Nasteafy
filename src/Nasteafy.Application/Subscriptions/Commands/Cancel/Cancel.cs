@@ -2,7 +2,6 @@
 using MediatR;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
-using Nasteafy.Application.Tracks.Commands.AddTrack;
 
 namespace Nasteafy.Application.Subscriptions.Commands.Cancel
 {

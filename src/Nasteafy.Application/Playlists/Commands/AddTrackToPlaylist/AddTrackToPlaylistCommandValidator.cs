@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Nasteafy.Application.Common.Abstractions.Data;
-using Nasteafy.Application.Tracks.Commands.AddTrack;
+using Nasteafy.Application.Playlists.Commands.AddTrackToPlaylist;
 
 public class AddTrackToPlaylistCommandValidator : AbstractValidator<AddTrackToPlaylistCommand>
 {

@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Music } from "lucide-react";
+import { Music, Trash } from "lucide-react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { client } from "../../../api/ApiClientProvider";
 import { handleApiError } from "../../../helpers/handleApiError";
-import type { UserPlaylistDto } from "../../../api/apiClient";
+import { RemoveTrackFromPlaylistCommand, type UserPlaylistDto } from "../../../api/apiClient";
 import TrackList from "../../tracks/TrackList";
+import { Button } from "../../../components/ui/button";
+import { useAuth } from "../../../hooks/useAuth";
+import toast from "react-hot-toast";
+import ConfirmDialog from "../../../components/ConfirmDialog";
 
 export default function PlaylistInfoCard() {
   const { id } = useParams();
   const [playlist, setPlaylist] = useState<UserPlaylistDto | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const { isUser } = useAuth();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [trackToRemove, setTrackToRemove] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -41,6 +48,21 @@ export default function PlaylistInfoCard() {
     }
   };
 
+  const handleRemoveTracksFromPlaylist = async () => {
+    if (!trackToRemove || !playlist?.id) return;
+    const command = new RemoveTrackFromPlaylistCommand({ trackId: trackToRemove });
+
+    try {
+      await client.tracksDELETE2(playlist.id, command);
+      toast.success("Track removed from playlist");
+      setRefreshKey((k) => k + 1);
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setTrackToRemove(null);
+    }
+  };
+
   if (!playlist) return <p className="p-4 text-muted-foreground">Loading...</p>;
 
   return (
@@ -67,7 +89,31 @@ export default function PlaylistInfoCard() {
           </div>
         </div>
 
-        <TrackList key={refreshKey} fetchTracks={fetchTracksForPlaylist} />
+        <TrackList
+          key={refreshKey}
+          fetchTracks={fetchTracksForPlaylist}
+          renderActions={(track) =>
+            isUser && (
+              <Button
+                variant="ghost"
+                size="icon"
+                title="Delete track"
+                onClick={() => setTrackToRemove(track.id!)}
+              >
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            )
+          }
+        />
+        {trackToRemove && (
+          <ConfirmDialog
+            message="Are you sure you want to remove this track from the playlist?"
+            onConfirm={handleRemoveTracksFromPlaylist}
+            onCancel={() => setTrackToRemove(null)}
+            confirmText="Yes, remove"
+            cancelText="No"
+          />
+        )}
       </CardContent>
     </Card>
   );

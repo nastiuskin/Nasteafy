@@ -1,7 +1,5 @@
 ﻿using Nasteafy.Application.Common.Models;
 using Nasteafy.Domain.Base;
-using Nasteafy.Domain.Contracts;
-using System.Linq.Expressions;
 
 namespace Nasteafy.Application.Common.Abstractions.Data.Repositories
 {
@@ -12,7 +10,7 @@ namespace Nasteafy.Application.Common.Abstractions.Data.Repositories
         Task<PagedResult<T>> GetPagedResultAsync(PagedRequest request, CancellationToken ct);
         Task AddAsync(T entity, CancellationToken ct);
         Task AddRangeAsync(IEnumerable<T> objModel, CancellationToken ct);
-        Task DeleteAsync(T entity, CancellationToken ct);
+        void Delete(T entity, CancellationToken ct);
         Task UpdateAsync(T entity, CancellationToken ct);
         Task<int> CountAsync(CancellationToken ct);
         Task<bool> ExistsAsync(Guid id, CancellationToken ct);

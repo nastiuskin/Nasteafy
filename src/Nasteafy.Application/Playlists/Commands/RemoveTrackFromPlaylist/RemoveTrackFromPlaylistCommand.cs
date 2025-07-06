@@ -2,10 +2,16 @@
 using MediatR;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using System.Text.Json.Serialization;
 
-namespace Nasteafy.Application.Tracks.Commands.RemoveFromPlaylist
+namespace Nasteafy.Application.Playlists.Commands.RemoveFromPlaylist
 {
-    public record RemoveTrackFromPlaylistCommand(Guid PlaylistId, Guid TrackId) : IRequest<Result>;
+    public class RemoveTrackFromPlaylistCommand : IRequest<Result>
+    {
+        [JsonIgnore]
+        public Guid PlaylistId { get; set; }
+        public Guid TrackId { get; set; }
+    }
 
     public class RemoveTrackFromPlaylistCommandHandler : IRequestHandler<RemoveTrackFromPlaylistCommand, Result>
     {

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import type { AlbumDto } from "../../api/apiClient";
+import { AddTrackToPlaylistCommand, type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
-import { Pencil, Trash } from "lucide-react";
+import { MoreVertical, Pencil, Trash } from "lucide-react";
 import type { AlbumFormData } from "./components/CreateUpdateAlbumModal";
 import CreateUpdateAlbumModal from "./components/CreateUpdateAlbumModal";
 import toast from "react-hot-toast";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import UploadTrackModal from "../tracks/UploadTrackModal";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../../components/ui/dropdown-menu";
 import TrackList from "../tracks/TrackList";
 
 export default function AlbumPage() {
@@ -21,7 +22,8 @@ export default function AlbumPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
-  const { isAdmin } = useAuth();
+  const [playlists, setPlaylists] = useState<UserPlaylistDto[]>([]);
+  const { isAdmin, isUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +40,20 @@ export default function AlbumPage() {
 
     fetchAlbum();
   }, [albumId]);
+
+
+  useEffect(() => {
+    fetchPlaylists();
+  }, []);
+
+  const fetchPlaylists = async () => {
+    try {
+      const response = await client.playlistsGET(1, 50);
+      setPlaylists(response.items ?? []);
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
 
   const handleUpdateAlbum = async (data: AlbumFormData) => {
     if (!album) return;
@@ -87,6 +103,16 @@ export default function AlbumPage() {
     }
   };
 
+  const handleAddToPlaylist = async (trackId: string, playlistId: string) => {
+    const command = new AddTrackToPlaylistCommand({ trackId });
+    try {
+      await client.tracksPOST2(playlistId, command);
+      toast.success("Track successfully added to playlist");
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
+
   const handleDeleteTrack = async (trackId: string) => {
     try {
       await client.tracksDELETE(trackId);
@@ -97,6 +123,41 @@ export default function AlbumPage() {
       setConfirmOpen(false);
     }
   };
+
+  const renderActions = (track: GetTrackDto) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="hover:bg-accent">
+          <MoreVertical className="w-5 h-5 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {isUser && (
+          <>
+            <div className="px-2 py-1 text-xs text-muted-foreground">Add to playlist</div>
+            {playlists.map((playlist) => (
+              <DropdownMenuItem
+                key={playlist.id}
+                onClick={() => handleAddToPlaylist(track.id!, playlist.id!)}
+              >
+                {playlist.title}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuItem className="h-px my-1 bg-border" disabled />
+          </>
+        )}
+        {isAdmin && (
+          <DropdownMenuItem
+            onClick={() => setTrackToDelete(track.id!)}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash className="w-4 h-4 mr-2" />
+            Delete track
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   if (!album) return <div className="p-6">Loading album...</div>;
 
@@ -155,18 +216,7 @@ export default function AlbumPage() {
         <TrackList
           key={refreshKey}
           fetchTracks={fetchTracksForAlbum}
-          renderActions={(track) =>
-            isAdmin && (
-              <Button
-                variant="ghost"
-                size="icon"
-                title="Delete track"
-                onClick={() => setTrackToDelete(track.id!)}
-              >
-                <Trash className="w-4 h-4 text-destructive" />
-              </Button>
-            )
-          }
+          renderActions={renderActions}
         />
       )}
 

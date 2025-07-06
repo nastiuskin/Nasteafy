@@ -3,10 +3,17 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
+using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Playlists.Commands.Update
 {
-    public record UpdatePlaylistCommand(Guid PlaylistId, string? Title, IFormFile? CoverFile) : IRequest<Result>;
+    public class UpdatePlaylistCommand : IRequest<Result>
+    {
+        [JsonIgnore]
+        public Guid PlaylistId { get; set; }
+        public string? Title { get; set; }
+        public IFormFile? CoverFile { get; set; }
+    }
 
     public class UpdatePlaylistCommandHandler : IRequestHandler<UpdatePlaylistCommand, Result>
     {

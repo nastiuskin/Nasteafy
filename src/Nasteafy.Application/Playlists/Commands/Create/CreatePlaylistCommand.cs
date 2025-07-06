@@ -1,23 +1,24 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Domain;
 using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Playlists.Commands.Create
 {
-    public record CreatePlaylistCommand(string Title) : IRequest<Result<Guid>>;
-
-    public class CreatePlaylistCommandHandler : IRequestHandler<CreatePlaylistCommand, Result<Guid>>
+    public class CreatePlaylistCommand : IRequest<Result<Guid>>
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ICurrentUserProvider _userProvider;
+        public required string Title { get; set; }
+        public IFormFile? PlaylistCover { get; set; }
+    }
 
-        public CreatePlaylistCommandHandler(IUnitOfWork unitOfWork, ICurrentUserProvider userProvider)
-        {
-            _unitOfWork = unitOfWork;
-            _userProvider = userProvider;
-        }
+    public class CreatePlaylistCommandHandler(
+        IUnitOfWork _unitOfWork,
+        ICurrentUserProvider _userProvider,
+        IFileStorageService fileStorageService) : IRequestHandler<CreatePlaylistCommand, Result<Guid>>
+    {
 
         public async Task<Result<Guid>> Handle(CreatePlaylistCommand request, CancellationToken cancellationToken)
         {
@@ -31,6 +32,20 @@ namespace Nasteafy.Application.Playlists.Commands.Create
                 Title = request.Title,
                 UserId = userId.Value,
             };
+
+            if (request.PlaylistCover != null && request?.PlaylistCover?.Length > 0)
+            {
+                await using var stream = request.PlaylistCover.OpenReadStream();
+
+                var result = await fileStorageService.UploadFileAsync(
+                    stream,
+                    request.PlaylistCover.FileName,
+                    request.PlaylistCover.ContentType,
+                    FileType.PlaylistCover);
+
+                if (result.IsSuccess)
+                    playlist.CoverUrl = result.Value;
+            }
 
             await _unitOfWork.Playlists.AddAsync(playlist, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

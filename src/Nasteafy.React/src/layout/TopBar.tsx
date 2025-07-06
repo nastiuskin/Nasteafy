@@ -19,6 +19,7 @@ import {
 import { Button } from "../components/ui/button";
 import { useAuth } from '../hooks/useAuth';
 import { Moon, Sun } from "lucide-react";
+import { Badge } from '../components/ui/badge';
 
 export default function Topbar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -61,6 +62,20 @@ export default function Topbar() {
             className="text-foreground hover:text-yellow-400">
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </Button>
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/subscriptions")}
+            className="text-sm text-foreground hover:underline flex items-center gap-1"
+          >
+            {user?.subscriptionType ? (
+              <>
+                {user.subscriptionType}
+                <Badge variant="success">Active</Badge> 
+              </>
+            ) : ( 
+              "Premium"
+            )}
+          </Button>
 
           {isAuthenticated ? (
             <DropdownMenu>
@@ -92,6 +107,7 @@ export default function Topbar() {
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
+
             </DropdownMenu>
           ) : (
             <>

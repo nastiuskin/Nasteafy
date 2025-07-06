@@ -6,9 +6,9 @@ import {
 } from "react";
 import { decodeToken, type UserType } from "../helpers/decodeToken";
 import { handleApiError } from "../helpers/handleApiError";
-import { authService } from "../services/AuthService";
 import { useNavigate } from "react-router-dom";
 import { client } from "../api/ApiClientProvider";
+import { authService } from "../services/auth/AuthService";
 
 export type AuthContextType = {    
   accessToken: string | null;

@@ -3,11 +3,17 @@ using MediatR;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain.Entities.Tracks;
+using System.Text.Json.Serialization;
 
-namespace Nasteafy.Application.Tracks.Commands.AddTrack
+namespace Nasteafy.Application.Playlists.Commands.AddTrackToPlaylist
 {
-    public record AddTrackToPlaylistCommand(Guid PlaylistId, Guid TrackId)
-        : IRequest<Result>;
+    public class AddTrackToPlaylistCommand : IRequest<Result>
+    {
+        [JsonIgnore]
+        public Guid PlaylistId { get; set; }
+        public Guid TrackId { get; set; }
+    }
+       
 
     public class AddTrackToPlaylistCommandHandler(
         IUnitOfWork unitOfWork,
@@ -23,10 +29,7 @@ namespace Nasteafy.Application.Tracks.Commands.AddTrack
 
             var playlist = await unitOfWork.Playlists.GetByIdWithTracks(request.PlaylistId, ct);
 
-            if (playlist is null)
-                return Result.Fail("Playlist not found").Log<AddTrackToPlaylistCommand>();
-
-            if (playlist.UserId != userId)
+            if (playlist!.UserId != userId)
                 return Result.Fail("You do not have permission to modify this playlist").Log<AddTrackToPlaylistCommandHandler>();
 
             var alreadyExists = playlist.PlaylistTracks.Any(pt => pt.TrackId == request.TrackId);

@@ -1,7 +1,7 @@
 import PaginatedList from "../../components/Pagination";
-import type { GetTrackDto } from "../../api/apiClient";
+import { type GetTrackDto } from "../../api/apiClient";
 import { useAudioPlayer } from "../../contexts/AudioPlayerContext";
-import { Music, Pause, Play } from "lucide-react";
+import { Music, Pause, Play, MoreVertical } from "lucide-react";
 import { Button } from "../../components/ui/button";
 
 type TrackListProps = {
@@ -16,6 +16,7 @@ type TrackListProps = {
 export default function TrackList({ fetchTracks, renderActions }: TrackListProps) {
   const { playTrack, currentUrl, isPlaying } = useAudioPlayer();
 
+
   return (
     <div className="mt-4">
       <PaginatedList
@@ -24,9 +25,12 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
         emptyContent={<p className="text-muted-foreground text-sm">No tracks yet</p>}
         renderItem={(track: GetTrackDto, index: number) => {
           const isCurrent = currentUrl === track.pathUrl;
-          
+
           return (
-            <div className={`flex items-center justify-between px-4 py-3 rounded-lg transition group border border-border bg-card ${isCurrent ? "bg-muted" : "hover:bg-muted"}`}
+            <div
+              className={`flex items-center justify-between px-4 py-3 rounded-lg transition group border border-border bg-card ${
+                isCurrent ? "bg-muted" : "hover:bg-muted"
+              }`}
             >
               <div className="flex items-center gap-4">
                 <span className="w-6 text-sm text-muted-foreground">{index + 1}</span>
@@ -65,7 +69,7 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
                     <Play className="w-6 h-6 text-foreground" />
                   )}
                 </Button>
-                {renderActions?.(track)}
+                {renderActions!(track)}
               </div>
             </div>
           );

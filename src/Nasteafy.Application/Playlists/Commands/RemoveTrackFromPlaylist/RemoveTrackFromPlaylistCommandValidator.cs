@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Nasteafy.Application.Common.Abstractions.Data;
 
-namespace Nasteafy.Application.Tracks.Commands.RemoveFromPlaylist
+namespace Nasteafy.Application.Playlists.Commands.RemoveFromPlaylist
 {
     public class RemoveTrackFromPlaylistCommandValidator : AbstractValidator<RemoveTrackFromPlaylistCommand>
     {

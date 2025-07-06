@@ -29,7 +29,7 @@ namespace Nasteafy.Application.Artists.Commands.Delete
             if (hasTracks || hasAlbums)
                 return Result.Fail("Cannot delete artist with associated tracks or albums.").Log<DeleteArtistCommandHandler>();
 
-            await unitOfWork.Artists.DeleteAsync(artist, ct);
+            unitOfWork.Artists.Delete(artist, ct);
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();

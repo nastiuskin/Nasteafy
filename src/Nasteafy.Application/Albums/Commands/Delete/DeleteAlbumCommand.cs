@@ -18,7 +18,7 @@ namespace Nasteafy.Application.Albums.Commands.Delete
             if (!string.IsNullOrEmpty(album!.CoverUrl))
                 await fileStorageService.DeleteFileAsync(FileType.AlbumCover, album.CoverUrl);
 
-            await unitOfWork.Albums.DeleteAsync(album, ct);
+            unitOfWork.Albums.Delete(album, ct);
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();

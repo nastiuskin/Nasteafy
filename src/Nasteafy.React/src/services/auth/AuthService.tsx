@@ -1,6 +1,6 @@
-import { handleApiError } from "../helpers/handleApiError";
-import { client } from "../api/ApiClientProvider"
-import { LoginCommand, RegisterCommand } from "../api/apiClient";
+import { handleApiError } from "../../helpers/handleApiError";
+import { client } from "../../api/ApiClientProvider"
+import { LoginCommand, RegisterCommand } from "../../api/apiClient";
 
 export const authService = {
   login: async (email: string, password: string): Promise<string | null> => {

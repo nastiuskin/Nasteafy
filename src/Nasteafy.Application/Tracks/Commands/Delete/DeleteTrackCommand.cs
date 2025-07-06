@@ -17,7 +17,7 @@ namespace Nasteafy.Application.Tracks.Commands.Delete
             if (!string.IsNullOrEmpty(track!.FilePath))
                 await fileStorageService.DeleteFileAsync(FileType.Audio, track.FilePath);
 
-            await unitOfWork.Tracks.DeleteAsync(track, ct);
+             unitOfWork.Tracks.Delete(track, ct);
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Ok();

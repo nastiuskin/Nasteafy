@@ -15,6 +15,7 @@ namespace Nasteafy.Endpoints.Playlists
             routes.MapPut("api/playlists/{id:guid}", async ([FromRoute] Guid id, [FromForm] UpdatePlaylistCommand request, ISender sender,
                 CancellationToken ct) =>
             {
+                request.PlaylistId = id;
                 var response = await sender.Send(request, ct);
 
                 if (response.IsFailed)

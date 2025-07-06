@@ -33,7 +33,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             return await _dbSet.CountAsync(ct);
         }
 
-        public async Task DeleteAsync(T entity, CancellationToken ct)
+        public void Delete(T entity, CancellationToken ct)
         {
             if (entity != null)
                 _dbSet.Remove(entity);
