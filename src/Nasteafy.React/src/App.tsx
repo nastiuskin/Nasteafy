@@ -19,13 +19,13 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   const initialOptions = {
-    clientId: "AUVYgV8ns3RqDh_M3oa5ovbSqsqibwKzmSM2CVoMFQCVEU_da-m-SMTLsxRKFYMa5fNnUrzJjoUhDHht",
+    clientId: "Adek0KYf3MuCn6V5keD-lXt32ezhs3bJx_kDbbZ5aLhge-vHO6GlU4M_osONC7MgR16d0rWkineXH-u7",
     currency: "USD",
     intent: "capture",
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 1500);
+    const timeout = setTimeout(() => setLoading(false), 1500);  
     return () => clearTimeout(timeout);
   }, []);
 

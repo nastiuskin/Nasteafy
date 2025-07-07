@@ -50,7 +50,7 @@ export default function HomePage() {
             </Card>
           </Link>
 
-          <Link to="/become-artist" className="block">
+          <Link to="/subscriptions" className="block">
             <Card className="hover:shadow-md transition cursor-pointer h-full">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Become an Artist</CardTitle>
@@ -109,7 +109,7 @@ export default function HomePage() {
                       <Card className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col items-center">
                         <div className="w-full aspect-square overflow-hidden rounded-md mb-3">
                           <img
-                            src={artist.avatarUrl || "/placeholder.jpg"}
+                            src={artist.avatarUrl || ""}
                             alt={artist.name}
                             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />

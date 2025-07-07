@@ -8,11 +8,12 @@ import { Badge } from "../../components/ui/badge";
 import { useAuth } from "../../hooks/useAuth";
 import Checkout from "../../services/payment/Checkout";
 import toast from "react-hot-toast";
+import { authService } from "../../services/auth/AuthService";
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<GetSubscriptionDto[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -27,16 +28,24 @@ export default function SubscriptionsPage() {
     fetchSubscriptions();
   }, []);
 
-    const subscribe = async (subscriptionId: string) => {
-      try {
-        const request = new SubscribeUserCommand({subscriptionId})
-        await client.subscribe(request);
-        setSelectedId(null);
-        toast.success("Subscription successfully activated");
-      } catch (err) {
-        handleApiError(err);
-      }
-    };
+
+ const subscribe = async (subscriptionId: string, subscriptionName: string) => {
+  try {
+    const request = new SubscribeUserCommand({ subscriptionId });
+    await client.subscribe(request);
+    setSelectedId(null);
+
+    setUser({
+      ... user!,
+      subscriptionType: subscriptionName,
+    });
+
+    toast.success("Subscription successfully activated");
+    window.location.reload();
+  } catch (err) {
+    handleApiError(err);
+  }
+};
 
   const isValidAmount = (val?: number): val is number => typeof val === "number" && val > 0;
 
@@ -90,7 +99,7 @@ export default function SubscriptionsPage() {
 
                   <Checkout
                     amount={sub.price}
-                    onSuccess={() => subscribe(sub.id!)}
+                    onSuccess={() => subscribe(sub.id!, sub.name!)}
                   />
                 </div>
               )}

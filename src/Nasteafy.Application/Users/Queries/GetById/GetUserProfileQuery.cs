@@ -1,8 +1,11 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
+using Nasteafy.Domain.Entities.Subscriptions;
+using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Users.Queries.GetById;
 
@@ -11,7 +14,8 @@ public record GetUserProfileQuery : IRequest<Result<GetUserResponse?>>;
 public class GetUserProfileQueryHandler(
     IUnitOfWork unitOfWork,
     IFileStorageService fileStorageService,
-    ICurrentUserProvider userIdProvider)
+    ICurrentUserProvider userIdProvider,
+    UserManager<User> userManager)
         : IRequestHandler<GetUserProfileQuery, Result<GetUserResponse?>>
 {
     public async Task<Result<GetUserResponse?>> Handle(GetUserProfileQuery request, CancellationToken ct)
@@ -20,9 +24,11 @@ public class GetUserProfileQueryHandler(
         if (userId is null || userId == Guid.Empty)
             return Result.Fail("UserId not found").Log<GetUserProfileQuery>();
 
-        var user = await unitOfWork.Users.GetByIdWithSubscriptionsAsync(userId.Value, ct);
+        var user = await userManager.FindByIdAsync(userId!.ToString()!);
         if (user is null)
             return Result.Fail("User not found").Log<GetUserProfileQuery>();
+
+        var role = (await userManager.GetRolesAsync(user)).FirstOrDefault() ?? UserRole.User.ToString();
 
         string? avatarUrl = null;
 
@@ -32,16 +38,14 @@ public class GetUserProfileQueryHandler(
             avatarUrl = result.IsSuccess ? result.Value : null;
         }
 
-        var subscription = user.UserSubscriptions
-            .Where(x => x.EndDate >= DateTime.UtcNow)
-            .Select(x => x.Subscription)
-            .FirstOrDefault();
+        var subscription = await unitOfWork.Subscriptions.GetActiveSubscriptionAsync(userId!.Value, ct);
 
         return new GetUserResponse(
             user.Email!,
             user.UserName!,
+            role,
             avatarUrl,
-            subscription?.Type
+            subscription?.Subscription.Type.Name ?? SubscriptionType.Free.Name
         );
     }
 }

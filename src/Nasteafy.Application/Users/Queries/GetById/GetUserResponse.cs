@@ -4,6 +4,7 @@ namespace Nasteafy.Application.Users.Queries.GetById
 {
     public record GetUserResponse(string Email,
         string UserName,
+        string UserRole,
         string? AvatarUrl,
-        SubscriptionType? SubscriptionType);
+        string? SubscriptionType);
 }

@@ -3496,8 +3496,9 @@ export interface IUpdateProfileCommand {
 export class GetUserResponse implements IGetUserResponse {
     email?: string | undefined;
     userName?: string | undefined;
+    userRole?: string | undefined;
     avatarUrl?: string | undefined;
-    subscriptionType?: SubscriptionType;
+    subscriptionType?: string | undefined;
 
     constructor(data?: IGetUserResponse) {
         if (data) {
@@ -3512,8 +3513,9 @@ export class GetUserResponse implements IGetUserResponse {
         if (_data) {
             this.email = _data["email"];
             this.userName = _data["userName"];
+            this.userRole = _data["userRole"];
             this.avatarUrl = _data["avatarUrl"];
-            this.subscriptionType = _data["subscriptionType"] ? SubscriptionType.fromJS(_data["subscriptionType"]) : <any>undefined;
+            this.subscriptionType = _data["subscriptionType"];
         }
     }
 
@@ -3528,8 +3530,9 @@ export class GetUserResponse implements IGetUserResponse {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email;
         data["userName"] = this.userName;
+        data["userRole"] = this.userRole;
         data["avatarUrl"] = this.avatarUrl;
-        data["subscriptionType"] = this.subscriptionType ? this.subscriptionType.toJSON() : <any>undefined;
+        data["subscriptionType"] = this.subscriptionType;
         return data;
     }
 }
@@ -3537,44 +3540,9 @@ export class GetUserResponse implements IGetUserResponse {
 export interface IGetUserResponse {
     email?: string | undefined;
     userName?: string | undefined;
+    userRole?: string | undefined;
     avatarUrl?: string | undefined;
-    subscriptionType?: SubscriptionType;
-}
-
-export class SubscriptionType implements ISubscriptionType {
-    name?: string | undefined;
-
-    constructor(data?: ISubscriptionType) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-        }
-    }
-
-    static fromJS(data: any): SubscriptionType {
-        data = typeof data === 'object' ? data : {};
-        let result = new SubscriptionType();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        return data;
-    }
-}
-
-export interface ISubscriptionType {
-    name?: string | undefined;
+    subscriptionType?: string | undefined;
 }
 
 export class ApiException extends Error {

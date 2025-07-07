@@ -1,16 +1,20 @@
 ﻿using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain.Entities.Subscriptions;
 using Nasteafy.Domain.Entities.Tracks;
+using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Subscriptions.Commands
 {
     public record SubscribeUserCommand(Guid SubscriptionId)
         : IRequest<Result>;
 
-    public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork, ICurrentUserProvider userProvider)
+    public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork,
+        ICurrentUserProvider userProvider,
+        UserManager<User> userManager)
         : IRequestHandler<SubscribeUserCommand, Result>
     {
         public async Task<Result> Handle(SubscribeUserCommand command, CancellationToken ct)
@@ -34,13 +38,26 @@ namespace Nasteafy.Application.Subscriptions.Commands
 
             if (subscription.Type == SubscriptionType.Artist)
             {
-                var alreadyArtist = await unitOfWork.Artists.ExistsByUserIdAsync(user!.Id, ct);
+                var userWithRoles = await userManager.FindByIdAsync(userId.ToString()!);
+                if (userWithRoles is not null)
+                {
+                    var currentRoles = await userManager.GetRolesAsync(userWithRoles);
+                    if (!currentRoles.Contains(UserRole.Artist.ToString()))
+                    {
+                        if (currentRoles.Any())
+                            await userManager.RemoveFromRolesAsync(userWithRoles, currentRoles);
+
+                        await userManager.AddToRoleAsync(userWithRoles, UserRole.Artist.ToString());
+                    }
+                }
+
+                var alreadyArtist = await unitOfWork.Artists.ExistsByUserIdAsync(user.Id, ct);
                 if (!alreadyArtist)
                 {
                     var artist = new Artist
                     {
                         UserId = user.Id,
-                        Name = user.Email!,
+                        Name = user.UserName!,
                         AvatarUrl = user.AvatarUrl,
                     };
                     await unitOfWork.Artists.AddAsync(artist, ct);
@@ -69,4 +86,5 @@ namespace Nasteafy.Application.Subscriptions.Commands
         }
     }
 }
+
 

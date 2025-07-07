@@ -4,13 +4,21 @@ import {
   type ReactNode,
   useEffect,
 } from "react";
-import { decodeToken, type UserType } from "../helpers/decodeToken";
 import { handleApiError } from "../helpers/handleApiError";
 import { useNavigate } from "react-router-dom";
 import { client } from "../api/ApiClientProvider";
 import { authService } from "../services/auth/AuthService";
 
-export type AuthContextType = {    
+export type UserType = {
+  id: string,
+  email: string;
+  userRole: string | null;
+  subscriptionType: string | null;
+  userName?: string | null;
+  avatarUrl?: string | null;
+};
+
+export type AuthContextType = {
   accessToken: string | null;
   isAuthenticated: boolean;
   isAuthReady: boolean;
@@ -40,12 +48,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setAccessToken(token);
       setIsAuthenticated(true);
 
-      const decoded = decodeToken(token);
-      if (!decoded) return false;
-
       const profile = await client.profileGET();
       setUser({
-        ...decoded,
+        email: profile.email ?? "",
+        userRole: profile.userRole ?? "User",
+        subscriptionType: profile.subscriptionType ?? "Free",
         userName: profile.userName,
         avatarUrl: profile.avatarUrl,
       });
@@ -72,19 +79,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-  const tryInit = async () => {
-    const token = localStorage.getItem("accessToken");
+    const tryInit = async () => {
+      const token = localStorage.getItem("accessToken");
 
-    if (token) {
-      const decoded = decodeToken(token);
-      if (decoded) {
+      if (token) {
         setAccessToken(token);
         setIsAuthenticated(true);
 
         try {
           const profile = await client.profileGET();
           setUser({
-            ...decoded,
+            email: profile.email ?? "",
+            userRole: profile.userRole ?? "User",
+            subscriptionType: profile.subscriptionType ?? null,
             userName: profile.userName,
             avatarUrl: profile.avatarUrl,
           });
@@ -93,37 +100,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setAccessToken(null);
           setIsAuthenticated(false);
           setUser(null);
-          //navigate("/login");
         }
-        setIsAuthReady(true);
-        return;
       }
-    }
-    else{
-      setAccessToken(null);
-      setIsAuthenticated(false);
-      setUser(null);
-      //navigate("/login");
+
       setIsAuthReady(true);
-    }
-  };
+    };
 
-  tryInit();
-}, []);
+    tryInit();
+  }, []);
 
- return (
-  <AuthContext.Provider
-    value={{
-      accessToken,
-      isAuthenticated,
-      isAuthReady,
-      user,
-      setUser,
-      login,
-      logout,
-    }}
-  >
-   {isAuthReady ? children : null}
-  </AuthContext.Provider>
-);
+  return (
+    <AuthContext.Provider
+      value={{
+        accessToken,
+        isAuthenticated,
+        isAuthReady,
+        user,
+        setUser,
+        login,
+        logout,
+      }}
+    >
+      {isAuthReady ? children : null}
+    </AuthContext.Provider>
+  );
 }

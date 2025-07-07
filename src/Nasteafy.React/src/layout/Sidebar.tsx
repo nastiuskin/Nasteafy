@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import logo from "../assets/logo.png";
 
 export default function Sidebar() {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isArtist } = useAuth();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
@@ -37,6 +37,13 @@ export default function Sidebar() {
           <>
             <Link to="/playlists" className={linkClasses(isActive("/playlists"))}>
               <Music className="w-4 h-4" /> My Playlists
+            </Link>
+          </>
+        )}
+         {isAuthenticated && isArtist && (
+          <>
+            <Link to="/playlists" className={linkClasses(isActive("/dashboard"))}>
+              <Music className="w-4 h-4" /> Artist Dashboard
             </Link>
           </>
         )}
