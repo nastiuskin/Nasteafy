@@ -2,10 +2,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 
 namespace Nasteafy.Application.Artists.Commands.Delete
 {
-    public record DeleteArtistCommand(Guid ArtistId) : IRequest<Result>;
+    public record DeleteArtistCommand(Guid ArtistId) : IRequest<Result>, ITransactionalCommand;
 
     public class DeleteArtistCommandHandler(IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteArtistCommand, Result>

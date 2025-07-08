@@ -2,13 +2,14 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
 using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Artists.Commands.Create
 {
 
-    public class CreateArtistCommand : IRequest<Result<Guid>>
+    public class CreateArtistCommand : IRequest<Result<Guid>>, ITransactionalCommand
     {
         public required string Name { get; init; }
         public IFormFile? ArtistPhoto { get; init; }

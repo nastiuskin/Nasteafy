@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Auth;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Auth.Commands.Logout
 {
-    public record LogoutCommand : IRequest<Result>;
+    public record LogoutCommand : IRequest<Result>, ITransactionalCommand;
 
     public class LogoutCommandHandler(
         ICurrentUserProvider userProvider,

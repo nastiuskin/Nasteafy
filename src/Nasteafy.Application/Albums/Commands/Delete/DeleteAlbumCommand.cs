@@ -2,11 +2,12 @@
 using MediatR;
 using Nasteafy.Application.Artists.Commands.Delete;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Albums.Commands.Delete
 {
-    public record DeleteAlbumCommand(Guid AlbumId) : IRequest<Result>;
+    public record DeleteAlbumCommand(Guid AlbumId) : IRequest<Result>, ITransactionalCommand;
 
     public class DeletePlaylistCommandHandler(IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
         : IRequestHandler<DeleteAlbumCommand, Result>

@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
 using Nasteafy.Domain.Entities;
 using Nasteafy.Domain.Entities.Tracks;
@@ -14,7 +15,7 @@ namespace Nasteafy.Application.Tracks.Commands.Create
           string Title,
           TimeSpan Duration,
           Guid? AlbumId,
-          List<Guid> ArtistIds) : IRequest<Result<Guid>>;
+          List<Guid> ArtistIds) : IRequest<Result<Guid>>, ITransactionalCommand;
 
     public class CreateTrackCommandHandler(IUnitOfWork unitOfWork, IFileStorageService _fileStorage)
       : IRequestHandler<CreateTrackCommand, Result<Guid>>
@@ -27,7 +28,9 @@ namespace Nasteafy.Application.Tracks.Commands.Create
                 .ToListAsync(ct);
 
             if (artistIds.Count != request.ArtistIds.Count)
+            {
                 return Result.Fail("Some of the specified artists were not found.").Log<CreateTrackCommandHandler>();
+            }               
 
             await using var stream = request.File.OpenReadStream();
             var uploadResult = await _fileStorage.UploadFileAsync(
@@ -37,7 +40,9 @@ namespace Nasteafy.Application.Tracks.Commands.Create
                 FileType.Audio);
 
             if (!uploadResult.IsSuccess)
+            {
                 return Result.Fail("Failed to upload file").Log<CreateTrackCommandHandler>();
+            }                
 
             var trackId = Guid.NewGuid();
 

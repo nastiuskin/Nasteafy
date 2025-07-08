@@ -2,12 +2,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
 using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Artists.Commands.Update
 {
-    public class UpdateArtistCommand : IRequest<Result>
+    public class UpdateArtistCommand : IRequest<Result>, ITransactionalCommand
     {
         [JsonIgnore]
         public Guid ArtistId { get; set; }

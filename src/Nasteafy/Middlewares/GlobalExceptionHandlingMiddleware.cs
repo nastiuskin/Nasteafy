@@ -1,9 +1,7 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Application.Common.Models;
 
-// Wrong namespace
-namespace Nasteafy.Application.Exceptions
+namespace Nasteafy.Middlewares
 {
     public class GlobalExceptionHandlingMiddleware
     {
@@ -31,18 +29,18 @@ namespace Nasteafy.Application.Exceptions
                     ? "Validation failed"
                     : $"{firstError.ErrorMessage}";
 
-                await WriteApiErrorAsync(context,StatusCodes.Status400BadRequest, $"{message}");
+                await WriteApiErrorAsync(context, StatusCodes.Status400BadRequest, $"{message}");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unhandled exception occurred.");
 
-                await WriteApiErrorAsync(context,StatusCodes.Status500InternalServerError,
+                await WriteApiErrorAsync(context, StatusCodes.Status500InternalServerError,
                     "An unexpected error occurred: " + ex.Message);
             }
         }
 
-        private static async Task WriteApiErrorAsync(HttpContext context,int statusCode,string message)
+        private static async Task WriteApiErrorAsync(HttpContext context, int statusCode, string message)
         {
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/json";

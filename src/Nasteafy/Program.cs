@@ -1,3 +1,4 @@
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Extensions;
 using Nasteafy.Persistence.Database.Extensions;
@@ -6,9 +7,10 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .CreateLogger();
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddUserSecrets<Program>() 
+    .AddEnvironmentVariables();
 
 builder.Host.UseSerilog((context, loggerConfiguration) =>
 {
@@ -48,12 +50,11 @@ if (app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing")
     app.ApplyMigrations();
 }
 
-// Either uncomment or remove. 
-//var logger = app.Services.GetRequiredService<IResultLogger>();
-//Result.Setup(settings =>
-//{
-//    settings.Logger = logger;
-//});
+var logger = app.Services.GetRequiredService<IResultLogger>();
+Result.Setup(settings =>
+{
+    settings.Logger = logger;
+});
 
 app.UseRouting();                  
 app.UseCors();                      

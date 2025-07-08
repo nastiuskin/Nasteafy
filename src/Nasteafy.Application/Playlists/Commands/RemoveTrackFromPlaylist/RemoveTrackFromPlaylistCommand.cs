@@ -2,11 +2,12 @@
 using MediatR;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Playlists.Commands.RemoveFromPlaylist
 {
-    public class RemoveTrackFromPlaylistCommand : IRequest<Result>
+    public class RemoveTrackFromPlaylistCommand : IRequest<Result>, ITransactionalCommand
     {
         [JsonIgnore]
         public Guid PlaylistId { get; set; }
@@ -29,7 +30,9 @@ namespace Nasteafy.Application.Playlists.Commands.RemoveFromPlaylist
             var userId = _userProvider.GetUserId();
 
             if (userId == null || userId == Guid.Empty)
+            {
                 return Result.Fail("User not authenticated").Log<RemoveTrackFromPlaylistCommandHandler>();
+            }                
 
             var playlist = await _unitOfWork.Playlists.GetByIdWithTracks(request.PlaylistId, ct);
 

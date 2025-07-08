@@ -6,8 +6,7 @@ namespace Nasteafy.Infrastructure.Services
 {
     public class CurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
     {
-        // Return type should not be nullable as you throw exception if it is null.
-        public Guid? GetUserId()
+        public Guid GetUserId()
         {
             var userIdClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimsConstants.UserId);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))

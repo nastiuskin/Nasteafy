@@ -3,18 +3,19 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain.Entities.Subscriptions;
 using Nasteafy.Domain.Entities.Tracks;
 using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Subscriptions.Commands
 {
-    public record SubscribeUserCommand(Guid SubscriptionId)
-        : IRequest<Result>;
+    public record SubscribeUserCommand(Guid SubscriptionId): IRequest<Result>, ITransactionalCommand;
 
     public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork,
         ICurrentUserProvider userProvider,
-        UserManager<User> userManager)
+        UserManager<User> userManager, 
+        IDateTimeService dateTimeService)
         : IRequestHandler<SubscribeUserCommand, Result>
     {
         public async Task<Result> Handle(SubscribeUserCommand command, CancellationToken ct)
@@ -22,9 +23,11 @@ namespace Nasteafy.Application.Subscriptions.Commands
             var userId = userProvider.GetUserId();
 
             if (userId == null  || userId == Guid.Empty)
+            {
                 return Result.Fail("UserId not found").Log<SubscribeUserCommandHandler>();
+            }               
 
-            var user = await unitOfWork.Users.GetByIdWithSubscriptionsAsync(userId.Value, ct);
+            var user = await unitOfWork.Users.GetByIdWithSubscriptionsAsync(userId, ct);
 
             var subscription = await unitOfWork.Subscriptions.GetByIdAsync(command.SubscriptionId, ct);
 
@@ -33,7 +36,9 @@ namespace Nasteafy.Application.Subscriptions.Commands
                 bool alreadyActivated = user!.UserSubscriptions.Any(us => us.Subscription.Type == SubscriptionType.Trial);
 
                 if (alreadyActivated)
+                {
                     return Result.Fail("Trial subscription can be activated only once.").Log<SubscribeUserCommandHandler>();
+                }                    
             }
 
             if (subscription.Type == SubscriptionType.Artist)
@@ -45,7 +50,9 @@ namespace Nasteafy.Application.Subscriptions.Commands
                     if (!currentRoles.Contains(UserRole.Artist.ToString()))
                     {
                         if (currentRoles.Any())
+                        {
                             await userManager.RemoveFromRolesAsync(userWithRoles, currentRoles);
+                        }                           
 
                         await userManager.AddToRoleAsync(userWithRoles, UserRole.Artist.ToString());
                     }
@@ -64,7 +71,7 @@ namespace Nasteafy.Application.Subscriptions.Commands
                 }
             }
 
-            var now = DateTime.UtcNow;
+            var now = dateTimeService.UtcNow;
 
             foreach (var sub in user!.UserSubscriptions.Where(s => s.EndDate > now))
             {

@@ -2,12 +2,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
 using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Playlists.Commands.Update
 {
-    public class UpdatePlaylistCommand : IRequest<Result>
+    public class UpdatePlaylistCommand : IRequest<Result>, ITransactionalCommand
     {
         [JsonIgnore]
         public Guid PlaylistId { get; set; }
@@ -33,7 +34,9 @@ namespace Nasteafy.Application.Playlists.Commands.Update
             var playlist = await _unitOfWork.Playlists.GetByIdAsync(request.PlaylistId, ct);
 
             if (!string.IsNullOrWhiteSpace(request.Title))
+            {
                 playlist!.Title = request.Title;
+            }                
 
             if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {

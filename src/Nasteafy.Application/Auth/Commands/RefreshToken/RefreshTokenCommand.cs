@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain.Entities.Users;
 using System.Security.Claims;
 
 namespace Nasteafy.Application.Auth.Commands.RefreshToken
 {
-    public record RefreshTokenCommand(string RefreshToken) : IRequest<Result<string>>;
+    public record RefreshTokenCommand(string RefreshToken) : IRequest<Result<string>>, ITransactionalCommand;
 
     public class RefreshTokenCommandHandler(
         IJwtTokenService jwtTokenService,

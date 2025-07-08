@@ -2,6 +2,6 @@
 {
     public interface ICurrentUserProvider
     {
-        Guid? GetUserId();
+        Guid GetUserId();
     }
 }

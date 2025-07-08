@@ -1,6 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 
 namespace Nasteafy.Application.Subscriptions.Commands.Update
 {
@@ -8,27 +9,21 @@ namespace Nasteafy.Application.Subscriptions.Commands.Update
         Guid Id,
         string Description,
         decimal Price,
-        int DurationInDays) : IRequest<Result>;
+        int DurationInDays) : IRequest<Result>, ITransactionalCommand;
 
-    public class UpdateSubscriptionCommandHandler : IRequestHandler<UpdateSubscriptionCommand, Result>
+    public class UpdateSubscriptionCommandHandler(IUnitOfWork unitOfWork) : IRequestHandler<UpdateSubscriptionCommand, Result>
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public UpdateSubscriptionCommandHandler(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         public async Task<Result> Handle(UpdateSubscriptionCommand request, CancellationToken cancellationToken)
         {
-            var subscription = await _unitOfWork.Subscriptions.GetByIdAsync(request.Id, cancellationToken);
+            var subscription = await unitOfWork.Subscriptions.GetByIdAsync(request.Id, cancellationToken);
 
             subscription!.Description = request.Description;
             subscription.Price = request.Price;
             subscription.DurationInDays = request.DurationInDays;
 
-            await _unitOfWork.Subscriptions.UpdateAsync(subscription, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.Subscriptions.UpdateAsync(subscription, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Ok();
         }

@@ -3,12 +3,13 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
 using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Albums.Commands.Create
 {
-    public class CreateAlbumCommand : IRequest<Result<Guid>>
+    public class CreateAlbumCommand : IRequest<Result<Guid>>, ITransactionalCommand
     {
         public required string Title { get; init; }
         public IFormFile? CoverFile { get; init; }

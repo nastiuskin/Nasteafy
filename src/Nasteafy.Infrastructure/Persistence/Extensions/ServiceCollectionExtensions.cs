@@ -8,13 +8,16 @@ using Minio;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Data.Repositories;
+using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Database.Repositories;
 using Nasteafy.Infrastructure.Options;
 using Nasteafy.Infrastructure.Persistence.Contexts;
-using Nasteafy.Infrastructure.Persistence.DataSeed;
+using Nasteafy.Infrastructure.Persistence.Extensions;
 using Nasteafy.Infrastructure.Persistence.Repositories;
 using Nasteafy.Infrastructure.Services;
+using System;
+using System.Reflection;
 
 namespace Nasteafy.Persistence.Database.Extensions
 {
@@ -22,10 +25,9 @@ namespace Nasteafy.Persistence.Database.Extensions
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
             services.AddDatabase(configuration)
-                    .AddRepositores(configuration)
+                    .AddRepositories(Assembly.GetExecutingAssembly())
                     .AddMinio(configuration)
-                    .AddUnitOfWork()
-                    .AddIdentity()
+                    .AddIdentity(configuration)
                     .AddServices();
 
         private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
@@ -33,28 +35,21 @@ namespace Nasteafy.Persistence.Database.Extensions
             string? connectionString = configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionString));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }
 
-        private static IServiceCollection AddIdentity(this IServiceCollection services)
+        private static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<User, IdentityRole<Guid>>(options =>
-                {
-                    // Can be better to move these into settings, you could reuse those settings in validation for example, without mentioning "8" directly.
-                    options.Password.RequiredLength = 8;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                })
+            services.Configure<IdentitySettings>(configuration.GetSection(nameof(IdentitySettings)));
+
+            services.AddIdentity<User, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<DatabaseContext>()
                 .AddDefaultTokenProviders();
 
-            return services;
-        }
-        private static IServiceCollection AddUnitOfWork(this IServiceCollection services)
-        {
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IConfigureOptions<IdentityOptions>, ConfigureIdentityOptions>();
+
             return services;
         }
 
@@ -77,16 +72,26 @@ namespace Nasteafy.Persistence.Database.Extensions
             return services;
         }
 
-        // You can use reflection to inject repositories since you follow rules of naming them with Repository name. In a number of them grows, the injection can become too big
-        // https://medium.com/@josiahmahachi/using-reflection-to-register-repositories-in-net-core-ebbc32f2d0ae
-        private static IServiceCollection AddRepositores(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddRepositories(this IServiceCollection services, Assembly assembly)
         {
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ITrackRepository, TrackRepository>();
-            services.AddScoped<IPlaylistRepository, PlaylistRepository>();
-            services.AddScoped<IArtistRepository, ArtistRepository>();
-            services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
-            services.AddScoped<IAlbumRepository, AlbumRepository>();
+            var repositoryTypes = assembly.GetTypes()
+                .Where(type => !type.IsAbstract && !type.IsInterface && type.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGenericRepository<>)));
+
+            var nonBaseRepos = repositoryTypes.Where(t => t != typeof(GenericRepository<>));
+
+            foreach (var repositoryType in nonBaseRepos)
+            {
+                var interfaces = repositoryType.GetInterfaces()
+                    .Where(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IGenericRepository<>))
+                    .ToList();
+
+                if (interfaces.Count != 1)
+                {
+                    throw new InvalidOperationException($"Repository '{repositoryType.Name}' must implement only one interface that implements IGenericRepository<T>.");
+                }
+
+                services.AddScoped(interfaces[0], repositoryType);
+            }
 
             return services;
         }
@@ -97,6 +102,10 @@ namespace Nasteafy.Persistence.Database.Extensions
             services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
             services.AddScoped<IFileStorageService, MinioStorageService>();
             services.AddScoped<IResultLogger, ResultLogger>();
+            services.AddScoped<IDateTimeService, DateTimeService>();
+            services.AddScoped<IUserManager, UserManager>();
+            services.AddScoped<ISignInService, SignInService>();
+            services.AddScoped<IClaimService, ClaimService>();
             return services;
         }
     }
