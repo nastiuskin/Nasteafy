@@ -36,7 +36,7 @@ namespace Nasteafy.Extensions
 
         private static JwtOptions ConfigureJwtOptions(IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSection = configuration.GetSection("JwtOptions");
+            var jwtSection = configuration.GetSection(nameof(JwtOptions));
             services.Configure<JwtOptions>(jwtSection);
             return jwtSection.Get<JwtOptions>();
         }

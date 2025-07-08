@@ -23,6 +23,7 @@ namespace Nasteafy.Application.Auth.Commands.Login
              .WithMessage("Password is required");
         }
 
+        // Same check here and in command, I think you can remove it in both places. Also here you use "is not null" and in command you use "!= null" which can behave different.
         private async Task<bool> UserExists(string email, CancellationToken ct)
         {
             return await _userManager.FindByEmailAsync(email) is not null;

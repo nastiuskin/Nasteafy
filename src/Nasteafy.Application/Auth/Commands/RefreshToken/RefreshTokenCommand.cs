@@ -20,6 +20,7 @@ namespace Nasteafy.Application.Auth.Commands.RefreshToken
     {
         public async Task<Result<string>> Handle(RefreshTokenCommand request, CancellationToken ct)
         {
+            // You can pass token
             var user = await userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken != null && u.RefreshToken.Token == request.RefreshToken);
 
             if (user is null)
@@ -35,10 +36,13 @@ namespace Nasteafy.Application.Auth.Commands.RefreshToken
             var claims = new List<Claim>
             {
                 new Claim(ClaimsConstants.UserId, user.Id.ToString()),
+                // Same empty email comment and in Login command
                 new Claim(ClaimsConstants.Email, user.Email ?? string.Empty),
+                // I also see in register command you add a free subscription, so can a user have no subscription? Maybe there is not need to pass string.Empty here
                 new Claim(ClaimsConstants.SubscriptionType, subscription?.Subscription?.Type.Name ?? string.Empty)
             };
 
+            // You can simplify it as in Login command comment
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimsConstants.Role, role));

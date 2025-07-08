@@ -16,7 +16,9 @@ namespace Nasteafy.Infrastructure.Persistence.DataSeed
             foreach (var role in Roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
+                {
                     await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+                }
             }
         }
     }

@@ -18,6 +18,8 @@ namespace Nasteafy.Application.Auth.Commands.Logout
         public async Task<Result> Handle(LogoutCommand command, CancellationToken ct)
         {
             var userId = userProvider.GetUserId();
+
+            // You can pass token 
             var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)

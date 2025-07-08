@@ -34,7 +34,7 @@ namespace Nasteafy.Extensions
                                 Id = JwtBearerDefaults.AuthenticationScheme
                             }
                         },
-                        new string[] { }
+                        Array.Empty<string>()
                     }
                 };
 

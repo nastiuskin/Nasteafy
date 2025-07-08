@@ -19,6 +19,7 @@ namespace Nasteafy.Application.Auth.Commands.Register
         {
             var existingUser = await userManager.FindByEmailAsync(request.Email);
 
+            //Since you do not reuse existingUser, you can move this check and FindByEmailAsync into validator.
             if (existingUser is not null)
                 return Result.Fail("User already exists").Log<AuthenticationService>();
 
@@ -38,6 +39,16 @@ namespace Nasteafy.Application.Auth.Commands.Register
             var roleAssignResult = await userManager.AddToRoleAsync(user, UserRole.User.ToString());
             if (!roleAssignResult.Succeeded)
             {
+                /*
+                 It is better to move this string join in extension methos and reuse it.
+                  public static string ToErrorsString(this IEnumerable<string> errors)
+                    {
+                        return string.Join(", ", errors);
+                    }
+
+                 Then you can use it like return Result.Fail(roleAssignResult.Errors.Select(e => e.Description).ToErrorsString());
+                 It is clearer and you standardize the errors string.
+                 */
                 return Result.Fail(string.Join(", ", roleAssignResult.Errors.Select(e => e.Description)))
                     .Log<AuthenticationService>();
             }
@@ -49,6 +60,22 @@ namespace Nasteafy.Application.Auth.Commands.Register
                 {
                     UserId = user.Id,
                     SubscriptionId = subscription.Id,
+                    // It is better to wrap DateTime into a simple interface such as 
+                    /*
+                     public interface IDateTimeService
+                        {
+                            DateTime UtcNow { get; }
+                        }
+
+                        public class DateTimeService : IDateTimeService
+                        {
+                            public DateTime UtcNow => DateTime.UtcNow;
+                        }
+                     */
+                    // Using DateTime directly is easier and is a direct approach, not an issue in most cases, but becomes difficult to unit test since it is a static class
+                    // and returns actual utc date on the time of the test. With interface you can mock it and return a specific date, test different scenarios and avoid
+                    // issues where your unit tests are running in a different timezone and start failing because of that.
+                    // also it standardizes usage of UTC only, where with DateTime you can use just .Now() accidentally. 
                     StartDate = DateTime.UtcNow,
                     EndDate = DateTime.UtcNow.AddDays(subscription.DurationInDays),
                 };

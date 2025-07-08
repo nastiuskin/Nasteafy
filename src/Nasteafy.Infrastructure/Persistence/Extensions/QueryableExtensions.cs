@@ -7,9 +7,11 @@ namespace Nasteafy.Infrastructure.Persistence.Extensions
 {
     public static class QueryableExtensions
     {
-        public static IQueryable<T> ApplyPaging<T>(this IQueryable<T> query, int pageNumber, int pageSize) =>
+        // Made private
+        private static IQueryable<T> ApplyPaging<T>(this IQueryable<T> query, int pageNumber, int pageSize) =>
             query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
+        // Need to add sorting and filtering
         public static async Task<Application.Common.Models.PagedResult<T>> ToPagedResultAsync<T>(
             this IQueryable<T> query,
             PagedRequest request,

@@ -2,11 +2,11 @@
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Infrastructure.Constants;
 
-
 namespace Nasteafy.Infrastructure.Services
 {
     public class CurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
     {
+        // Return type should not be nullable as you throw exception if it is null.
         public Guid? GetUserId()
         {
             var userIdClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimsConstants.UserId);

@@ -12,6 +12,7 @@ namespace Nasteafy.Extensions
         {
             builder.Services
                 .AddInfrastructure(builder.Configuration)
+                //Either remove or uncomment
                 //.AddJwtAuthentication(builder.Configuration)
                 .AddApplication()
                 .AddSwagger();

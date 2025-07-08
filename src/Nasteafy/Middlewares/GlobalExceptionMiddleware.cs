@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Application.Common.Models;
 
+// Wrong namespace
 namespace Nasteafy.Application.Exceptions
 {
     public class GlobalExceptionHandlingMiddleware

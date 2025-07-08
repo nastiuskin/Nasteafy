@@ -48,6 +48,7 @@ if (app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing")
     app.ApplyMigrations();
 }
 
+// Either uncomment or remove. 
 //var logger = app.Services.GetRequiredService<IResultLogger>();
 //Result.Setup(settings =>
 //{
@@ -72,4 +73,3 @@ app.UseFluentResultsLogger();
 await app.RunAsync();
 
 public partial class Program { }
-

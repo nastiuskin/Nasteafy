@@ -6,6 +6,7 @@ namespace Nasteafy.Infrastructure.Persistence.DataSeed
 {
     public static class SubscriptionsSeeder
     {
+        // No need for ct in parameters since you don't pass it outside. 
         public static async Task SeedAsync(IServiceProvider serviceProvider, CancellationToken ct = default)
         {
             using var scope = serviceProvider.CreateScope();
@@ -50,11 +51,13 @@ namespace Nasteafy.Infrastructure.Persistence.DataSeed
 
             foreach (var subscription in subscriptions)
             {
-                var existingSubscription = await unitOfWork.Subscriptions
-                    .GetByTypeAsync(subscription.Type, ct);
+                // You are making a lot of requests here, better to transform this query into contains and outside of this foreach 
+                var existingSubscription = await unitOfWork.Subscriptions.GetByTypeAsync(subscription.Type, ct);
 
                 if (existingSubscription is null)
+                {
                     await unitOfWork.Subscriptions.AddAsync(subscription, ct);
+                }
             }
 
             await unitOfWork.SaveChangesAsync(ct);

@@ -13,8 +13,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
         public async Task<bool> ExistsByUserIdAsync(Guid userId, CancellationToken ct)
         {
-            return await _context.Artists
-                .AnyAsync(x => x.UserId == userId, ct);
+            return await _context.Artists.AnyAsync(x => x.UserId == userId, ct);
         }
 
         public IQueryable<Artist> FindAllByIds(List<Guid> ids)
@@ -26,8 +25,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
         public async Task<PagedResult<Artist>> GetAllArtists(PagedRequest request, CancellationToken ct)
         {
-            var query = _context.Artists
-                .AsNoTracking();
+            var query = _context.Artists.AsNoTracking();
 
             return await query.ToPagedResultAsync(request, ct);
         }

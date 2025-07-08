@@ -33,7 +33,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             return await _context.Playlists
               .Where(x => x.Id == id)
               .Include(p => p.PlaylistTracks)
-                .FirstOrDefaultAsync(ct);
+              .FirstOrDefaultAsync(ct);
         }
 
         public async Task<PagedResult<Playlist>> GetByUserIdAsync(Guid userId, PagedRequest request, CancellationToken ct)
@@ -41,7 +41,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             var query = _context.Playlists
                 .AsNoTracking()
                 .Where(x => x.UserId == userId)
-                    .Include(x => x.PlaylistTracks);
+                .Include(x => x.PlaylistTracks);
 
             return await query.ToPagedResultAsync(request, ct);
         }

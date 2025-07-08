@@ -29,15 +29,19 @@ namespace Nasteafy.Infrastructure.Persistence.DataSeed
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    EmailConfirmed = true,
-                    Playlists = [],
-                    UserSubscriptions = [],
+                    EmailConfirmed = true 
+                    //Playlists = [],
+                    //UserSubscriptions = [],
                 };
 
                 var result = await userManager.CreateAsync(newAdmin, adminPassword);
 
+                // Either use one line braces everywhere or don't use it anywhere. 
+                // Generally you want to use curly braces even if there is only one line. For consistency and readability and less field for errors. 
                 if (result.Succeeded)
-                    await userManager.AddToRoleAsync(newAdmin, "Admin"); 
+                {
+                    await userManager.AddToRoleAsync(newAdmin, "Admin");
+                }
             }
         }
     }

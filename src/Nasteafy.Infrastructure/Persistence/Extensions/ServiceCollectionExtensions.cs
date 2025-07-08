@@ -41,6 +41,7 @@ namespace Nasteafy.Persistence.Database.Extensions
         {
             services.AddIdentity<User, IdentityRole<Guid>>(options =>
                 {
+                    // Can be better to move these into settings, you could reuse those settings in validation for example, without mentioning "8" directly.
                     options.Password.RequiredLength = 8;
                     options.Password.RequireDigit = false;
                     options.Password.RequireNonAlphanumeric = false;
@@ -59,7 +60,7 @@ namespace Nasteafy.Persistence.Database.Extensions
 
         public static IServiceCollection AddMinio(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<MinioOptions>(configuration.GetSection(MinioOptions.SectionName));
+            services.Configure<MinioOptions>(configuration.GetSection(nameof(MinioOptions)));
 
             services.AddSingleton(sp =>
             {
@@ -76,6 +77,8 @@ namespace Nasteafy.Persistence.Database.Extensions
             return services;
         }
 
+        // You can use reflection to inject repositories since you follow rules of naming them with Repository name. In a number of them grows, the injection can become too big
+        // https://medium.com/@josiahmahachi/using-reflection-to-register-repositories-in-net-core-ebbc32f2d0ae
         private static IServiceCollection AddRepositores(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IUserRepository, UserRepository>();

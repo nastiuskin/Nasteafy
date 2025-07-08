@@ -12,7 +12,13 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Users
         {
             builder.ToTable("Users", schema: SchemaConstants.Auth);
 
+            //Move this into BaseEntityConfiguration so that all entities have guid generated automatically
             builder.HasKey(x => x.Id);
+
+            //Move this into BaseEntityConfiguration so that all entities have guid generated automatically
+            builder.Property(e => e.Id)
+                  .HasDefaultValueSql("NEWID()")
+                  .ValueGeneratedOnAdd();
 
             builder.Property(x => x.AvatarUrl)
                 .HasMaxLength(255)

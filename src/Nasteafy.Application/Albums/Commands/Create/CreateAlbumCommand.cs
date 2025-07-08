@@ -45,6 +45,7 @@ namespace Nasteafy.Application.Albums.Commands.Create
                     coverUrl = uploadResult.Value;
             }
 
+            // It is better to create guid automatically via configuration builder, see example in UserConfiguration
             var albumId = Guid.NewGuid();
             var album = new Album
             {

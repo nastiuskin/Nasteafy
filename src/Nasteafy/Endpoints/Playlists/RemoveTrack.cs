@@ -12,6 +12,9 @@ namespace Nasteafy.Endpoints.Playlists
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
+            // Seems wrong to use such endpoint structure, since both playlist and track ids are required you better move all to URL params, such as 
+            // /api/playlists/{playlistId}/tracks/{trackId}
+            // by looking at the current Api it seems like you delete all tracks from playlist. 
             routes.MapDelete("api/playlists/{playlistId:guid}/tracks", async ([FromRoute] Guid playlistId,
                 [FromBody] RemoveTrackFromPlaylistCommand command,
                 ISender sender,
