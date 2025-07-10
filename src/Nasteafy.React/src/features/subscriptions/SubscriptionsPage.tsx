@@ -8,12 +8,15 @@ import { Badge } from "../../components/ui/badge";
 import { useAuth } from "../../hooks/useAuth";
 import Checkout from "../../services/payment/Checkout";
 import toast from "react-hot-toast";
-import { authService } from "../../services/auth/AuthService";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import { useNavigate } from "react-router-dom";
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<GetSubscriptionDto[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const { user, setUser } = useAuth();
+  const [confirming, setConfirming] = useState<GetSubscriptionDto | null>(null);
+  const { user, setUser, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -28,24 +31,27 @@ export default function SubscriptionsPage() {
     fetchSubscriptions();
   }, []);
 
+  const subscribe = async (subscriptionId: string, subscriptionName: string) => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    try {
+      const request = new SubscribeUserCommand({ subscriptionId });
+      await client.subscribe(request);
+      setSelectedId(null);
 
- const subscribe = async (subscriptionId: string, subscriptionName: string) => {
-  try {
-    const request = new SubscribeUserCommand({ subscriptionId });
-    await client.subscribe(request);
-    setSelectedId(null);
+      setUser({
+        ...user!,
+        subscriptionType: subscriptionName,
+      });
 
-    setUser({
-      ... user!,
-      subscriptionType: subscriptionName,
-    });
-
-    toast.success("Subscription successfully activated");
-    window.location.reload();
-  } catch (err) {
-    handleApiError(err);
-  }
-};
+      window.location.reload();
+      toast.success("Subscription successfully activated");
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
 
   const isValidAmount = (val?: number): val is number => typeof val === "number" && val > 0;
 
@@ -83,7 +89,17 @@ export default function SubscriptionsPage() {
               {!isActive && (
                 <div className="pt-4 flex justify-end">
                   <Button
-                    onClick={() => setSelectedId(sub.id!)}
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        navigate("/login");
+                        return;
+                      }
+                      if (!isValidAmount(sub.price)) {
+                        setConfirming(sub);
+                      } else {
+                        setSelectedId(sub.id!);
+                      }
+                    }}
                     className="px-6 py-1.5 text-sm rounded-full"
                   >
                     Subscribe
@@ -105,7 +121,20 @@ export default function SubscriptionsPage() {
               )}
             </Card>
           );
+
         })
+      )}
+      {confirming && (
+        <ConfirmDialog
+          message={`Are you sure you want to activate the "${confirming.name}" subscription?`}
+          onConfirm={() => {
+            subscribe(confirming.id!, confirming.name!);
+            setConfirming(null);
+          }}
+          onCancel={() => setConfirming(null)}
+          confirmText="Yes, activate"
+          cancelText="Cancel"
+        />
       )}
     </div>
   );

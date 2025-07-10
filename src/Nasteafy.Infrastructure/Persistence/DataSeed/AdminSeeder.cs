@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Infrastructure.Persistence.DataSeed
@@ -10,16 +11,16 @@ namespace Nasteafy.Infrastructure.Persistence.DataSeed
         {
             using var scope = serviceProvider.CreateScope();
 
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<IUserManager>();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
 
             const string adminEmail = "admin@nasteafy.local";
             const string adminPassword = "Admincik!";
 
-            var roleExists = await roleManager.RoleExistsAsync("Admin");
+            var roleExists = await roleManager.RoleExistsAsync(UserRole.Admin.ToString());
             if (!roleExists)
             {
-                await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
+                await roleManager.CreateAsync(new IdentityRole<Guid>(UserRole.Admin.ToString()));
             }
 
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
@@ -34,9 +35,9 @@ namespace Nasteafy.Infrastructure.Persistence.DataSeed
 
                 var result = await userManager.CreateAsync(newAdmin, adminPassword);
 
-                if (result.Succeeded)
+                if (result.IsSuccess)
                 {
-                    await userManager.AddToRoleAsync(newAdmin, "Admin");
+                    await userManager.AddToRoleAsync(newAdmin, UserRole.Admin.ToString());
                 }
             }
         }

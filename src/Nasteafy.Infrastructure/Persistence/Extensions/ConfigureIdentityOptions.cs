@@ -4,14 +4,22 @@ using Nasteafy.Infrastructure.Options;
 
 namespace Nasteafy.Infrastructure.Persistence.Extensions
 {
-    public class ConfigureIdentityOptions(IdentitySettings settings) : IConfigureOptions<IdentityOptions>
+    public class ConfigureIdentityOptions : IConfigureOptions<IdentityOptions>
     {
+        private readonly IdentitySettings _settings;
+
+        public ConfigureIdentityOptions(IOptions<IdentitySettings> options)
+        {
+            _settings = options.Value; 
+        }
+
         public void Configure(IdentityOptions options)
         {
-            options.Password.RequiredLength = settings.Password.RequiredLength;
-            options.Password.RequireDigit = settings.Password.RequireDigit;
-            options.Password.RequireNonAlphanumeric = settings.Password.RequireNonAlphanumeric;
-            options.Password.RequireUppercase = settings.Password.RequireUppercase;
+            options.Password.RequiredLength = _settings.RequiredLength;
+            options.Password.RequireDigit = _settings.RequireDigit;
+            options.Password.RequireNonAlphanumeric = _settings.RequireNonAlphanumeric;
+            options.Password.RequireUppercase = _settings.RequireUppercase;
         }
     }
 }
+

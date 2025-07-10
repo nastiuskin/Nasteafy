@@ -2,11 +2,11 @@
 {
     public class SeedFacade
     {
-        public static async Task SeedData(IServiceProvider serviceProvider)
+        public static async Task SeedData(IServiceProvider serviceProvider, CancellationToken ct)
         {
             await AdminSeeder.SeedAdminAsync(serviceProvider);
             await RoleSeeder.SeedRolesAsync(serviceProvider);
-            await SubscriptionsSeeder.SeedAsync(serviceProvider);
+            await SubscriptionsSeeder.SeedAsync(serviceProvider, ct);
         }
     }
 }

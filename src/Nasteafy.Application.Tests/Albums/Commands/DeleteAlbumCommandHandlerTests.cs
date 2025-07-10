@@ -71,7 +71,7 @@ namespace Nasteafy.Application.Tests.Albums.Commands
             _fileStorageMock.Verify(fs =>
                 fs.DeleteFileAsync(FileType.AlbumCover, "cover.jpg"), Times.Once);
             _albumRepoMock.Verify(r =>
-                r.DeleteAsync(album, It.IsAny<CancellationToken>()), Times.Once);
+                r.Delete(album, It.IsAny<CancellationToken>()), Times.Once);
             _unitOfWorkMock.Verify(u =>
                 u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }
@@ -101,7 +101,7 @@ namespace Nasteafy.Application.Tests.Albums.Commands
             _fileStorageMock.Verify(fs =>
                 fs.DeleteFileAsync(It.IsAny<FileType>(), It.IsAny<string>()), Times.Never);
             _albumRepoMock.Verify(r =>
-                r.DeleteAsync(album, It.IsAny<CancellationToken>()), Times.Once);
+                r.Delete(album, It.IsAny<CancellationToken>()), Times.Once);
             _unitOfWorkMock.Verify(u =>
                 u.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
         }

@@ -8,13 +8,11 @@ namespace Nasteafy.Infrastructure.Services
     {
         public Guid GetUserId()
         {
-            var userIdClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimsConstants.UserId);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                throw new UnauthorizedAccessException("User is not authenticated.");
-            }
+            var claim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimsConstants.UserId);
+            if (Guid.TryParse(claim?.Value, out var id))
+                return id;
 
-            return userId;
+            return Guid.Empty;
         }
     }
 }

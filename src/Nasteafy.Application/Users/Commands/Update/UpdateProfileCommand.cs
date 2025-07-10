@@ -24,26 +24,26 @@ namespace Nasteafy.Application.Users.Commands.Update
         public async Task<Result> Handle(UpdateProfileCommand request, CancellationToken ct)
         {
             var userId = userProvider.GetUserId();
-            if (userId == null  || userId == Guid.Empty)
+            if (userId == Guid.Empty)
             {
                 return Result.Fail("UserId not found").Log<UpdateProfileCommandHandler>();
-            }                
+            }
 
             var user = await unitOfWork.Users.GetByIdAsync(userId, ct);
             if (user == null)
             {
                 return Result.Fail("User not found").Log<UpdateProfileCommandHandler>();
-            }                
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Email))
             {
                 user.Email = request.Email;
-            }                
+            }
 
             if (!string.IsNullOrEmpty(request.UserName))
             {
                 user.UserName = request.UserName;
-            }                
+            }
 
             if (request.AvatarFile != null && request?.AvatarFile?.Length > 0)
             {

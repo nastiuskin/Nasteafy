@@ -6,6 +6,6 @@ namespace Nasteafy.Application.Common.Abstractions.Data.Repositories
     {
         Task<Subscription?> GetByTypeAsync(SubscriptionType subscriptionType, CancellationToken ct);
         Task<UserSubscription?> GetActiveSubscriptionAsync(Guid userId, CancellationToken ct);
-        //Task CancelActiveSubscriptionAsync(Guid userId, CancellationToken ct);
+        Task<List<UserSubscription>> GetAllByUserIdAsync(Guid userId, CancellationToken ct);
     }
 }

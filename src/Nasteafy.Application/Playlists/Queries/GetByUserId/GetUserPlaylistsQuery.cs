@@ -21,7 +21,7 @@ namespace Nasteafy.Application.Playlists.Queries.GetByUserId
             if (userId == null  || userId == Guid.Empty)
                 return Result.Fail("UserId not found").Log<GetUserPlaylistsQueryHandler>();
 
-            var playlists = await unitOfWork.Playlists.GetByUserIdAsync(userId.Value, query.PagedRequest, ct);
+            var playlists = await unitOfWork.Playlists.GetByUserIdAsync(userId, query.PagedRequest, ct);
 
             var playlistDtos = new List<UserPlaylistDto>();
 

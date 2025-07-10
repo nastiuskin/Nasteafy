@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
@@ -12,7 +11,7 @@ namespace Nasteafy.Endpoints.Users
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPut("api/users/profile", async ([FromForm] UpdateProfileCommand command, ISender sender, CancellationToken ct) =>
+            routes.MapPut("api/users/profile", async ([FromForm] UpdateProfileCommand command, ISender sender, CancellationToken ct = default) =>
             {
                 var response = await sender.Send(command, ct);
 

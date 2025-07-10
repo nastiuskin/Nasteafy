@@ -4,14 +4,14 @@ namespace Nasteafy.Extensions
 {
     public static class HostExtensions
     {
-        public static async Task SeedData(this IHost host)
+        public static async Task SeedData(this IHost host, CancellationToken ct = default)
         {
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
                 {
-                    await SeedFacade.SeedData(services);
+                    await SeedFacade.SeedData(services, ct);
                 }
                 catch (Exception ex)
                 {

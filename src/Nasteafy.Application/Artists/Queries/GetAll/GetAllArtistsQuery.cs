@@ -15,8 +15,7 @@ namespace Nasteafy.Application.Artists.Queries
     {
         public async Task<Result<PagedResult<ArtistDto>>> Handle(GetAllArtistsQuery request, CancellationToken ct)
         {
-            var artistsPaged = await unitOfWork.Artists
-                .GetPagedResultAsync(request.PagedRequest, ct);
+            var artistsPaged = await unitOfWork.Artists.GetPagedResultAsync(request.PagedRequest, ct);
 
             var artistDtos = new List<ArtistDto>(); 
 

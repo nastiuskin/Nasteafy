@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Domain;
@@ -15,18 +14,22 @@ public class GetUserProfileQueryHandler(
     IUnitOfWork unitOfWork,
     IFileStorageService fileStorageService,
     ICurrentUserProvider userIdProvider,
-    UserManager<User> userManager)
+    IUserManager userManager)
         : IRequestHandler<GetUserProfileQuery, Result<GetUserResponse?>>
 {
     public async Task<Result<GetUserResponse?>> Handle(GetUserProfileQuery request, CancellationToken ct)
     {
         var userId = userIdProvider.GetUserId();
-        if (userId is null || userId == Guid.Empty)
+        if (userId == Guid.Empty)
+        {
             return Result.Fail("UserId not found").Log<GetUserProfileQuery>();
+        }
 
-        var user = await userManager.FindByIdAsync(userId!.ToString()!);
+        var user = await unitOfWork.Users.GetByIdAsync(userId, ct);
         if (user is null)
+        {
             return Result.Fail("User not found").Log<GetUserProfileQuery>();
+        }
 
         var role = (await userManager.GetRolesAsync(user)).FirstOrDefault() ?? UserRole.User.ToString();
 
@@ -38,7 +41,7 @@ public class GetUserProfileQueryHandler(
             avatarUrl = result.IsSuccess ? result.Value : null;
         }
 
-        var subscription = await unitOfWork.Subscriptions.GetActiveSubscriptionAsync(userId!.Value, ct);
+        var subscription = await unitOfWork.Subscriptions.GetActiveSubscriptionAsync(userId, ct);
 
         return new GetUserResponse(
             user.Email!,

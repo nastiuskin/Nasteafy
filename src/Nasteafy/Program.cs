@@ -50,12 +50,6 @@ if (app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing")
     app.ApplyMigrations();
 }
 
-var logger = app.Services.GetRequiredService<IResultLogger>();
-Result.Setup(settings =>
-{
-    settings.Logger = logger;
-});
-
 app.UseRouting();                  
 app.UseCors();                      
 app.UseGlobalExceptionHandling();  
@@ -63,11 +57,6 @@ app.UseRequestTimingMiddleware();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapEndpoints();
-
-if (!app.Environment.IsEnvironment("Testing"))
-{
-    app.UseDbTransaction();
-}
 
 app.UseFluentResultsLogger();
 

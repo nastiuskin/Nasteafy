@@ -8,6 +8,7 @@ import { handleApiError } from "../helpers/handleApiError";
 import { useNavigate } from "react-router-dom";
 import { client } from "../api/ApiClientProvider";
 import { authService } from "../services/auth/AuthService";
+import { decodeToken } from "../helpers/decodeToken"; 
 
 export type UserType = {
   id: string,
@@ -47,9 +48,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem("accessToken", token);
       setAccessToken(token);
       setIsAuthenticated(true);
-
+      const userId = decodeToken(token);
       const profile = await client.profileGET();
       setUser({
+        id: userId ?? "",
         email: profile.email ?? "",
         userRole: profile.userRole ?? "User",
         subscriptionType: profile.subscriptionType ?? "Free",
@@ -85,10 +87,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (token) {
         setAccessToken(token);
         setIsAuthenticated(true);
+         const userId = decodeToken(token);
 
         try {
           const profile = await client.profileGET();
           setUser({
+            id: userId ?? "",
             email: profile.email ?? "",
             userRole: profile.userRole ?? "User",
             subscriptionType: profile.subscriptionType ?? null,

@@ -11,17 +11,23 @@ namespace Nasteafy.Application.Auth.Commands.Login
 
     public class LoginCommandHandler(
         ISignInService signInService,
-        UserManager<User> userManager,
+        IUserManager userManager,
         IClaimService claimService,
         IJwtTokenService jwtTokenService) : IRequestHandler<LoginCommand, Result<AuthResponse>>
     {
         public async Task<Result<AuthResponse>> Handle(LoginCommand request, CancellationToken ct)
         {
             var user = await userManager.FindByEmailAsync(request.Email);
+            if(user is null)
+            {
+                return Result.Fail("Invalid email or password").Log<LoginCommandHandler>();
+            }
 
             var result = await signInService.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
             if (!result.Succeeded)
+            {
                 return Result.Fail("Invalid username or password").Log<LoginCommandHandler>();
+            }                
 
             var roles = await userManager.GetRolesAsync(user);
             var claims = await claimService.GenerateClaimsAsync(user, ct);

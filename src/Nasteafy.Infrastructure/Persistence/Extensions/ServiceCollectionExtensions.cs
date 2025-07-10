@@ -25,7 +25,8 @@ namespace Nasteafy.Persistence.Database.Extensions
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) =>
             services.AddDatabase(configuration)
-                    .AddRepositories(Assembly.GetExecutingAssembly())
+                    .AddRepositories(typeof(TrackRepository).Assembly)
+                    .AddUnitOfWork()
                     .AddMinio(configuration)
                     .AddIdentity(configuration)
                     .AddServices();
@@ -35,8 +36,13 @@ namespace Nasteafy.Persistence.Database.Extensions
             string? connectionString = configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionString));
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            return services;
+        }
+
+        private static IServiceCollection AddUnitOfWork(this IServiceCollection services)
+        {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
 
@@ -74,27 +80,29 @@ namespace Nasteafy.Persistence.Database.Extensions
 
         public static IServiceCollection AddRepositories(this IServiceCollection services, Assembly assembly)
         {
-            var repositoryTypes = assembly.GetTypes()
-                .Where(type => !type.IsAbstract && !type.IsInterface && type.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGenericRepository<>)));
+            var allTypes = assembly.GetTypes();
 
-            var nonBaseRepos = repositoryTypes.Where(t => t != typeof(GenericRepository<>));
+            var repoTypes = allTypes
+                .Where(t => !t.IsAbstract && !t.IsInterface)
+                .ToList();
 
-            foreach (var repositoryType in nonBaseRepos)
+            foreach (var impl in repoTypes)
             {
-                var interfaces = repositoryType.GetInterfaces()
-                    .Where(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IGenericRepository<>))
+                var interfaces = impl.GetInterfaces()
+                    .Where(i => i.IsInterface && i != typeof(IGenericRepository<>) &&
+                                i.GetInterfaces().Any(ii =>
+                                    ii.IsGenericType && ii.GetGenericTypeDefinition() == typeof(IGenericRepository<>)))
                     .ToList();
 
-                if (interfaces.Count != 1)
+                foreach (var iface in interfaces)
                 {
-                    throw new InvalidOperationException($"Repository '{repositoryType.Name}' must implement only one interface that implements IGenericRepository<T>.");
+                    services.AddScoped(iface, impl);
                 }
-
-                services.AddScoped(interfaces[0], repositoryType);
             }
 
             return services;
         }
+
 
         private static IServiceCollection AddServices(this IServiceCollection services)
         {

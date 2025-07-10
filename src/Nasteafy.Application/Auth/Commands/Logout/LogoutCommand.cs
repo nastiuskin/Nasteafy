@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Helpers;
@@ -24,7 +23,9 @@ namespace Nasteafy.Application.Auth.Commands.Logout
             var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
+            {
                 return Result.Fail("Unauthorized").Log<AuthenticationService>();
+            }
 
             user.RefreshToken = null;
             await userManager.UpdateAsync(user);

@@ -1,4 +1,5 @@
-﻿using Nasteafy.Domain.Entities.Users;
+﻿using FluentResults;
+using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Common.Abstractions.Auth
 {
@@ -7,5 +8,7 @@ namespace Nasteafy.Application.Common.Abstractions.Auth
         Task<User?> FindByEmailAsync(string email);
         Task<IList<string>> GetRolesAsync(User user);
         Task UpdateAsync(User user);
+        Task<Result> CreateAsync(User user, string password);
+        Task AddToRoleAsync(User user, string role);
     }
 }
