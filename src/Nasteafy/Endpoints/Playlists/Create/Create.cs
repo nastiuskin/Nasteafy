@@ -11,7 +11,10 @@ namespace Nasteafy.Endpoints.Playlists.Create
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/playlists", async ([FromForm] CreatePlaylistRequest request, ISender sender, CancellationToken ct) =>
+            routes.MapPost("api/playlists", async (
+                [FromForm] CreatePlaylistRequest request,
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var command = new CreatePlaylistCommand(request.Title, request.PlaylistCover);
                 var result = await sender.Send(command, ct);

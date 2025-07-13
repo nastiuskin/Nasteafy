@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Tracks.Commands.Delete;
@@ -10,7 +11,10 @@ namespace Nasteafy.Endpoints.Tracks.Delete
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/tracks/{trackId:guid}", async (Guid trackId, ISender sender, CancellationToken ct) =>
+            routes.MapDelete("api/tracks/{trackId:guid}", async (
+                [FromRoute] Guid trackId,
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var result = await sender.Send(new DeleteTrackCommand(trackId), ct);
 

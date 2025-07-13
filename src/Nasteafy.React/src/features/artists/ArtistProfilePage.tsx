@@ -25,7 +25,7 @@ export default function ArtistProfilePage() {
   useEffect(() => {
     const fetchArtist = async () => {
       try {
-        const data = await client.artistsGET2(id!);
+        const data = await client.artistsGET(id!);
         setArtist(data);
       } catch (error) {
         handleApiError(error);
@@ -37,7 +37,7 @@ export default function ArtistProfilePage() {
 
   const fetchAlbums = async (page: number, pageSize: number) => {
     try {
-      const response = await client.albumsGET2(id!, page, pageSize);
+      const response = await client.paginatedSearch2(id!, page, pageSize);
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,

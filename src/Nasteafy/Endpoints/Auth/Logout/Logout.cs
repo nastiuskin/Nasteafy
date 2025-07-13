@@ -2,6 +2,7 @@
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Auth.Commands.Logout;
 using Nasteafy.Application.Common.Models;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Auth.Logout
 {
@@ -14,7 +15,9 @@ namespace Nasteafy.Endpoints.Auth.Logout
                 var response = await sender.Send(new LogoutCommand(), ct);
 
                 if (!response.IsSuccess)
-                    return Results.BadRequest(response.Reasons.First().Message);
+                {
+                    return response.ToApiError();
+                }                    
 
                 http.Cookies.Delete("refreshToken", new CookieOptions
                 {

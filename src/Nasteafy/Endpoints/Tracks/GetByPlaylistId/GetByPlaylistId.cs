@@ -7,14 +7,14 @@ using Nasteafy.Application.Tracks.Queries.GetByPlaylistId;
 using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Tracks
-{
+{   
     public sealed class GetByPlaylistIdEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/playlists/{playlistId:guid}/tracks", async (
+            routes.MapPost("api/playlists/{playlistId:guid}/tracks/paginated-search", async (
                 [FromRoute] Guid playlistId,
-                [AsParameters] PagedRequest pagedRequest,
+                [FromBody] PagedRequest pagedRequest,
                 ISender sender,
                 CancellationToken ct) =>
             {

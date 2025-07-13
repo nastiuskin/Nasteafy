@@ -20,7 +20,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
         public async Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken ct)
         {
-            return await _context.Users                
+            return await _context.Users
                 .Where(u => u.RefreshToken != null && u.RefreshToken.Token == refreshToken)
                 .FirstOrDefaultAsync(ct);
         }

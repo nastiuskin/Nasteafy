@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Albums.Commands.Delete;
 using Nasteafy.Application.Common.Models;
@@ -10,7 +11,10 @@ namespace Nasteafy.Endpoints.Albums.Delete
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/albums/{albumId:guid}", async (Guid albumId, ISender sender, CancellationToken ct) =>
+            routes.MapDelete("api/albums/{albumId:guid}", async (
+                [FromRoute] Guid albumId,
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var result = await sender.Send(new DeleteAlbumCommand(albumId), ct);
 

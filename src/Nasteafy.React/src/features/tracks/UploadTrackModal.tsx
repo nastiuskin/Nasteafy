@@ -9,9 +9,7 @@ import { client } from "../../api/ApiClientProvider";
 
 const schema = z.object({
   title: z.string().min(1, "Track title is required"),
-  file: z
-    .any()
-    .refine(
+  file: z.any().refine(
       (files) => files instanceof FileList && files.length > 0,
       "Audio file is required"
     )
@@ -55,7 +53,7 @@ export default function UploadTrackModal({ open, setOpen, albumId, onUploaded }:
         data.title,
         duration,
         albumId,
-        ["019793f5-699c-7d2f-8ad8-45daf35cb244"] //TEST
+        //PASS ARTISTS TO THE REQUEST
       );
       reset();
       setOpen(false);

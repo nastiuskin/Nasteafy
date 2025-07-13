@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { client } from "../../api/ApiClientProvider";
 import { handleApiError } from "../../helpers/handleApiError";
-import { SubscribeUserCommand, type GetSubscriptionDto } from "../../api/apiClient";
+import { type GetSubscriptionDto } from "../../api/apiClient";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
@@ -21,7 +21,7 @@ export default function SubscriptionsPage() {
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        const result = await client.subscriptionsGET();
+        const result = await client.subscriptions2();
         setSubscriptions(result.subscriptions ?? []);
       } catch (err) {
         handleApiError(err);
@@ -37,8 +37,7 @@ export default function SubscriptionsPage() {
       return;
     }
     try {
-      const request = new SubscribeUserCommand({ subscriptionId });
-      await client.subscribe(request);
+      await client.subscribe(subscriptionId);
       setSelectedId(null);
 
       setUser({

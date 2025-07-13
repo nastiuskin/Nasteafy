@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import type { ArtistDto } from "../../api/apiClient";
+import { ArtistDto, PagedRequest } from "../../api/apiClient";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import {
@@ -13,6 +13,7 @@ import {
 } from "../../components/ui/carousel";
 import { BarChart, Music, Users } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { handleApiError } from "../../helpers/handleApiError";
 
 export default function HomePage() {
   const [artists, setArtists] = useState<ArtistDto[]>([]);
@@ -22,11 +23,20 @@ export default function HomePage() {
 
   useEffect(() => {
     (async () => {
+       const pagedRequest = new PagedRequest();
+          pagedRequest.init({
+            pageNumber: page,
+            pageSize: 5,
+            filters: [],
+            sortBy: "Name",
+            sortDirection: null
+          }); 
       try {
-        const res = await client.artistsGET(page, 5);
+        const res = await client.paginatedSearch5(pagedRequest);
         setArtists(res.items ?? []);
         setTotalPages(res.totalPages ?? null);
       } catch (err) {
+        handleApiError(err);
         console.error(err);
       }
     })();

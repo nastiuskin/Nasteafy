@@ -1,7 +1,7 @@
 import PaginatedList from "../../components/Pagination";
 import { type GetTrackDto } from "../../api/apiClient";
 import { useAudioPlayer } from "../../contexts/AudioPlayerContext";
-import { Music, Pause, Play, MoreVertical } from "lucide-react";
+import { Music, Pause, Play } from "lucide-react";
 import { Button } from "../../components/ui/button";
 
 type TrackListProps = {

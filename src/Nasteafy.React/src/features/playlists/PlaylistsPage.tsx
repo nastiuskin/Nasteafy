@@ -1,7 +1,7 @@
 import { client } from "../../api/ApiClientProvider";
 import { Button } from "../../components/ui/button";
 import PlaylistCard from "./components/PlaylistCard";
-import { UserPlaylistDto } from "../../api/apiClient";
+import { PagedRequest, UserPlaylistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import PaginatedList from "../../components/Pagination";
 import PlaylistModal, { type PlaylistFormData } from "./components/CreateUpdatePlaylistModal";
@@ -12,8 +12,16 @@ export default function PlaylistsPage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const fetchPlaylists = async (page: number, pageSize: number) => {
+    const pagedRequest = new PagedRequest();
+    pagedRequest.init({
+      pageNumber: page,
+      pageSize: pageSize,
+      filters: [],
+      sortBy: null,
+      sortDirection: null
+    });
     try {
-      const response = await client.playlistsGET2(page, pageSize);
+      const response = await client.paginatedSearch4(pagedRequest);
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,
@@ -43,11 +51,11 @@ export default function PlaylistsPage() {
       <h1 className="text-2xl font-bold mb-4">My Playlists</h1>
       <div className="flex justify-end mb-4">
         <Button onClick={() => setOpen(true)}>Create Playlist</Button>
-          <PlaylistModal
-                    open={open}
-                    setOpen={setOpen}
-                    onSubmit={handleCreatePlaylist}
-                  />
+        <PlaylistModal
+          open={open}
+          setOpen={setOpen}
+          onSubmit={handleCreatePlaylist}
+        />
       </div>
       <PaginatedList
         key={refreshKey}

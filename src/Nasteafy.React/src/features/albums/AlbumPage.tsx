@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import { type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
+import { PagedRequest, type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
@@ -46,9 +46,17 @@ export default function AlbumPage() {
     fetchPlaylists();
   }, []);
 
-  const fetchPlaylists = async () => {
+  const fetchPlaylists = async (pageSize = 1, pageNumber = 10) => {
     try {
-      const response = await client.playlistsGET2(1, 50);
+      const pagedRequest = new PagedRequest();
+      pagedRequest.init({
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        filters: [],
+        sortBy: null,
+        sortDirection: null
+      });
+      const response = await client.paginatedSearch4(pagedRequest);
       setPlaylists(response.items ?? []);
     } catch (err) {
       handleApiError(err);
@@ -76,18 +84,26 @@ export default function AlbumPage() {
   };
 
   const fetchTracksForAlbum = async (page: number, pageSize: number) => {
+    if (!albumId) {
+      return { items: [], totalPages: 1 };
+    }
+    const pagedRequest = new PagedRequest();
+    pagedRequest.init({
+      pageNumber: page,
+      pageSize: pageSize,
+      filters: [],
+      sortBy: null,
+      sortDirection: null
+    });
     try {
-      if (!albumId) {
-        return { items: [], totalPages: 1 };
-      }
-      const result = await client.tracksGET(albumId!, page, pageSize);
+      const result = await client.paginatedSearch3(albumId, pagedRequest);
       return {
         items: result.items ?? [],
         totalPages: result.totalPages ?? 1,
-      }
+      };
     } catch (error) {
-      handleApiError(error)
-      return { items: [], totalPages: 1 };;
+      handleApiError(error);
+      return { items: [], totalPages: 1 };
     }
   };
 

@@ -55,14 +55,5 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
             return await query.ToPagedResultAsync(req, ct);
         }
-
-        //public IQueryable<Track> GetByIdWithArtists(Guid id)
-        //{
-        //   return _context.Tracks
-        //        .AsNoTracking()
-        //        .Where(x => x.Id == id)
-        //        .Include(x => x.ArtistTracks)
-        //            .ThenInclude(at => at.Artist);
-        //}
     }
 }

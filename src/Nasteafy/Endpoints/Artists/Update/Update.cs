@@ -11,8 +11,11 @@ namespace Nasteafy.Endpoints.Artists.Update
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPut("api/artists/{id:guid}", async ([FromRoute] Guid id,
-                [FromForm] UpdateArtistRequest request, ISender sender, CancellationToken ct) =>
+            routes.MapPut("api/artists/{id:guid}", async (
+                [FromRoute] Guid id,
+                [FromForm] UpdateArtistRequest request,
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var command = new UpdateArtistCommand(id, request.Name, request.AvatarFile);
                 var response = await sender.Send(command, ct);
@@ -29,4 +32,5 @@ namespace Nasteafy.Endpoints.Artists.Update
         }
     }
 }
+
 

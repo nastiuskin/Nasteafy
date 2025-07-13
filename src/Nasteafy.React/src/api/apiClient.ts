@@ -23,50 +23,46 @@ export interface IClient {
      */
     profilePUT(email: string | null | undefined, userName: string | null | undefined, avatarFile: FileParameter | null | undefined): Promise<void>;
     /**
-     * @param file (optional) 
-     * @param title (optional) 
-     * @param duration (optional) 
-     * @param albumId (optional) 
-     * @param artistIds (optional) 
      * @return OK
      */
-    tracksPOST(file: FileParameter | null | undefined, title: string | null | undefined, duration: string | undefined, albumId: string | null | undefined, artistIds: string[] | null | undefined): Promise<void>;
+    paginatedSearch(playlistId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @return OK
+     */
+    tracksGET(id: string): Promise<GetTrackDto>;
+    /**
+     * @return OK
+     */
+    paginatedSearch2(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @return OK
+     */
+    paginatedSearch3(albumId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
     tracksDELETE(trackId: string): Promise<void>;
     /**
+     * @param title (optional) 
+     * @param file (optional) 
+     * @param duration (optional) 
+     * @param albumId (optional) 
+     * @param artists (optional) 
      * @return OK
      */
-    tracksGET(albumId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    tracksPOST(title: string | null | undefined, file: FileParameter | null | undefined, duration: string | undefined, albumId: string | null | undefined, artists: string[] | null | undefined): Promise<void>;
     /**
      * @return OK
      */
-    tracksGET2(artistId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    subscribe(subscriptionId: string): Promise<void>;
     /**
      * @return OK
      */
-    tracksGET3(id: string): Promise<GetTrackDto>;
+    subscriptions(id: string): Promise<GetSubscriptionDto>;
     /**
      * @return OK
      */
-    tracksGET4(playlistId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
-    /**
-     * @return OK
-     */
-    subscriptionsPUT(body: UpdateSubscriptionCommand): Promise<void>;
-    /**
-     * @return OK
-     */
-    subscriptionsGET(): Promise<GetAllSubscriptionsResponse>;
-    /**
-     * @return OK
-     */
-    subscribe(body: SubscribeUserCommand): Promise<void>;
-    /**
-     * @return OK
-     */
-    subscriptionsGET2(id: string): Promise<GetSubscriptionDto>;
+    subscriptions2(): Promise<GetAllSubscriptionsResponse>;
     /**
      * @param title (optional) 
      * @param coverFile (optional) 
@@ -88,17 +84,17 @@ export interface IClient {
     /**
      * @return OK
      */
-    playlistsGET2(pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch4(body: PagedRequest): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @return OK
+     */
+    playlistsDELETE(playlistId: string): Promise<void>;
     /**
      * @param title (optional) 
      * @param playlistCover (optional) 
      * @return OK
      */
     playlistsPOST(title: string | null | undefined, playlistCover: FileParameter | null | undefined): Promise<string>;
-    /**
-     * @return OK
-     */
-    playlistsDELETE(playlistId: string): Promise<void>;
     /**
      * @return OK
      */
@@ -118,13 +114,7 @@ export interface IClient {
     /**
      * @return OK
      */
-    artistsGET(pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
-    /**
-     * @param name (optional) 
-     * @param artistPhoto (optional) 
-     * @return Created
-     */
-    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined): Promise<void>;
+    paginatedSearch5(body: PagedRequest): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @param name (optional) 
      * @param avatarFile (optional) 
@@ -134,11 +124,17 @@ export interface IClient {
     /**
      * @return OK
      */
-    artistsGET2(id: string): Promise<ArtistDto>;
+    artistsGET(id: string): Promise<ArtistDto>;
     /**
      * @return No Content
      */
     artistsDELETE(artistId: string): Promise<void>;
+    /**
+     * @param name (optional) 
+     * @param artistPhoto (optional) 
+     * @return Created
+     */
+    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined): Promise<void>;
     /**
      * @param coverFile (optional) 
      * @param releaseDate (optional) 
@@ -153,7 +149,7 @@ export interface IClient {
     /**
      * @return OK
      */
-    albumsGET2(artistId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch6(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
@@ -306,36 +302,24 @@ export class Client implements IClient {
     }
 
     /**
-     * @param file (optional) 
-     * @param title (optional) 
-     * @param duration (optional) 
-     * @param albumId (optional) 
-     * @param artistIds (optional) 
      * @return OK
      */
-    tracksPOST(file: FileParameter | null | undefined, title: string | null | undefined, duration: string | undefined, albumId: string | null | undefined, artistIds: string[] | null | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/tracks";
+    paginatedSearch(playlistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/playlists/{playlistId}/tracks/paginated-search";
+        if (playlistId === undefined || playlistId === null)
+            throw new Error("The parameter 'playlistId' must be defined.");
+        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = new FormData();
-        if (file !== null && file !== undefined)
-            content_.append("file", file.data, file.fileName ? file.fileName : "file");
-        if (title !== null && title !== undefined)
-            content_.append("title", title.toString());
-        if (duration === null || duration === undefined)
-            throw new Error("The parameter 'duration' cannot be null.");
-        else
-            content_.append("duration", duration.toString());
-        if (albumId !== null && albumId !== undefined)
-            content_.append("albumId", albumId.toString());
-        if (artistIds !== null && artistIds !== undefined)
-            artistIds.forEach(item_ => content_.append("artistIds", item_.toString()));
+        const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
             method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
             },
             cancelToken
         };
@@ -347,11 +331,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processTracksPOST(_response);
+            return this.processPaginatedSearch(_response);
         });
     }
 
-    protected processTracksPOST(response: AxiosResponse): Promise<void> {
+    protected processPaginatedSearch(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -363,7 +347,10 @@ export class Client implements IClient {
         }
         if (status === 200) {
             const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -376,7 +363,198 @@ export class Client implements IClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    tracksGET(id: string, cancelToken?: CancelToken): Promise<GetTrackDto> {
+        let url_ = this.baseUrl + "/api/tracks/{Id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTracksGET(_response);
+        });
+    }
+
+    protected processTracksGET(response: AxiosResponse): Promise<GetTrackDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = GetTrackDto.fromJS(resultData200);
+            return Promise.resolve<GetTrackDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GetTrackDto>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    paginatedSearch2(artistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/artists/{artistId}/tracks/paginated-search";
+        if (artistId === undefined || artistId === null)
+            throw new Error("The parameter 'artistId' must be defined.");
+        url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPaginatedSearch2(_response);
+        });
+    }
+
+    protected processPaginatedSearch2(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    paginatedSearch3(albumId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/albums/{albumId}/tracks/paginated-search";
+        if (albumId === undefined || albumId === null)
+            throw new Error("The parameter 'albumId' must be defined.");
+        url_ = url_.replace("{albumId}", encodeURIComponent("" + albumId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPaginatedSearch3(_response);
+        });
+    }
+
+    protected processPaginatedSearch3(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
     }
 
     /**
@@ -437,288 +615,36 @@ export class Client implements IClient {
     }
 
     /**
+     * @param title (optional) 
+     * @param file (optional) 
+     * @param duration (optional) 
+     * @param albumId (optional) 
+     * @param artists (optional) 
      * @return OK
      */
-    tracksGET(albumId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/albums/{albumId}/tracks?";
-        if (albumId === undefined || albumId === null)
-            throw new Error("The parameter 'albumId' must be defined.");
-        url_ = url_.replace("{albumId}", encodeURIComponent("" + albumId));
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+    tracksPOST(title: string | null | undefined, file: FileParameter | null | undefined, duration: string | undefined, albumId: string | null | undefined, artists: string[] | null | undefined, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/tracks";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processTracksGET(_response);
-        });
-    }
-
-    protected processTracksGET(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
-            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    tracksGET2(artistId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/artists/{artistId}/tracks?";
-        if (artistId === undefined || artistId === null)
-            throw new Error("The parameter 'artistId' must be defined.");
-        url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
+        const content_ = new FormData();
+        if (title !== null && title !== undefined)
+            content_.append("title", title.toString());
+        if (file !== null && file !== undefined)
+            content_.append("file", file.data, file.fileName ? file.fileName : "file");
+        if (duration === null || duration === undefined)
+            throw new Error("The parameter 'duration' cannot be null.");
         else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processTracksGET2(_response);
-        });
-    }
-
-    protected processTracksGET2(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
-            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    tracksGET3(id: string, cancelToken?: CancelToken): Promise<GetTrackDto> {
-        let url_ = this.baseUrl + "/api/tracks/{Id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processTracksGET3(_response);
-        });
-    }
-
-    protected processTracksGET3(response: AxiosResponse): Promise<GetTrackDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetTrackDto.fromJS(resultData200);
-            return Promise.resolve<GetTrackDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetTrackDto>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    tracksGET4(playlistId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/playlists/{playlistId}/tracks?";
-        if (playlistId === undefined || playlistId === null)
-            throw new Error("The parameter 'playlistId' must be defined.");
-        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processTracksGET4(_response);
-        });
-    }
-
-    protected processTracksGET4(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
-            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    subscriptionsPUT(body: UpdateSubscriptionCommand, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/subscriptions";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
+            content_.append("duration", duration.toString());
+        if (albumId !== null && albumId !== undefined)
+            content_.append("albumId", albumId.toString());
+        if (artists !== null && artists !== undefined)
+            artists.forEach(item_ => content_.append("artists", item_.toString()));
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "PUT",
+            method: "POST",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
             },
             cancelToken
         };
@@ -730,11 +656,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processSubscriptionsPUT(_response);
+            return this.processTracksPOST(_response);
         });
     }
 
-    protected processSubscriptionsPUT(response: AxiosResponse): Promise<void> {
+    protected processTracksPOST(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -765,76 +691,17 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    subscriptionsGET( cancelToken?: CancelToken): Promise<GetAllSubscriptionsResponse> {
-        let url_ = this.baseUrl + "/api/subscriptions";
+    subscribe(subscriptionId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/users/subscriptions/{subscriptionId}/subscribe";
+        if (subscriptionId === undefined || subscriptionId === null)
+            throw new Error("The parameter 'subscriptionId' must be defined.");
+        url_ = url_.replace("{subscriptionId}", encodeURIComponent("" + subscriptionId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processSubscriptionsGET(_response);
-        });
-    }
-
-    protected processSubscriptionsGET(response: AxiosResponse): Promise<GetAllSubscriptionsResponse> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = GetAllSubscriptionsResponse.fromJS(resultData200);
-            return Promise.resolve<GetAllSubscriptionsResponse>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<GetAllSubscriptionsResponse>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    subscribe(body: SubscribeUserCommand, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/users/subscribe";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
             method: "POST",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
             },
             cancelToken
         };
@@ -881,7 +748,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    subscriptionsGET2(id: string, cancelToken?: CancelToken): Promise<GetSubscriptionDto> {
+    subscriptions(id: string, cancelToken?: CancelToken): Promise<GetSubscriptionDto> {
         let url_ = this.baseUrl + "/api/subscriptions/{Id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -904,11 +771,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processSubscriptionsGET2(_response);
+            return this.processSubscriptions(_response);
         });
     }
 
-    protected processSubscriptionsGET2(response: AxiosResponse): Promise<GetSubscriptionDto> {
+    protected processSubscriptions(response: AxiosResponse): Promise<GetSubscriptionDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -937,6 +804,64 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<GetSubscriptionDto>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    subscriptions2( cancelToken?: CancelToken): Promise<GetAllSubscriptionsResponse> {
+        let url_ = this.baseUrl + "/api/subscriptions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSubscriptions2(_response);
+        });
+    }
+
+    protected processSubscriptions2(response: AxiosResponse): Promise<GetAllSubscriptionsResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = GetAllSubscriptionsResponse.fromJS(resultData200);
+            return Promise.resolve<GetAllSubscriptionsResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<GetAllSubscriptionsResponse>(null as any);
     }
 
     /**
@@ -1189,22 +1114,18 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    playlistsGET2(pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/playlists?";
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+    paginatedSearch4(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/playlists/paginated-search";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             cancelToken
@@ -1217,11 +1138,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPlaylistsGET2(_response);
+            return this.processPaginatedSearch4(_response);
         });
     }
 
-    protected processPlaylistsGET2(response: AxiosResponse): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch4(response: AxiosResponse): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1250,6 +1171,63 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    playlistsDELETE(playlistId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/playlists/{playlistId}";
+        if (playlistId === undefined || playlistId === null)
+            throw new Error("The parameter 'playlistId' must be defined.");
+        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPlaylistsDELETE(_response);
+        });
+    }
+
+    protected processPlaylistsDELETE(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -1318,63 +1296,6 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<string>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    playlistsDELETE(playlistId: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/playlists/{playlistId}";
-        if (playlistId === undefined || playlistId === null)
-            throw new Error("The parameter 'playlistId' must be defined.");
-        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "DELETE",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processPlaylistsDELETE(_response);
-        });
-    }
-
-    protected processPlaylistsDELETE(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -1614,22 +1535,18 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    artistsGET(pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/artists?";
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+    paginatedSearch5(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/artists/paginated-search";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             cancelToken
@@ -1642,11 +1559,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processArtistsGET(_response);
+            return this.processPaginatedSearch5(_response);
         });
     }
 
-    protected processArtistsGET(response: AxiosResponse): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch5(response: AxiosResponse): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1675,69 +1592,6 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
-    }
-
-    /**
-     * @param name (optional) 
-     * @param artistPhoto (optional) 
-     * @return Created
-     */
-    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/artists";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = new FormData();
-        if (name !== null && name !== undefined)
-            content_.append("name", name.toString());
-        if (artistPhoto !== null && artistPhoto !== undefined)
-            content_.append("artistPhoto", artistPhoto.data, artistPhoto.fileName ? artistPhoto.fileName : "artistPhoto");
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processArtistsPOST(_response);
-        });
-    }
-
-    protected processArtistsPOST(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 201) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
     }
 
     /**
@@ -1809,7 +1663,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    artistsGET2(id: string, cancelToken?: CancelToken): Promise<ArtistDto> {
+    artistsGET(id: string, cancelToken?: CancelToken): Promise<ArtistDto> {
         let url_ = this.baseUrl + "/api/artists/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1832,11 +1686,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processArtistsGET2(_response);
+            return this.processArtistsGET(_response);
         });
     }
 
-    protected processArtistsGET2(response: AxiosResponse): Promise<ArtistDto> {
+    protected processArtistsGET(response: AxiosResponse): Promise<ArtistDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1907,6 +1761,69 @@ export class Client implements IClient {
             }
         }
         if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @param name (optional) 
+     * @param artistPhoto (optional) 
+     * @return Created
+     */
+    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/artists";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (name !== null && name !== undefined)
+            content_.append("name", name.toString());
+        if (artistPhoto !== null && artistPhoto !== undefined)
+            content_.append("artistPhoto", artistPhoto.data, artistPhoto.fileName ? artistPhoto.fileName : "artistPhoto");
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processArtistsPOST(_response);
+        });
+    }
+
+    protected processArtistsPOST(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
@@ -2059,25 +1976,21 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    albumsGET2(artistId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/artists/{artistId}/albums?";
+    paginatedSearch6(artistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/artists/{artistId}/albums/paginated-search";
         if (artistId === undefined || artistId === null)
             throw new Error("The parameter 'artistId' must be defined.");
         url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             },
             cancelToken
@@ -2090,11 +2003,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAlbumsGET2(_response);
+            return this.processPaginatedSearch6(_response);
         });
     }
 
-    protected processAlbumsGET2(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch6(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2394,6 +2307,103 @@ export interface IApiError {
     errorMessage: string | undefined;
 }
 
+export class Filter implements IFilter {
+    path?: string | undefined;
+    value?: string | undefined;
+
+    constructor(data?: IFilter) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.path = _data["path"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): Filter {
+        data = typeof data === 'object' ? data : {};
+        let result = new Filter();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["path"] = this.path;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IFilter {
+    path?: string | undefined;
+    value?: string | undefined;
+}
+
+export enum FilterLogicalOperators {
+    _0 = 0,
+    _1 = 1,
+}
+
+export class PagedRequest implements IPagedRequest {
+    pageNumber?: number;
+    pageSize?: number;
+    sortBy?: string | undefined;
+    sortDirection?: string | undefined;
+    requestFilters?: RequestFilters;
+
+    constructor(data?: IPagedRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.sortBy = _data["sortBy"];
+            this.sortDirection = _data["sortDirection"];
+            this.requestFilters = _data["requestFilters"] ? RequestFilters.fromJS(_data["requestFilters"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): PagedRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new PagedRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["sortBy"] = this.sortBy;
+        data["sortDirection"] = this.sortDirection;
+        data["requestFilters"] = this.requestFilters ? this.requestFilters.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IPagedRequest {
+    pageNumber?: number;
+    pageSize?: number;
+    sortBy?: string | undefined;
+    sortDirection?: string | undefined;
+    requestFilters?: RequestFilters;
+}
+
 export class PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null implements IPagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null {
     items?: AlbumDto[] | undefined;
     totalItems?: number;
@@ -2634,6 +2644,54 @@ export interface IPagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neut
     totalPages?: number;
 }
 
+export class RequestFilters implements IRequestFilters {
+    logicalOperator?: FilterLogicalOperators;
+    filters?: Filter[] | undefined;
+
+    constructor(data?: IRequestFilters) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.logicalOperator = _data["logicalOperator"];
+            if (Array.isArray(_data["filters"])) {
+                this.filters = [] as any;
+                for (let item of _data["filters"])
+                    this.filters!.push(Filter.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RequestFilters {
+        data = typeof data === 'object' ? data : {};
+        let result = new RequestFilters();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["logicalOperator"] = this.logicalOperator;
+        if (Array.isArray(this.filters)) {
+            data["filters"] = [];
+            for (let item of this.filters)
+                data["filters"].push(item ? item.toJSON() : <any>undefined);
+        }
+        return data;
+    }
+}
+
+export interface IRequestFilters {
+    logicalOperator?: FilterLogicalOperators;
+    filters?: Filter[] | undefined;
+}
+
 export class UserPlaylistDto implements IUserPlaylistDto {
     id?: string;
     title?: string | undefined;
@@ -2680,90 +2738,6 @@ export interface IUserPlaylistDto {
     title?: string | undefined;
     coverUrl?: string | undefined;
     tracksCount?: number;
-}
-
-export class SubscribeUserCommand implements ISubscribeUserCommand {
-    subscriptionId?: string;
-
-    constructor(data?: ISubscribeUserCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.subscriptionId = _data["subscriptionId"];
-        }
-    }
-
-    static fromJS(data: any): SubscribeUserCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new SubscribeUserCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["subscriptionId"] = this.subscriptionId;
-        return data;
-    }
-}
-
-export interface ISubscribeUserCommand {
-    subscriptionId?: string;
-}
-
-export class UpdateSubscriptionCommand implements IUpdateSubscriptionCommand {
-    id?: string;
-    description?: string | undefined;
-    price?: number;
-    durationInDays?: number;
-
-    constructor(data?: IUpdateSubscriptionCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.description = _data["description"];
-            this.price = _data["price"];
-            this.durationInDays = _data["durationInDays"];
-        }
-    }
-
-    static fromJS(data: any): UpdateSubscriptionCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateSubscriptionCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["description"] = this.description;
-        data["price"] = this.price;
-        data["durationInDays"] = this.durationInDays;
-        return data;
-    }
-}
-
-export interface IUpdateSubscriptionCommand {
-    id?: string;
-    description?: string | undefined;
-    price?: number;
-    durationInDays?: number;
 }
 
 export class GetAllSubscriptionsResponse implements IGetAllSubscriptionsResponse {
@@ -2856,66 +2830,6 @@ export interface IGetSubscriptionDto {
     name?: string | undefined;
     description?: string | undefined;
     price?: number;
-}
-
-export class CreateTrackCommand implements ICreateTrackCommand {
-    file?: string | undefined;
-    title?: string | undefined;
-    duration?: string;
-    albumId?: string | undefined;
-    artistIds?: string[] | undefined;
-
-    constructor(data?: ICreateTrackCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.file = _data["file"];
-            this.title = _data["title"];
-            this.duration = _data["duration"];
-            this.albumId = _data["albumId"];
-            if (Array.isArray(_data["artistIds"])) {
-                this.artistIds = [] as any;
-                for (let item of _data["artistIds"])
-                    this.artistIds!.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): CreateTrackCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateTrackCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["file"] = this.file;
-        data["title"] = this.title;
-        data["duration"] = this.duration;
-        data["albumId"] = this.albumId;
-        if (Array.isArray(this.artistIds)) {
-            data["artistIds"] = [];
-            for (let item of this.artistIds)
-                data["artistIds"].push(item);
-        }
-        return data;
-    }
-}
-
-export interface ICreateTrackCommand {
-    file?: string | undefined;
-    title?: string | undefined;
-    duration?: string;
-    albumId?: string | undefined;
-    artistIds?: string[] | undefined;
 }
 
 export class GetTrackDto implements IGetTrackDto {
@@ -3364,6 +3278,66 @@ export class UpdatePlaylistRequest implements IUpdatePlaylistRequest {
 export interface IUpdatePlaylistRequest {
     title?: string | undefined;
     coverFile?: string | undefined;
+}
+
+export class CreateTrackRequest implements ICreateTrackRequest {
+    title!: string | undefined;
+    file!: string | undefined;
+    duration!: string;
+    albumId?: string | undefined;
+    artists?: string[] | undefined;
+
+    constructor(data?: ICreateTrackRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.file = _data["file"];
+            this.duration = _data["duration"];
+            this.albumId = _data["albumId"];
+            if (Array.isArray(_data["artists"])) {
+                this.artists = [] as any;
+                for (let item of _data["artists"])
+                    this.artists!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateTrackRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTrackRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["file"] = this.file;
+        data["duration"] = this.duration;
+        data["albumId"] = this.albumId;
+        if (Array.isArray(this.artists)) {
+            data["artists"] = [];
+            for (let item of this.artists)
+                data["artists"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ICreateTrackRequest {
+    title: string | undefined;
+    file: string | undefined;
+    duration: string;
+    albumId?: string | undefined;
+    artists?: string[] | undefined;
 }
 
 export class UpdateUserProfileRequest implements IUpdateUserProfileRequest {

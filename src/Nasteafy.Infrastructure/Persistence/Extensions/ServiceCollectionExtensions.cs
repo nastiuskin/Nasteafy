@@ -103,8 +103,6 @@ namespace Nasteafy.Persistence.Database.Extensions
 
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-            // Is it possible to use reflection here?
-            // I don't have a common base interface for all services like IGenericRepository<T> for repositories.
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
             services.AddScoped<IFileStorageService, MinioStorageService>();

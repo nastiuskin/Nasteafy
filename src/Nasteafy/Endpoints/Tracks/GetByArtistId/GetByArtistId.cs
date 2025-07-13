@@ -12,9 +12,9 @@ namespace Nasteafy.Endpoints.Tracks.GetByArtistId
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/artists/{artistId:guid}/tracks", async (
+            routes.MapPost("api/artists/{artistId:guid}/tracks/paginated-search", async (
                 [FromRoute] Guid artistId, 
-                [AsParameters] PagedRequest pagedRequest,
+                [FromBody] PagedRequest pagedRequest,
                 ISender sender,
                 CancellationToken ct) =>
             {

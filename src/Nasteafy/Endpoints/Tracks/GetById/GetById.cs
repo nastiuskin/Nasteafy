@@ -11,7 +11,10 @@ namespace Nasteafy.Endpoints.Tracks.GetById
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/tracks/{Id:guid}", async ([FromRoute] Guid Id, ISender sender, CancellationToken ct) =>
+            routes.MapGet("api/tracks/{Id:guid}", async (
+                [FromRoute] Guid Id, 
+                ISender sender, 
+                CancellationToken ct) =>
             {
                 var response = await sender.Send(new GetTrackByIdQuery(Id), ct);
 

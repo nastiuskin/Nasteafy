@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Playlists.Commands.Delete;
@@ -10,7 +11,10 @@ namespace Nasteafy.Endpoints.Playlists.Delete
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/playlists/{playlistId:guid}", async (Guid playlistId, ISender sender, CancellationToken ct) =>
+            routes.MapDelete("api/playlists/{playlistId:guid}", async (
+                [FromRoute] Guid playlistId,
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var result = await sender.Send(new DeletePlaylistCommand(playlistId), ct);
 

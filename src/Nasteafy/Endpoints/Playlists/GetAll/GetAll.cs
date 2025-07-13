@@ -3,6 +3,7 @@ using Nasteafy.Abstractions;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Playlists.Queries.GetByUserId;
 using Nasteafy.Extensions;
+using System.Web.Http;
 
 namespace Nasteafy.Endpoints.Playlists.GetAll
 {
@@ -10,7 +11,10 @@ namespace Nasteafy.Endpoints.Playlists.GetAll
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/playlists", async (ISender sender, [AsParameters] PagedRequest pagedRequest, CancellationToken ct) =>
+            routes.MapPost("api/playlists/paginated-search", async (
+                [FromBody] PagedRequest pagedRequest,
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var result = await sender.Send(new GetUserPlaylistsQuery(pagedRequest), ct);
 

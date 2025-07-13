@@ -12,7 +12,10 @@ namespace Nasteafy.Endpoints.Playlists.GetById
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/playlists/{Id:guid}", async ([FromRoute] Guid Id, ISender sender, CancellationToken ct) =>
+            routes.MapGet("api/playlists/{Id:guid}", async (
+                [FromRoute] Guid Id,
+                ISender sender, 
+                CancellationToken ct) =>
             {
                 var response = await sender.Send(new GetPlaylistByIdQuery(Id), ct);
 

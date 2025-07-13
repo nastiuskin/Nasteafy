@@ -38,6 +38,8 @@ namespace Nasteafy.Middlewares
 
         private static async Task WriteApiErrorAsync(HttpContext context, int statusCode, string message)
         {
+            context.Response.StatusCode = statusCode;
+
             var apiError = new ApiError
             {
                 StatusCode = statusCode,

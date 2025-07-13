@@ -11,7 +11,10 @@ namespace Nasteafy.Endpoints.Artists.Create
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/artists", async ([FromForm] CreateArtistRequest request, ISender sender, CancellationToken ct) =>
+            routes.MapPost("api/artists", async (
+                [FromForm] CreateArtistRequest request,
+                ISender sender, 
+                CancellationToken ct) =>
             {
                 var command = new CreateArtistCommand(request.Name, request.ArtistPhoto);
                 var result = await sender.Send(command, ct);

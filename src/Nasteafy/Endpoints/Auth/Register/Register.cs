@@ -11,7 +11,10 @@ namespace Nasteafy.Endpoints.Auth.Register
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/auth/register", async ([FromBody] RegisterRequest request, ISender sender, CancellationToken ct) =>
+            routes.MapPost("api/auth/register", async (
+                [FromBody] RegisterRequest request, 
+                ISender sender,
+                CancellationToken ct) =>
             {
                 var command = new RegisterCommand(request.Email, request.Password);
                 var response = await sender.Send(command, ct);
