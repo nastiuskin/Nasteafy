@@ -28,10 +28,10 @@ public class GetUserProfileQueryHandler(
         var user = await unitOfWork.Users.GetByIdAsync(userId, ct);
         if (user is null)
         {
-            return Result.Fail("User not found").Log<GetUserProfileQuery>();
+            return Result.Fail("Failed to get user profile").Log<GetUserProfileQuery>();
         }
 
-        var role = (await userManager.GetRolesAsync(user)).FirstOrDefault() ?? UserRole.User.ToString();
+        var role = (await userManager.GetRolesAsync(user)).FirstOrDefault() ?? UserRole.Guest.ToString();
 
         string? avatarUrl = null;
 

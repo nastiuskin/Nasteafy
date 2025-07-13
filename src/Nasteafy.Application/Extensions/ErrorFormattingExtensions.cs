@@ -19,5 +19,10 @@ namespace Nasteafy.Extensions
         {
             return string.Join("; ", errors.Select(e => e.Description));
         }
+
+        public static string ToErrorMessage(this Exception ex)
+        {
+            return ex.Message ?? "An unexpected error occured";
+        }
     }
 }

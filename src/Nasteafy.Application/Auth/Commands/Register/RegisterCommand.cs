@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain.Entities.Subscriptions;
@@ -13,7 +13,7 @@ namespace Nasteafy.Application.Auth.Commands.Register
 
     public class RegisterCommandHandler(
         IUnitOfWork unitOfWork,
-        UserManager<User> userManager,
+        IUserManager userManager,
         IDateTimeService dateTimeService)
         : IRequestHandler<RegisterCommand, Result>
     {
@@ -26,19 +26,19 @@ namespace Nasteafy.Application.Auth.Commands.Register
             };
 
             var result = await userManager.CreateAsync(user, request.Password);
-            if (!result.Succeeded)
+            if (!result.IsSuccess)
             {
                 return Result.Fail(result.Errors.ToErrorMessage());
             }
 
-            var roleAssignResult = await userManager.AddToRoleAsync(user, UserRole.User.ToString());
-            if (!roleAssignResult.Succeeded)
+            var roleAssignResult = await userManager.AddToRoleAsync(user, UserRole.Guest.ToString());
+            if (!roleAssignResult.IsSuccess)
             {
                 return Result.Fail(roleAssignResult.Errors.ToErrorMessage());
             }
 
             var subscription = await unitOfWork.Subscriptions.GetByTypeAsync(SubscriptionType.Free, ct);
-            if (subscription != null)
+            if (subscription is not null)
             {
                 var userSubscription = new UserSubscription
                 {
@@ -52,7 +52,6 @@ namespace Nasteafy.Application.Auth.Commands.Register
             }
 
             await unitOfWork.SaveChangesAsync(ct);
-
             return Result.Ok();
         }
     }

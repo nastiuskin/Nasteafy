@@ -18,17 +18,16 @@ namespace Nasteafy.Application.Artists.Commands.Delete
                     request.ArtistId,
                     ct,
                     x => x.Include(x => x.ArtistTracks)
-                        .Include(x => x.AlbumArtists)                   
+                          .Include(x => x.AlbumArtists)
                 );
 
-            if (artist is null)
-                return Result.Fail("Artist not found.").Log<DeleteArtistCommandHandler>();
-
-            bool hasTracks = artist.ArtistTracks.Any();
+            bool hasTracks = artist!.ArtistTracks.Any();
             bool hasAlbums = artist.AlbumArtists.Any();
 
             if (hasTracks || hasAlbums)
+            {
                 return Result.Fail("Cannot delete artist with associated tracks or albums.").Log<DeleteArtistCommandHandler>();
+            }
 
             unitOfWork.Artists.Delete(artist, ct);
             await unitOfWork.SaveChangesAsync(ct);

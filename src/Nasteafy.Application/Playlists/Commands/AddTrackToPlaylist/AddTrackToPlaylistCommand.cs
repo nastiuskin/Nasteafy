@@ -4,17 +4,11 @@ using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain.Entities.Tracks;
-using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Playlists.Commands.AddTrackToPlaylist
 {
-    public class AddTrackToPlaylistCommand : IRequest<Result>, ITransactionalCommand
-    {
-        [JsonIgnore]
-        public Guid PlaylistId { get; set; }
-        public Guid TrackId { get; set; }
-    }
-       
+    public record AddTrackToPlaylistCommand(Guid PlaylistId, Guid TrackId)
+        : IRequest<Result>, ITransactionalCommand;
 
     public class AddTrackToPlaylistCommandHandler(
         IUnitOfWork unitOfWork,
@@ -25,7 +19,7 @@ namespace Nasteafy.Application.Playlists.Commands.AddTrackToPlaylist
         {
             var userId = userProvider.GetUserId();
 
-            if (userId == null || userId == Guid.Empty)
+            if (userId == Guid.Empty)
             {
                 return Result.Fail("User not authenticated").Log<AddTrackToPlaylistCommandHandler>();
             }
@@ -35,14 +29,14 @@ namespace Nasteafy.Application.Playlists.Commands.AddTrackToPlaylist
             if (playlist!.UserId != userId)
             {
                 return Result.Fail("You do not have permission to modify this playlist").Log<AddTrackToPlaylistCommandHandler>();
-            }                
+            }
 
             var alreadyExists = playlist.PlaylistTracks.Any(pt => pt.TrackId == request.TrackId);
 
             if (alreadyExists)
             {
                 return Result.Fail("Track is already in the playlist").Log<AddTrackToPlaylistCommandHandler>();
-            }                
+            }
 
             var nextOrder = playlist.PlaylistTracks.Any()
                 ? playlist.PlaylistTracks.Max(pt => pt.Order) + 1

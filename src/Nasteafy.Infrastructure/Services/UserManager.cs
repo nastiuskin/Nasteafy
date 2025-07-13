@@ -21,6 +21,20 @@ namespace Nasteafy.Infrastructure.Services
                 : Result.Fail(identityResult.Errors.Select(e => new Error(e.Description)));
         }
 
-        public Task AddToRoleAsync(User user, string role) => userManager.AddToRoleAsync(user, role);
+        public async Task<Result> AddToRoleAsync(User user, string role)
+        {
+            var identityResult = await userManager.AddToRoleAsync(user, role);
+            return identityResult.Succeeded
+                ? Result.Ok()
+                : Result.Fail(identityResult.Errors.Select(e => new Error(e.Description)));
+        }   
+        
+        public async Task<Result> RemoveRoleAsync(User user, string role)
+        {
+            var identityResult = await userManager.RemoveFromRoleAsync(user, role);
+            return identityResult.Succeeded
+                ? Result.Ok()
+                : Result.Fail(identityResult.Errors.Select(e => new Error(e.Description)));
+        }
     }
 }

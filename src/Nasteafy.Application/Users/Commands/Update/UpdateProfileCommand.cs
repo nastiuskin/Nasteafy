@@ -8,12 +8,10 @@ using Nasteafy.Domain;
 
 namespace Nasteafy.Application.Users.Commands.Update
 {
-    public class UpdateProfileCommand : IRequest<Result>, ITransactionalCommand
-    {
-        public string? Email { get; init; }
-        public string? UserName { get; init; }
-        public IFormFile? AvatarFile { get; init; }
-    }
+    public record UpdateProfileCommand(
+        string? Email,
+        string? UserName,
+        IFormFile? AvatarFile) : IRequest<Result>, ITransactionalCommand;
 
     public class UpdateProfileCommandHandler(
         IUnitOfWork unitOfWork,

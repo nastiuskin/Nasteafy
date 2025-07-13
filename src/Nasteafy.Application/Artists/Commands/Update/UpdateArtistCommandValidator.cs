@@ -8,10 +8,8 @@ namespace Nasteafy.Application.Artists.Commands.Update
         public UpdateArtistCommandValidator(IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.ArtistId)
-                .NotEmpty()
-                    .WithMessage("ArtistId is required")
-                .MustAsync(unitOfWork.Artists.ExistsAsync)
-                    .WithMessage("Artist not found");
+                .NotEmpty().WithMessage("ArtistId is required")
+                .MustAsync(unitOfWork.Artists.ExistsAsync).WithMessage("Artist not found");
         }
     }
 }

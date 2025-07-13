@@ -9,7 +9,7 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
     {
         public void Configure(EntityTypeBuilder<PlaylistTrack> builder)
         {
-            builder.ToTable("PlaylistTracks", schema: SchemaConstants.Music);
+            builder.ToTable("PlaylistTrack", schema: SchemaConstants.Music);
 
             builder.HasKey(x => new { x.PlaylistId, x.TrackId });
 

@@ -18,7 +18,7 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
         public async Task<Subscription?> GetByTypeAsync(SubscriptionType subscriptionType, CancellationToken ct)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Type == SubscriptionType.Free);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Type == SubscriptionType.Free, ct);
         }
 
         public async Task<List<UserSubscription>> GetAllByUserIdAsync(Guid userId, CancellationToken ct)

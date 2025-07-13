@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Nasteafy.Application.Common.Models;
+using Nasteafy.Extensions;
 
 namespace Nasteafy.Middlewares
 {
@@ -22,29 +23,21 @@ namespace Nasteafy.Middlewares
             }
             catch (ValidationException ex)
             {
-                _logger.LogError(ex, "Validation errors occurred.");
+                _logger.LogError(ex, "Validation errors occurred: {ErrorMessage}", ex.Message);
 
-                var firstError = ex.Errors.FirstOrDefault();
-                var message = firstError is null
-                    ? "Validation failed"
-                    : $"{firstError.ErrorMessage}";
-
-                await WriteApiErrorAsync(context, StatusCodes.Status400BadRequest, $"{message}");
+                await WriteApiErrorAsync(context, StatusCodes.Status400BadRequest, $"{ex.ToErrorMessage()}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred.");
+                _logger.LogError(ex, "An unexpected error occurred: {ErrorMessage}", ex.Message);
 
                 await WriteApiErrorAsync(context, StatusCodes.Status500InternalServerError,
-                    "An unexpected error occurred: " + ex.Message);
+                     "Something went wrong. Please try again later.");
             }
         }
 
         private static async Task WriteApiErrorAsync(HttpContext context, int statusCode, string message)
         {
-            context.Response.StatusCode = statusCode;
-            context.Response.ContentType = "application/json";
-
             var apiError = new ApiError
             {
                 StatusCode = statusCode,
@@ -53,7 +46,6 @@ namespace Nasteafy.Middlewares
 
             await context.Response.WriteAsJsonAsync(apiError);
         }
-
     }
 }
 

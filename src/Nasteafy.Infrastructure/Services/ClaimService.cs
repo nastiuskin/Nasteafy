@@ -1,5 +1,6 @@
 ﻿using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
+using Nasteafy.Domain.Entities.Subscriptions;
 using Nasteafy.Domain.Entities.Users;
 using Nasteafy.Infrastructure.Constants;
 using System.Security.Claims;
@@ -17,7 +18,7 @@ namespace Nasteafy.Infrastructure.Services
             {
                 new Claim(ClaimsConstants.UserId, user.Id.ToString()),
                 new Claim(ClaimsConstants.Email, user.Email!),
-                new Claim(ClaimsConstants.SubscriptionType, subscription?.Subscription?.Type.Name ?? string.Empty)
+                new Claim(ClaimsConstants.SubscriptionType, subscription?.Subscription?.Type.Name ?? SubscriptionType.Free.Name)
             };
 
             claims.AddRange(roles.Select(role => new Claim(ClaimsConstants.Role, role)));

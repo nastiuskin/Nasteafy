@@ -4,12 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-import { RegisterCommand } from "../../api/apiClient";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { client } from "../../api/ApiClientProvider";
 import { handleApiError } from "../../helpers/handleApiError";
+import { RegisterRequest } from "../../api/apiClient";
 
 const registerSchema = z.object({
     email: z.string().email("Invalid email"),
@@ -36,7 +36,7 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const command = new RegisterCommand({ email: data.email, password: data.password });
+      const command = new RegisterRequest({ email: data.email, password: data.password });
       await client.register(command);
       toast.success("Registration successful");
       navigate("/login");

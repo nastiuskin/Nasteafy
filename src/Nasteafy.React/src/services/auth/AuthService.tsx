@@ -1,11 +1,11 @@
 import { handleApiError } from "../../helpers/handleApiError";
 import { client } from "../../api/ApiClientProvider"
-import { LoginCommand, RegisterCommand } from "../../api/apiClient";
+import { LoginRequest, RegisterRequest } from "../../api/apiClient";
 
 export const authService = {
   login: async (email: string, password: string): Promise<string | null> => {
     try {
-      const command = new LoginCommand({ email, password });
+      const command = new LoginRequest({ email, password });
       const token = await client.login(command);
       return token;
     } catch (error) {
@@ -16,7 +16,7 @@ export const authService = {
 
   register: async (email: string, password: string): Promise<void> => {
     try {
-      const command = new RegisterCommand({ email, password });
+      const command = new RegisterRequest({ email, password });
       await client.register(command);
     } catch (error) {
       handleApiError(error);

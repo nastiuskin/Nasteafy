@@ -12,10 +12,13 @@ namespace Nasteafy.Application.Subscriptions.Queries.GetById
     {
         public async Task<Result<GetSubscriptionDto?>> Handle(GetSubscriptionByIdQuery req, CancellationToken ct)
         {
-            var subscription = await unitOfWork.Subscriptions
-                .GetByIdAsync(req.SubscriptionId, ct);
+            var subscription = await unitOfWork.Subscriptions.GetByIdAsync(req.SubscriptionId, ct);
 
-            return new GetSubscriptionDto(subscription!.Id, subscription.Type.Name, subscription.Description, subscription.Price);
+            return new GetSubscriptionDto(
+                subscription!.Id,
+                subscription.Type.Name,
+                subscription.Description,
+                subscription.Price);
         }
     }
 }

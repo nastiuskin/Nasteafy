@@ -21,24 +21,21 @@ namespace Nasteafy.Application.Tracks.Queries.GetById
                          .ThenInclude(at => at.Artist)
                      .Include(x => x.Album));
 
-            var fileUrl = !string.IsNullOrEmpty(track?.FilePath)
-               ? await fileStorageService.GetFileUrlAsync(FileType.Audio, track?.FilePath)
-               : null;
+            var getFileResult = await fileStorageService.GetFileUrlAsync(FileType.Audio, track!.FilePath);
+            if (getFileResult.IsFailed)
+            {
+                return Result.Fail(getFileResult.Errors.ToList());
+            }
 
             var albumCoverUrl = !string.IsNullOrEmpty(track?.Album?.CoverUrl)
                 ? await fileStorageService.GetFileUrlAsync(FileType.AlbumCover, track?.Album.CoverUrl)
-                : null;
-
-
-            if (track is null)
-                return Result.Fail("Track not found")
-                    .LogIfFailed<GetTrackByIdQueryHandler>();
+                : null;          
 
             var trackDto = new GetTrackDto(
-                 track.Id,
+                 track!.Id,
                  track.Title,
                  string.Join(", ", track.ArtistTracks.Select(at => at.Artist.Name)),
-                 fileUrl.Value,
+                 getFileResult.Value,
                  track.Duration,
                  albumCoverUrl?.Value
              );

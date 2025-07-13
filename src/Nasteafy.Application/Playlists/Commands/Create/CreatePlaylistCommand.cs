@@ -9,11 +9,8 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Playlists.Commands.Create
 {
-    public class CreatePlaylistCommand : IRequest<Result<Guid>>, ITransactionalCommand
-    {
-        public required string Title { get; set; }
-        public IFormFile? PlaylistCover { get; set; }
-    }
+    public record CreatePlaylistCommand(string Title, IFormFile? PlaylistCover)
+        : IRequest<Result<Guid>>, ITransactionalCommand;
 
     public class CreatePlaylistCommandHandler(
         IUnitOfWork _unitOfWork,
@@ -25,10 +22,10 @@ namespace Nasteafy.Application.Playlists.Commands.Create
         {
             var userId = _userProvider.GetUserId();
 
-            if (userId == null || userId == Guid.Empty)
+            if (userId == Guid.Empty)
             {
                 return Result.Fail("UserId not found").Log<CreatePlaylistCommandHandler>();
-            }               
+            }
 
             var playlist = new Playlist
             {
@@ -49,7 +46,7 @@ namespace Nasteafy.Application.Playlists.Commands.Create
                 if (result.IsSuccess)
                 {
                     playlist.CoverUrl = result.Value;
-                }                    
+                }
             }
 
             await _unitOfWork.Playlists.AddAsync(playlist, cancellationToken);

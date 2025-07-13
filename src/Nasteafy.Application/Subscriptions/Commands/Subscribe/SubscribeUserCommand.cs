@@ -1,7 +1,5 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Helpers;
@@ -11,11 +9,11 @@ using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Subscriptions.Commands
 {
-    public record SubscribeUserCommand(Guid SubscriptionId): IRequest<Result>, ITransactionalCommand;
+    public record SubscribeUserCommand(Guid SubscriptionId) : IRequest<Result>, ITransactionalCommand;
 
     public class SubscribeUserCommandHandler(IUnitOfWork unitOfWork,
         ICurrentUserProvider userProvider,
-        UserManager<User> userManager, 
+        IUserManager userManager,
         IDateTimeService dateTimeService)
         : IRequestHandler<SubscribeUserCommand, Result>
     {
@@ -26,100 +24,111 @@ namespace Nasteafy.Application.Subscriptions.Commands
             if (userId == Guid.Empty)
             {
                 return Result.Fail("UserId not found").Log<SubscribeUserCommandHandler>();
-            }               
+            }
 
             var user = await unitOfWork.Users.GetByIdWithSubscriptionsAsync(userId, ct);
-            if(user is null)
+            if (user is null)
             {
                 return Result.Fail("User not found").Log<SubscribeUserCommandHandler>();
             }
 
             var subscription = await unitOfWork.Subscriptions.GetByIdAsync(command.SubscriptionId, ct);
+            var userRoles = await userManager.GetRolesAsync(user);
 
-            var existingArtist = await unitOfWork.Artists.GetByIdAsync(user.Id, ct);
-
-            if (subscription!.Type == SubscriptionType.Trial)
+            var isTrialAlreadyActivated = user.UserSubscriptions.Any(us => us.Subscription.Type == SubscriptionType.Trial);
+            if (subscription!.Type == SubscriptionType.Trial && isTrialAlreadyActivated)
             {
-                bool alreadyActivated = user!.UserSubscriptions.Any(us => us.Subscription.Type == SubscriptionType.Trial);
-
-                if (alreadyActivated)
-                {
-                    return Result.Fail("Trial subscription can be activated only once.").Log<SubscribeUserCommandHandler>();
-                }                    
+                return Result.Fail("Trial subscription can be activated only once.").Log<SubscribeUserCommandHandler>();
             }
-
-            var userWithRoles = await userManager.FindByIdAsync(userId.ToString()!);
 
             if (subscription.Type == SubscriptionType.Artist)
             {
-                if (userWithRoles is not null)
-                {
-                    var currentRoles = await userManager.GetRolesAsync(userWithRoles);
-                    if (!currentRoles.Contains(UserRole.Artist.ToString()))
-                    {
-                        await userManager.AddToRoleAsync(userWithRoles, UserRole.Artist.ToString());
-                    }
-                }
-
-                if (existingArtist is null)
-                {
-                    var artist = new Artist
-                    {
-                        UserId = user.Id,
-                        Name = user.UserName!,
-                        AvatarUrl = user.AvatarUrl,
-                    };
-
-                    await unitOfWork.Artists.AddAsync(artist, ct);
-                }
-                else
-                {
-                    existingArtist.Name = user.UserName!;
-                    existingArtist.AvatarUrl = user.AvatarUrl;
-                }
+                await AddOrSyncArtistEntityAsync(user, userRoles, ct);
             }
             else
             {
-                if (userWithRoles is not null)
-                {
-                    var currentRoles = await userManager.GetRolesAsync(userWithRoles);
-                    if (currentRoles.Contains(UserRole.Artist.ToString()))
-                    {
-                        await userManager.RemoveFromRoleAsync(userWithRoles, UserRole.Artist.ToString());
-                    }
-                }
+                await RemoveArtistRoleIfExistsAsync(user, userRoles, ct);
             }
 
-            var now = dateTimeService.UtcNow;
+            DeactivateOtherSubscriptions(user, subscription.Id);
+            UpdateOrAddSubscription(user, subscription);
 
-            foreach (var sub in user.UserSubscriptions.Where(s => s.EndDate > now && s.SubscriptionId != subscription.Id))
+            await unitOfWork.SaveChangesAsync(ct);
+            return Result.Ok();
+        }
+
+        private void DeactivateOtherSubscriptions(User user, Guid activeSubscriptionId)
+        {
+            var now = dateTimeService.UtcNow;
+            foreach (var sub in user.UserSubscriptions.Where(s => s.EndDate > now &&
+                    s.SubscriptionId != activeSubscriptionId))
             {
                 sub.EndDate = now;
             }
+        }
 
-            var existingSub = user.UserSubscriptions.FirstOrDefault(s => s.SubscriptionId == subscription.Id);
-
-            if (existingSub is not null)
+        private async Task RemoveArtistRoleIfExistsAsync(User user, IList<string> roles, CancellationToken ct)
+        {
+            var artistRole = UserRole.Artist.ToString();
+            if (roles.Contains(artistRole))
             {
-                existingSub.StartDate = now;
-                existingSub.EndDate = now.AddDays(subscription.DurationInDays);
+                await userManager.RemoveRoleAsync(user, artistRole);
+            }
+        }
+
+        private void UpdateOrAddSubscription(User user, Subscription subscription)
+        {
+            var now = dateTimeService.UtcNow;
+            var endDate = now.AddDays(subscription.DurationInDays);
+
+            var existing = user.UserSubscriptions.FirstOrDefault(s => s.SubscriptionId == subscription.Id);
+
+            if (existing is not null)
+            {
+                existing.StartDate = now;
+                existing.EndDate = endDate;
             }
             else
             {
-                var newUserSubscription = new UserSubscription
+                user.UserSubscriptions.Add(new UserSubscription
                 {
                     UserId = user.Id,
                     SubscriptionId = subscription.Id,
                     StartDate = now,
-                    EndDate = now.AddDays(subscription.DurationInDays)
-                };
+                    EndDate = endDate
+                });
+            }
+        }
 
-               user.UserSubscriptions.Add(newUserSubscription);
+        private async Task AddOrSyncArtistEntityAsync(User user, IList<string> roles, CancellationToken ct)
+        {
+            var artistRole = UserRole.Artist.ToString();
+
+            if (!roles.Contains(artistRole))
+            {
+                await userManager.AddToRoleAsync(user, artistRole);
             }
 
-            await unitOfWork.SaveChangesAsync(ct);
+            var existingArtist = await unitOfWork.Artists.GetByIdAsync(user.Id, ct);
 
-            return Result.Ok();
+            if (existingArtist is null)
+            {
+                var newArtist = new Artist
+                {
+                    UserId = user.Id,
+                    Name = user.UserName!,
+                    AvatarUrl = user.AvatarUrl
+                };
+
+                await unitOfWork.Artists.AddAsync(newArtist, ct);
+            }
+            else
+            {
+                existingArtist.Name = user.UserName!;
+                existingArtist.AvatarUrl = user.AvatarUrl;
+
+                await unitOfWork.Artists.UpdateAsync(existingArtist, ct);
+            }
         }
     }
 }

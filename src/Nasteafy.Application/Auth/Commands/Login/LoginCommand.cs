@@ -1,9 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Helpers;
-using Nasteafy.Domain.Entities.Users;
 
 namespace Nasteafy.Application.Auth.Commands.Login
 {
@@ -18,16 +16,16 @@ namespace Nasteafy.Application.Auth.Commands.Login
         public async Task<Result<AuthResponse>> Handle(LoginCommand request, CancellationToken ct)
         {
             var user = await userManager.FindByEmailAsync(request.Email);
-            if(user is null)
+            if (user is null)
             {
-                return Result.Fail("Invalid email or password").Log<LoginCommandHandler>();
+                return Result.Fail("Invalid username or password").Log<LoginCommandHandler>();
             }
 
             var result = await signInService.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
             if (!result.Succeeded)
             {
                 return Result.Fail("Invalid username or password").Log<LoginCommandHandler>();
-            }                
+            }
 
             var roles = await userManager.GetRolesAsync(user);
             var claims = await claimService.GenerateClaimsAsync(user, ct);
@@ -38,7 +36,7 @@ namespace Nasteafy.Application.Auth.Commands.Login
             user.RefreshToken = refreshToken;
             await userManager.UpdateAsync(user);
 
-            return Result.Ok(new AuthResponse(accessToken, refreshToken.Token));
+            return Result.Ok(new AuthResponse(accessToken, refreshToken));
         }
     }
 }

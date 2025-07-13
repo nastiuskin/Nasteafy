@@ -4,17 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
-using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Playlists.Commands.Update
 {
-    public class UpdatePlaylistCommand : IRequest<Result>, ITransactionalCommand
-    {
-        [JsonIgnore]
-        public Guid PlaylistId { get; set; }
-        public string? Title { get; set; }
-        public IFormFile? CoverFile { get; set; }
-    }
+    public record UpdatePlaylistCommand(Guid PlaylistId, string? Title, IFormFile? CoverFile)
+        : IRequest<Result>, ITransactionalCommand;
 
     public class UpdatePlaylistCommandHandler : IRequestHandler<UpdatePlaylistCommand, Result>
     {
@@ -36,7 +30,7 @@ namespace Nasteafy.Application.Playlists.Commands.Update
             if (!string.IsNullOrWhiteSpace(request.Title))
             {
                 playlist!.Title = request.Title;
-            }                
+            }
 
             if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {
@@ -52,8 +46,8 @@ namespace Nasteafy.Application.Playlists.Commands.Update
             }
 
             await _unitOfWork.Playlists.UpdateAsync(playlist!, ct);
-
             await _unitOfWork.SaveChangesAsync(ct);
+
             return Result.Ok();
         }
     }

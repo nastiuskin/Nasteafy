@@ -8,12 +8,9 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Artists.Commands.Create
 {
-
-    public class CreateArtistCommand : IRequest<Result<Guid>>, ITransactionalCommand
-    {
-        public required string Name { get; init; }
-        public IFormFile? ArtistPhoto { get; init; }
-    }
+    public record CreateArtistCommand(
+        string Name,
+        IFormFile? ArtistPhoto) : IRequest<Result<Guid>>, ITransactionalCommand;
 
     public class CreateArtistCommandHandler(IUnitOfWork unitOfWork, 
         IFileStorageService fileStorageService)

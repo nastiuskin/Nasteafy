@@ -54,15 +54,7 @@ export interface IClient {
     /**
      * @return OK
      */
-    tracksPOST2(playlistId: string, body: AddTrackToPlaylistCommand): Promise<void>;
-    /**
-     * @return OK
-     */
-    tracksDELETE2(playlistId: string, body: RemoveTrackFromPlaylistCommand): Promise<void>;
-    /**
-     * @return OK
-     */
-    cancel(): Promise<void>;
+    subscriptionsPUT(body: UpdateSubscriptionCommand): Promise<void>;
     /**
      * @return OK
      */
@@ -70,33 +62,11 @@ export interface IClient {
     /**
      * @return OK
      */
-    subscriptionsPUT(body: UpdateSubscriptionCommand): Promise<void>;
+    subscribe(body: SubscribeUserCommand): Promise<void>;
     /**
      * @return OK
      */
     subscriptionsGET2(id: string): Promise<GetSubscriptionDto>;
-    /**
-     * @return OK
-     */
-    subscribe(body: SubscribeUserCommand): Promise<void>;
-    /**
-     * @param title (optional) 
-     * @param playlistCover (optional) 
-     * @return OK
-     */
-    playlistsPOST(title: string | null | undefined, playlistCover: FileParameter | null | undefined): Promise<string>;
-    /**
-     * @return OK
-     */
-    playlistsGET(pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
-    /**
-     * @return OK
-     */
-    playlistsDELETE(playlistId: string): Promise<void>;
-    /**
-     * @return OK
-     */
-    playlistsGET2(id: string): Promise<UserPlaylistDto>;
     /**
      * @param title (optional) 
      * @param coverFile (optional) 
@@ -106,11 +76,33 @@ export interface IClient {
     /**
      * @return OK
      */
-    login(body: LoginCommand): Promise<string>;
+    tracksDELETE2(playlistId: string, trackId: string): Promise<void>;
     /**
      * @return OK
      */
-    logout(): Promise<void>;
+    tracksPOST2(playlistId: string, trackId: string): Promise<void>;
+    /**
+     * @return OK
+     */
+    playlistsGET(id: string): Promise<UserPlaylistDto>;
+    /**
+     * @return OK
+     */
+    playlistsGET2(pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @param title (optional) 
+     * @param playlistCover (optional) 
+     * @return OK
+     */
+    playlistsPOST(title: string | null | undefined, playlistCover: FileParameter | null | undefined): Promise<string>;
+    /**
+     * @return OK
+     */
+    playlistsDELETE(playlistId: string): Promise<void>;
+    /**
+     * @return OK
+     */
+    register(body: RegisterRequest): Promise<void>;
     /**
      * @return OK
      */
@@ -118,25 +110,21 @@ export interface IClient {
     /**
      * @return OK
      */
-    register(body: RegisterCommand): Promise<void>;
+    logout(): Promise<void>;
     /**
-     * @param name (optional) 
-     * @param artistPhoto (optional) 
      * @return OK
      */
-    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined): Promise<string>;
+    login(body: LoginRequest): Promise<string>;
     /**
      * @return OK
      */
     artistsGET(pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
-     * @return OK
+     * @param name (optional) 
+     * @param artistPhoto (optional) 
+     * @return Created
      */
-    artistsDELETE(artistId: string): Promise<void>;
-    /**
-     * @return OK
-     */
-    artistsGET2(id: string): Promise<ArtistDto>;
+    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined): Promise<void>;
     /**
      * @param name (optional) 
      * @param avatarFile (optional) 
@@ -144,25 +132,13 @@ export interface IClient {
      */
     artistsPUT(id: string, name: string | null | undefined, avatarFile: FileParameter | null | undefined): Promise<void>;
     /**
-     * @param title (optional) 
-     * @param coverFile (optional) 
-     * @param releaseDate (optional) 
-     * @param artists (optional) 
      * @return OK
      */
-    albumsPOST(title: string | null | undefined, coverFile: FileParameter | null | undefined, releaseDate: Date | undefined, artists: string[] | null | undefined): Promise<string>;
+    artistsGET2(id: string): Promise<ArtistDto>;
     /**
-     * @return OK
+     * @return No Content
      */
-    albumsDELETE(albumId: string): Promise<void>;
-    /**
-     * @return OK
-     */
-    albumsGET(artistId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
-    /**
-     * @return OK
-     */
-    albumsGET2(id: string): Promise<AlbumDto>;
+    artistsDELETE(artistId: string): Promise<void>;
     /**
      * @param coverFile (optional) 
      * @param releaseDate (optional) 
@@ -170,6 +146,26 @@ export interface IClient {
      * @return OK
      */
     albumsPUT(id: string, coverFile: FileParameter | null | undefined, releaseDate: Date | undefined, title: string | null | undefined): Promise<void>;
+    /**
+     * @return OK
+     */
+    albumsGET(id: string): Promise<AlbumDto>;
+    /**
+     * @return OK
+     */
+    albumsGET2(artistId: string, pageNumber: number, pageSize: number): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @return OK
+     */
+    albumsDELETE(albumId: string): Promise<void>;
+    /**
+     * @param title (optional) 
+     * @param coverFile (optional) 
+     * @param releaseDate (optional) 
+     * @param artists (optional) 
+     * @return Created
+     */
+    albumsPOST(title: string | null | undefined, coverFile: FileParameter | null | undefined, releaseDate: Date | undefined, artists: string[] | null | undefined): Promise<void>;
 }
 
 export class Client implements IClient {
@@ -711,18 +707,15 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    tracksPOST2(playlistId: string, body: AddTrackToPlaylistCommand, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/playlists/{playlistId}/tracks";
-        if (playlistId === undefined || playlistId === null)
-            throw new Error("The parameter 'playlistId' must be defined.");
-        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
+    subscriptionsPUT(body: UpdateSubscriptionCommand, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/subscriptions";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "POST",
+            method: "PUT",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -737,126 +730,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processTracksPOST2(_response);
+            return this.processSubscriptionsPUT(_response);
         });
     }
 
-    protected processTracksPOST2(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    tracksDELETE2(playlistId: string, body: RemoveTrackFromPlaylistCommand, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/playlists/{playlistId}/tracks";
-        if (playlistId === undefined || playlistId === null)
-            throw new Error("The parameter 'playlistId' must be defined.");
-        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "DELETE",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processTracksDELETE2(_response);
-        });
-    }
-
-    protected processTracksDELETE2(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    cancel( cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/subscriptions/cancel";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCancel(_response);
-        });
-    }
-
-    protected processCancel(response: AxiosResponse): Promise<void> {
+    protected processSubscriptionsPUT(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -945,15 +823,15 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    subscriptionsPUT(body: UpdateSubscriptionCommand, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/subscriptions";
+    subscribe(body: SubscribeUserCommand, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/users/subscribe";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "PUT",
+            method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -968,11 +846,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processSubscriptionsPUT(_response);
+            return this.processSubscribe(_response);
         });
     }
 
-    protected processSubscriptionsPUT(response: AxiosResponse): Promise<void> {
+    protected processSubscribe(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1062,20 +940,28 @@ export class Client implements IClient {
     }
 
     /**
+     * @param title (optional) 
+     * @param coverFile (optional) 
      * @return OK
      */
-    subscribe(body: SubscribeUserCommand, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/users/subscribe";
+    playlistsPUT(id: string, title: string | null | undefined, coverFile: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/playlists/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
+        const content_ = new FormData();
+        if (title !== null && title !== undefined)
+            content_.append("title", title.toString());
+        if (coverFile !== null && coverFile !== undefined)
+            content_.append("coverFile", coverFile.data, coverFile.fileName ? coverFile.fileName : "coverFile");
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "POST",
+            method: "PUT",
             url: url_,
             headers: {
-                "Content-Type": "application/json",
             },
             cancelToken
         };
@@ -1087,11 +973,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processSubscribe(_response);
+            return this.processPlaylistsPUT(_response);
         });
     }
 
-    protected processSubscribe(response: AxiosResponse): Promise<void> {
+    protected processPlaylistsPUT(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1117,6 +1003,253 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    tracksDELETE2(playlistId: string, trackId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/playlists/{playlistId}/tracks/{trackId}";
+        if (playlistId === undefined || playlistId === null)
+            throw new Error("The parameter 'playlistId' must be defined.");
+        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
+        if (trackId === undefined || trackId === null)
+            throw new Error("The parameter 'trackId' must be defined.");
+        url_ = url_.replace("{trackId}", encodeURIComponent("" + trackId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTracksDELETE2(_response);
+        });
+    }
+
+    protected processTracksDELETE2(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    tracksPOST2(playlistId: string, trackId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/playlists/{playlistId}/tracks/{trackId}";
+        if (playlistId === undefined || playlistId === null)
+            throw new Error("The parameter 'playlistId' must be defined.");
+        url_ = url_.replace("{playlistId}", encodeURIComponent("" + playlistId));
+        if (trackId === undefined || trackId === null)
+            throw new Error("The parameter 'trackId' must be defined.");
+        url_ = url_.replace("{trackId}", encodeURIComponent("" + trackId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTracksPOST2(_response);
+        });
+    }
+
+    protected processTracksPOST2(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    playlistsGET(id: string, cancelToken?: CancelToken): Promise<UserPlaylistDto> {
+        let url_ = this.baseUrl + "/api/playlists/{Id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPlaylistsGET(_response);
+        });
+    }
+
+    protected processPlaylistsGET(response: AxiosResponse): Promise<UserPlaylistDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = UserPlaylistDto.fromJS(resultData200);
+            return Promise.resolve<UserPlaylistDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<UserPlaylistDto>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    playlistsGET2(pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/playlists?";
+        if (pageNumber === undefined || pageNumber === null)
+            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
+        else
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === undefined || pageSize === null)
+            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
+        else
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPlaylistsGET2(_response);
+        });
+    }
+
+    protected processPlaylistsGET2(response: AxiosResponse): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
     }
 
     /**
@@ -1190,72 +1323,6 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    playlistsGET(pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/playlists?";
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processPlaylistsGET(_response);
-        });
-    }
-
-    protected processPlaylistsGET(response: AxiosResponse): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
-            return Promise.resolve<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
     playlistsDELETE(playlistId: string, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/playlists/{playlistId}";
         if (playlistId === undefined || playlistId === null)
@@ -1313,303 +1380,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    playlistsGET2(id: string, cancelToken?: CancelToken): Promise<UserPlaylistDto> {
-        let url_ = this.baseUrl + "/api/playlists/{Id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processPlaylistsGET2(_response);
-        });
-    }
-
-    protected processPlaylistsGET2(response: AxiosResponse): Promise<UserPlaylistDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = UserPlaylistDto.fromJS(resultData200);
-            return Promise.resolve<UserPlaylistDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<UserPlaylistDto>(null as any);
-    }
-
-    /**
-     * @param title (optional) 
-     * @param coverFile (optional) 
-     * @return OK
-     */
-    playlistsPUT(id: string, title: string | null | undefined, coverFile: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/playlists/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = new FormData();
-        if (title !== null && title !== undefined)
-            content_.append("title", title.toString());
-        if (coverFile !== null && coverFile !== undefined)
-            content_.append("coverFile", coverFile.data, coverFile.fileName ? coverFile.fileName : "coverFile");
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "PUT",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processPlaylistsPUT(_response);
-        });
-    }
-
-    protected processPlaylistsPUT(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    login(body: LoginCommand, cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/auth/login";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processLogin(_response);
-        });
-    }
-
-    protected processLogin(response: AxiosResponse): Promise<string> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<string>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<string>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    logout( cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/auth/logout";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processLogout(_response);
-        });
-    }
-
-    protected processLogout(response: AxiosResponse): Promise<void> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    refresh( cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/auth/refresh";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "POST",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processRefresh(_response);
-        });
-    }
-
-    protected processRefresh(response: AxiosResponse): Promise<string> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<string>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<string>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    register(body: RegisterCommand, cancelToken?: CancelToken): Promise<void> {
+    register(body: RegisterRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/auth/register";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1665,22 +1436,13 @@ export class Client implements IClient {
     }
 
     /**
-     * @param name (optional) 
-     * @param artistPhoto (optional) 
      * @return OK
      */
-    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/artists";
+    refresh( cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/auth/refresh";
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = new FormData();
-        if (name !== null && name !== undefined)
-            content_.append("name", name.toString());
-        if (artistPhoto !== null && artistPhoto !== undefined)
-            content_.append("artistPhoto", artistPhoto.data, artistPhoto.fileName ? artistPhoto.fileName : "artistPhoto");
-
         let options_: AxiosRequestConfig = {
-            data: content_,
             method: "POST",
             url: url_,
             headers: {
@@ -1696,11 +1458,128 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processArtistsPOST(_response);
+            return this.processRefresh(_response);
         });
     }
 
-    protected processArtistsPOST(response: AxiosResponse): Promise<string> {
+    protected processRefresh(response: AxiosResponse): Promise<string> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return Promise.resolve<string>(result200);
+
+        } else if (status === 401) {
+            const _responseText = response.data;
+            let result401: any = null;
+            let resultData401  = _responseText;
+            result401 = ApiError.fromJS(resultData401);
+            return throwException("Unauthorized", status, _responseText, _headers, result401);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<string>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    logout( cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/auth/logout";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processLogout(_response);
+        });
+    }
+
+    protected processLogout(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    login(body: LoginRequest, cancelToken?: CancelToken): Promise<string> {
+        let url_ = this.baseUrl + "/api/auth/login";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processLogin(_response);
+        });
+    }
+
+    protected processLogin(response: AxiosResponse): Promise<string> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1799,17 +1678,23 @@ export class Client implements IClient {
     }
 
     /**
-     * @return OK
+     * @param name (optional) 
+     * @param artistPhoto (optional) 
+     * @return Created
      */
-    artistsDELETE(artistId: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/artists/{artistId}";
-        if (artistId === undefined || artistId === null)
-            throw new Error("The parameter 'artistId' must be defined.");
-        url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
+    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/artists";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = new FormData();
+        if (name !== null && name !== undefined)
+            content_.append("name", name.toString());
+        if (artistPhoto !== null && artistPhoto !== undefined)
+            content_.append("artistPhoto", artistPhoto.data, artistPhoto.fileName ? artistPhoto.fileName : "artistPhoto");
+
         let options_: AxiosRequestConfig = {
-            method: "DELETE",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
             },
@@ -1823,11 +1708,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processArtistsDELETE(_response);
+            return this.processArtistsPOST(_response);
         });
     }
 
-    protected processArtistsDELETE(response: AxiosResponse): Promise<void> {
+    protected processArtistsPOST(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1837,7 +1722,7 @@ export class Client implements IClient {
                 }
             }
         }
-        if (status === 200) {
+        if (status === 201) {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
@@ -1853,67 +1738,6 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    artistsGET2(id: string, cancelToken?: CancelToken): Promise<ArtistDto> {
-        let url_ = this.baseUrl + "/api/artists/{Id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processArtistsGET2(_response);
-        });
-    }
-
-    protected processArtistsGET2(response: AxiosResponse): Promise<ArtistDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = ArtistDto.fromJS(resultData200);
-            return Promise.resolve<ArtistDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ArtistDto>(null as any);
     }
 
     /**
@@ -1983,31 +1807,17 @@ export class Client implements IClient {
     }
 
     /**
-     * @param title (optional) 
-     * @param coverFile (optional) 
-     * @param releaseDate (optional) 
-     * @param artists (optional) 
      * @return OK
      */
-    albumsPOST(title: string | null | undefined, coverFile: FileParameter | null | undefined, releaseDate: Date | undefined, artists: string[] | null | undefined, cancelToken?: CancelToken): Promise<string> {
-        let url_ = this.baseUrl + "/api/albums";
+    artistsGET2(id: string, cancelToken?: CancelToken): Promise<ArtistDto> {
+        let url_ = this.baseUrl + "/api/artists/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = new FormData();
-        if (title !== null && title !== undefined)
-            content_.append("title", title.toString());
-        if (coverFile !== null && coverFile !== undefined)
-            content_.append("coverFile", coverFile.data, coverFile.fileName ? coverFile.fileName : "coverFile");
-        if (releaseDate === null || releaseDate === undefined)
-            throw new Error("The parameter 'releaseDate' cannot be null.");
-        else
-            content_.append("releaseDate", releaseDate.toJSON());
-        if (artists !== null && artists !== undefined)
-            artists.forEach(item_ => content_.append("artists", item_.toString()));
-
         let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
                 "Accept": "application/json"
@@ -2022,11 +1832,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAlbumsPOST(_response);
+            return this.processArtistsGET2(_response);
         });
     }
 
-    protected processAlbumsPOST(response: AxiosResponse): Promise<string> {
+    protected processArtistsGET2(response: AxiosResponse): Promise<ArtistDto> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2040,9 +1850,8 @@ export class Client implements IClient {
             const _responseText = response.data;
             let result200: any = null;
             let resultData200  = _responseText;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
-            return Promise.resolve<string>(result200);
+            result200 = ArtistDto.fromJS(resultData200);
+            return Promise.resolve<ArtistDto>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -2055,17 +1864,17 @@ export class Client implements IClient {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<ArtistDto>(null as any);
     }
 
     /**
-     * @return OK
+     * @return No Content
      */
-    albumsDELETE(albumId: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/albums/{albumId}";
-        if (albumId === undefined || albumId === null)
-            throw new Error("The parameter 'albumId' must be defined.");
-        url_ = url_.replace("{albumId}", encodeURIComponent("" + albumId));
+    artistsDELETE(artistId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/artists/{artistId}";
+        if (artistId === undefined || artistId === null)
+            throw new Error("The parameter 'artistId' must be defined.");
+        url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -2083,11 +1892,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processAlbumsDELETE(_response);
+            return this.processArtistsDELETE(_response);
         });
     }
 
-    protected processAlbumsDELETE(response: AxiosResponse): Promise<void> {
+    protected processArtistsDELETE(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2097,7 +1906,7 @@ export class Client implements IClient {
                 }
             }
         }
-        if (status === 200) {
+        if (status === 204) {
             const _responseText = response.data;
             return Promise.resolve<void>(null as any);
 
@@ -2113,136 +1922,6 @@ export class Client implements IClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    albumsGET(artistId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        let url_ = this.baseUrl + "/api/artists/{artistId}/albums?";
-        if (artistId === undefined || artistId === null)
-            throw new Error("The parameter 'artistId' must be defined.");
-        url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
-        if (pageNumber === undefined || pageNumber === null)
-            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
-        else
-            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
-        if (pageSize === undefined || pageSize === null)
-            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
-        else
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processAlbumsGET(_response);
-        });
-    }
-
-    protected processAlbumsGET(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
-            return Promise.resolve<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    albumsGET2(id: string, cancelToken?: CancelToken): Promise<AlbumDto> {
-        let url_ = this.baseUrl + "/api/albums/{Id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processAlbumsGET2(_response);
-        });
-    }
-
-    protected processAlbumsGET2(response: AxiosResponse): Promise<AlbumDto> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = AlbumDto.fromJS(resultData200);
-            return Promise.resolve<AlbumDto>(result200);
-
-        } else if (status === 400) {
-            const _responseText = response.data;
-            let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = ApiError.fromJS(resultData400);
-            return throwException("Bad Request", status, _responseText, _headers, result400);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<AlbumDto>(null as any);
     }
 
     /**
@@ -2315,106 +1994,264 @@ export class Client implements IClient {
         }
         return Promise.resolve<void>(null as any);
     }
-}
 
-export class CreateAlbumCommand implements ICreateAlbumCommand {
-    title!: string | undefined;
-    coverFile?: string | undefined;
-    releaseDate!: Date;
-    artists?: string[] | undefined;
+    /**
+     * @return OK
+     */
+    albumsGET(id: string, cancelToken?: CancelToken): Promise<AlbumDto> {
+        let url_ = this.baseUrl + "/api/albums/{Id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{Id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
 
-    constructor(data?: ICreateAlbumCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAlbumsGET(_response);
+        });
+    }
+
+    protected processAlbumsGET(response: AxiosResponse): Promise<AlbumDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
             }
         }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = AlbumDto.fromJS(resultData200);
+            return Promise.resolve<AlbumDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<AlbumDto>(null as any);
     }
 
-    init(_data?: any) {
-        if (_data) {
-            this.title = _data["title"];
-            this.coverFile = _data["coverFile"];
-            this.releaseDate = _data["releaseDate"] ? new Date(_data["releaseDate"].toString()) : <any>undefined;
-            if (Array.isArray(_data["artists"])) {
-                this.artists = [] as any;
-                for (let item of _data["artists"])
-                    this.artists!.push(item);
+    /**
+     * @return OK
+     */
+    albumsGET2(artistId: string, pageNumber: number, pageSize: number, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/artists/{artistId}/albums?";
+        if (artistId === undefined || artistId === null)
+            throw new Error("The parameter 'artistId' must be defined.");
+        url_ = url_.replace("{artistId}", encodeURIComponent("" + artistId));
+        if (pageNumber === undefined || pageNumber === null)
+            throw new Error("The parameter 'pageNumber' must be defined and cannot be null.");
+        else
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === undefined || pageSize === null)
+            throw new Error("The parameter 'pageSize' must be defined and cannot be null.");
+        else
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAlbumsGET2(_response);
+        });
+    }
+
+    protected processAlbumsGET2(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
             }
         }
-    }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
 
-    static fromJS(data: any): CreateAlbumCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateAlbumCommand();
-        result.init(data);
-        return result;
-    }
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
 
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["title"] = this.title;
-        data["coverFile"] = this.coverFile;
-        data["releaseDate"] = this.releaseDate ? this.releaseDate.toISOString() : <any>undefined;
-        if (Array.isArray(this.artists)) {
-            data["artists"] = [];
-            for (let item of this.artists)
-                data["artists"].push(item);
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return data;
+        return Promise.resolve<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
     }
-}
 
-export interface ICreateAlbumCommand {
-    title: string | undefined;
-    coverFile?: string | undefined;
-    releaseDate: Date;
-    artists?: string[] | undefined;
-}
+    /**
+     * @return OK
+     */
+    albumsDELETE(albumId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/albums/{albumId}";
+        if (albumId === undefined || albumId === null)
+            throw new Error("The parameter 'albumId' must be defined.");
+        url_ = url_.replace("{albumId}", encodeURIComponent("" + albumId));
+        url_ = url_.replace(/[?&]$/, "");
 
-export class UpdateAlbumCommand implements IUpdateAlbumCommand {
-    coverFile?: string | undefined;
-    releaseDate?: Date;
-    title?: string | undefined;
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
 
-    constructor(data?: IUpdateAlbumCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAlbumsDELETE(_response);
+        });
+    }
+
+    protected processAlbumsDELETE(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
             }
         }
-    }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
 
-    init(_data?: any) {
-        if (_data) {
-            this.coverFile = _data["coverFile"];
-            this.releaseDate = _data["releaseDate"] ? new Date(_data["releaseDate"].toString()) : <any>undefined;
-            this.title = _data["title"];
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
+        return Promise.resolve<void>(null as any);
     }
 
-    static fromJS(data: any): UpdateAlbumCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateAlbumCommand();
-        result.init(data);
-        return result;
+    /**
+     * @param title (optional) 
+     * @param coverFile (optional) 
+     * @param releaseDate (optional) 
+     * @param artists (optional) 
+     * @return Created
+     */
+    albumsPOST(title: string | null | undefined, coverFile: FileParameter | null | undefined, releaseDate: Date | undefined, artists: string[] | null | undefined, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/albums";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (title !== null && title !== undefined)
+            content_.append("title", title.toString());
+        if (coverFile !== null && coverFile !== undefined)
+            content_.append("coverFile", coverFile.data, coverFile.fileName ? coverFile.fileName : "coverFile");
+        if (releaseDate === null || releaseDate === undefined)
+            throw new Error("The parameter 'releaseDate' cannot be null.");
+        else
+            content_.append("releaseDate", releaseDate.toJSON());
+        if (artists !== null && artists !== undefined)
+            artists.forEach(item_ => content_.append("artists", item_.toString()));
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAlbumsPOST(_response);
+        });
     }
 
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["coverFile"] = this.coverFile;
-        data["releaseDate"] = this.releaseDate ? this.releaseDate.toISOString() : <any>undefined;
-        data["title"] = this.title;
-        return data;
-    }
-}
+    protected processAlbumsPOST(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 201) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
 
-export interface IUpdateAlbumCommand {
-    coverFile?: string | undefined;
-    releaseDate?: Date;
-    title?: string | undefined;
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
 }
 
 export class AlbumDto implements IAlbumDto {
@@ -2469,86 +2306,6 @@ export interface IAlbumDto {
     artist?: string | undefined;
 }
 
-export class CreateArtistCommand implements ICreateArtistCommand {
-    name!: string | undefined;
-    artistPhoto?: string | undefined;
-
-    constructor(data?: ICreateArtistCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.artistPhoto = _data["artistPhoto"];
-        }
-    }
-
-    static fromJS(data: any): CreateArtistCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateArtistCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["artistPhoto"] = this.artistPhoto;
-        return data;
-    }
-}
-
-export interface ICreateArtistCommand {
-    name: string | undefined;
-    artistPhoto?: string | undefined;
-}
-
-export class UpdateArtistCommand implements IUpdateArtistCommand {
-    name?: string | undefined;
-    avatarFile?: string | undefined;
-
-    constructor(data?: IUpdateArtistCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.avatarFile = _data["avatarFile"];
-        }
-    }
-
-    static fromJS(data: any): UpdateArtistCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateArtistCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["avatarFile"] = this.avatarFile;
-        return data;
-    }
-}
-
-export interface IUpdateArtistCommand {
-    name?: string | undefined;
-    avatarFile?: string | undefined;
-}
-
 export class ArtistDto implements IArtistDto {
     id?: string;
     avatarUrl?: string | undefined;
@@ -2595,86 +2352,6 @@ export interface IArtistDto {
     avatarUrl?: string | undefined;
     name?: string | undefined;
     isVerified?: boolean;
-}
-
-export class LoginCommand implements ILoginCommand {
-    email?: string | undefined;
-    password?: string | undefined;
-
-    constructor(data?: ILoginCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.password = _data["password"];
-        }
-    }
-
-    static fromJS(data: any): LoginCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new LoginCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["password"] = this.password;
-        return data;
-    }
-}
-
-export interface ILoginCommand {
-    email?: string | undefined;
-    password?: string | undefined;
-}
-
-export class RegisterCommand implements IRegisterCommand {
-    email?: string | undefined;
-    password?: string | undefined;
-
-    constructor(data?: IRegisterCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.password = _data["password"];
-        }
-    }
-
-    static fromJS(data: any): RegisterCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new RegisterCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["password"] = this.password;
-        return data;
-    }
-}
-
-export interface IRegisterCommand {
-    email?: string | undefined;
-    password?: string | undefined;
 }
 
 export class ApiError implements IApiError {
@@ -2955,158 +2632,6 @@ export interface IPagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neut
     pageNumber?: number;
     pageSize?: number;
     totalPages?: number;
-}
-
-export class AddTrackToPlaylistCommand implements IAddTrackToPlaylistCommand {
-    trackId?: string;
-
-    constructor(data?: IAddTrackToPlaylistCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.trackId = _data["trackId"];
-        }
-    }
-
-    static fromJS(data: any): AddTrackToPlaylistCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new AddTrackToPlaylistCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["trackId"] = this.trackId;
-        return data;
-    }
-}
-
-export interface IAddTrackToPlaylistCommand {
-    trackId?: string;
-}
-
-export class CreatePlaylistCommand implements ICreatePlaylistCommand {
-    title!: string | undefined;
-    playlistCover?: string | undefined;
-
-    constructor(data?: ICreatePlaylistCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.title = _data["title"];
-            this.playlistCover = _data["playlistCover"];
-        }
-    }
-
-    static fromJS(data: any): CreatePlaylistCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreatePlaylistCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["title"] = this.title;
-        data["playlistCover"] = this.playlistCover;
-        return data;
-    }
-}
-
-export interface ICreatePlaylistCommand {
-    title: string | undefined;
-    playlistCover?: string | undefined;
-}
-
-export class RemoveTrackFromPlaylistCommand implements IRemoveTrackFromPlaylistCommand {
-    trackId?: string;
-
-    constructor(data?: IRemoveTrackFromPlaylistCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.trackId = _data["trackId"];
-        }
-    }
-
-    static fromJS(data: any): RemoveTrackFromPlaylistCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new RemoveTrackFromPlaylistCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["trackId"] = this.trackId;
-        return data;
-    }
-}
-
-export interface IRemoveTrackFromPlaylistCommand {
-    trackId?: string;
-}
-
-export class UpdatePlaylistCommand implements IUpdatePlaylistCommand {
-    title?: string | undefined;
-    coverFile?: string | undefined;
-
-    constructor(data?: IUpdatePlaylistCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.title = _data["title"];
-            this.coverFile = _data["coverFile"];
-        }
-    }
-
-    static fromJS(data: any): UpdatePlaylistCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdatePlaylistCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["title"] = this.title;
-        data["coverFile"] = this.coverFile;
-        return data;
-    }
-}
-
-export interface IUpdatePlaylistCommand {
-    title?: string | undefined;
-    coverFile?: string | undefined;
 }
 
 export class UserPlaylistDto implements IUserPlaylistDto {
@@ -3449,50 +2974,6 @@ export interface IGetTrackDto {
     albumCover?: string | undefined;
 }
 
-export class UpdateProfileCommand implements IUpdateProfileCommand {
-    email?: string | undefined;
-    userName?: string | undefined;
-    avatarFile?: string | undefined;
-
-    constructor(data?: IUpdateProfileCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.userName = _data["userName"];
-            this.avatarFile = _data["avatarFile"];
-        }
-    }
-
-    static fromJS(data: any): UpdateProfileCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateProfileCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["userName"] = this.userName;
-        data["avatarFile"] = this.avatarFile;
-        return data;
-    }
-}
-
-export interface IUpdateProfileCommand {
-    email?: string | undefined;
-    userName?: string | undefined;
-    avatarFile?: string | undefined;
-}
-
 export class GetUserResponse implements IGetUserResponse {
     email?: string | undefined;
     userName?: string | undefined;
@@ -3543,6 +3024,390 @@ export interface IGetUserResponse {
     userRole?: string | undefined;
     avatarUrl?: string | undefined;
     subscriptionType?: string | undefined;
+}
+
+export class CreateAlbumRequest implements ICreateAlbumRequest {
+    title!: string | undefined;
+    coverFile?: string | undefined;
+    releaseDate!: Date;
+    artists?: string[] | undefined;
+
+    constructor(data?: ICreateAlbumRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.coverFile = _data["coverFile"];
+            this.releaseDate = _data["releaseDate"] ? new Date(_data["releaseDate"].toString()) : <any>undefined;
+            if (Array.isArray(_data["artists"])) {
+                this.artists = [] as any;
+                for (let item of _data["artists"])
+                    this.artists!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateAlbumRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateAlbumRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["coverFile"] = this.coverFile;
+        data["releaseDate"] = this.releaseDate ? this.releaseDate.toISOString() : <any>undefined;
+        if (Array.isArray(this.artists)) {
+            data["artists"] = [];
+            for (let item of this.artists)
+                data["artists"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ICreateAlbumRequest {
+    title: string | undefined;
+    coverFile?: string | undefined;
+    releaseDate: Date;
+    artists?: string[] | undefined;
+}
+
+export class UpdateAlbumRequest implements IUpdateAlbumRequest {
+    coverFile?: string | undefined;
+    releaseDate?: Date;
+    title?: string | undefined;
+
+    constructor(data?: IUpdateAlbumRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.coverFile = _data["coverFile"];
+            this.releaseDate = _data["releaseDate"] ? new Date(_data["releaseDate"].toString()) : <any>undefined;
+            this.title = _data["title"];
+        }
+    }
+
+    static fromJS(data: any): UpdateAlbumRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateAlbumRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["coverFile"] = this.coverFile;
+        data["releaseDate"] = this.releaseDate ? this.releaseDate.toISOString() : <any>undefined;
+        data["title"] = this.title;
+        return data;
+    }
+}
+
+export interface IUpdateAlbumRequest {
+    coverFile?: string | undefined;
+    releaseDate?: Date;
+    title?: string | undefined;
+}
+
+export class CreateArtistRequest implements ICreateArtistRequest {
+    name!: string | undefined;
+    artistPhoto?: string | undefined;
+
+    constructor(data?: ICreateArtistRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.artistPhoto = _data["artistPhoto"];
+        }
+    }
+
+    static fromJS(data: any): CreateArtistRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateArtistRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["artistPhoto"] = this.artistPhoto;
+        return data;
+    }
+}
+
+export interface ICreateArtistRequest {
+    name: string | undefined;
+    artistPhoto?: string | undefined;
+}
+
+export class UpdateArtistRequest implements IUpdateArtistRequest {
+    name?: string | undefined;
+    avatarFile?: string | undefined;
+
+    constructor(data?: IUpdateArtistRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.avatarFile = _data["avatarFile"];
+        }
+    }
+
+    static fromJS(data: any): UpdateArtistRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateArtistRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["avatarFile"] = this.avatarFile;
+        return data;
+    }
+}
+
+export interface IUpdateArtistRequest {
+    name?: string | undefined;
+    avatarFile?: string | undefined;
+}
+
+export class LoginRequest implements ILoginRequest {
+    email!: string | undefined;
+    password!: string | undefined;
+
+    constructor(data?: ILoginRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.password = _data["password"];
+        }
+    }
+
+    static fromJS(data: any): LoginRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new LoginRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["password"] = this.password;
+        return data;
+    }
+}
+
+export interface ILoginRequest {
+    email: string | undefined;
+    password: string | undefined;
+}
+
+export class RegisterRequest implements IRegisterRequest {
+    email!: string | undefined;
+    password!: string | undefined;
+
+    constructor(data?: IRegisterRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.password = _data["password"];
+        }
+    }
+
+    static fromJS(data: any): RegisterRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new RegisterRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["password"] = this.password;
+        return data;
+    }
+}
+
+export interface IRegisterRequest {
+    email: string | undefined;
+    password: string | undefined;
+}
+
+export class CreatePlaylistRequest implements ICreatePlaylistRequest {
+    title!: string | undefined;
+    playlistCover?: string | undefined;
+
+    constructor(data?: ICreatePlaylistRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.playlistCover = _data["playlistCover"];
+        }
+    }
+
+    static fromJS(data: any): CreatePlaylistRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatePlaylistRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["playlistCover"] = this.playlistCover;
+        return data;
+    }
+}
+
+export interface ICreatePlaylistRequest {
+    title: string | undefined;
+    playlistCover?: string | undefined;
+}
+
+export class UpdatePlaylistRequest implements IUpdatePlaylistRequest {
+    title?: string | undefined;
+    coverFile?: string | undefined;
+
+    constructor(data?: IUpdatePlaylistRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.title = _data["title"];
+            this.coverFile = _data["coverFile"];
+        }
+    }
+
+    static fromJS(data: any): UpdatePlaylistRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdatePlaylistRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["title"] = this.title;
+        data["coverFile"] = this.coverFile;
+        return data;
+    }
+}
+
+export interface IUpdatePlaylistRequest {
+    title?: string | undefined;
+    coverFile?: string | undefined;
+}
+
+export class UpdateUserProfileRequest implements IUpdateUserProfileRequest {
+    email?: string | undefined;
+    userName?: string | undefined;
+    avatarFile?: string | undefined;
+
+    constructor(data?: IUpdateUserProfileRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.userName = _data["userName"];
+            this.avatarFile = _data["avatarFile"];
+        }
+    }
+
+    static fromJS(data: any): UpdateUserProfileRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateUserProfileRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["userName"] = this.userName;
+        data["avatarFile"] = this.avatarFile;
+        return data;
+    }
+}
+
+export interface IUpdateUserProfileRequest {
+    email?: string | undefined;
+    userName?: string | undefined;
+    avatarFile?: string | undefined;
 }
 
 export class ApiException extends Error {

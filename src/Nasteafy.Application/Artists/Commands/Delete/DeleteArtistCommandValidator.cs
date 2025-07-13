@@ -9,8 +9,7 @@ namespace Nasteafy.Application.Artists.Commands.Delete
         public DeleteArtistCommandValidator(IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.ArtistId)
-                .NotEmpty()
-                .WithMessage("Artist ID must not be empty.")
+                .NotEmpty().WithMessage("Artist ID must not be empty.")
                 .MustAsync(unitOfWork.Artists.ExistsAsync)
                 .WithMessage("Artist does not exist.");
         }

@@ -13,7 +13,7 @@ export default function PlaylistsPage() {
 
   const fetchPlaylists = async (page: number, pageSize: number) => {
     try {
-      const response = await client.playlistsGET(page, pageSize);
+      const response = await client.playlistsGET2(page, pageSize);
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,

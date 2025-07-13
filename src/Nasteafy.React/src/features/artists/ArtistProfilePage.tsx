@@ -37,7 +37,7 @@ export default function ArtistProfilePage() {
 
   const fetchAlbums = async (page: number, pageSize: number) => {
     try {
-      const response = await client.albumsGET(id!, page, pageSize);
+      const response = await client.albumsGET2(id!, page, pageSize);
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,

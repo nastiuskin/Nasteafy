@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import { AddTrackToPlaylistCommand, type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
+import { type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
@@ -31,7 +31,7 @@ export default function AlbumPage() {
 
     const fetchAlbum = async () => {
       try {
-        const data = await client.albumsGET2(albumId);
+        const data = await client.albumsGET(albumId);
         setAlbum(data);
       } catch (error) {
         handleApiError(error);
@@ -48,7 +48,7 @@ export default function AlbumPage() {
 
   const fetchPlaylists = async () => {
     try {
-      const response = await client.playlistsGET(1, 50);
+      const response = await client.playlistsGET2(1, 50);
       setPlaylists(response.items ?? []);
     } catch (err) {
       handleApiError(err);
@@ -66,7 +66,7 @@ export default function AlbumPage() {
         data.title
       );
 
-      const updated = await client.albumsGET2(album.id!);
+      const updated = await client.albumsGET(album.id!);
       setAlbum(updated);
       toast.success("Album updated");
       setEditOpen(false);
@@ -104,9 +104,8 @@ export default function AlbumPage() {
   };
 
   const handleAddToPlaylist = async (trackId: string, playlistId: string) => {
-    const command = new AddTrackToPlaylistCommand({ trackId });
     try {
-      await client.tracksPOST2(playlistId, command);
+      await client.tracksPOST2(playlistId, trackId);
       toast.success("Track successfully added to playlist");
     } catch (err) {
       handleApiError(err);

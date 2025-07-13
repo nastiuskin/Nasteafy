@@ -4,7 +4,7 @@ import { Music, Trash } from "lucide-react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { client } from "../../../api/ApiClientProvider";
 import { handleApiError } from "../../../helpers/handleApiError";
-import { RemoveTrackFromPlaylistCommand, type UserPlaylistDto } from "../../../api/apiClient";
+import { type UserPlaylistDto } from "../../../api/apiClient";
 import TrackList from "../../tracks/TrackList";
 import { Button } from "../../../components/ui/button";
 import { useAuth } from "../../../hooks/useAuth";
@@ -16,7 +16,6 @@ export default function PlaylistInfoCard() {
   const [playlist, setPlaylist] = useState<UserPlaylistDto | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const { isUser } = useAuth();
-  const [confirmOpen, setConfirmOpen] = useState(false);
   const [trackToRemove, setTrackToRemove] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export default function PlaylistInfoCard() {
 
     const loadPlaylist = async () => {
       try {
-        const data = await client.playlistsGET2(id);
+        const data = await client.playlistsGET(id);
         setPlaylist(data);
       } catch (err) {
         handleApiError(err);
@@ -50,10 +49,8 @@ export default function PlaylistInfoCard() {
 
   const handleRemoveTracksFromPlaylist = async () => {
     if (!trackToRemove || !playlist?.id) return;
-    const command = new RemoveTrackFromPlaylistCommand({ trackId: trackToRemove });
-
     try {
-      await client.tracksDELETE2(playlist.id, command);
+      await client.tracksDELETE2(playlist.id, trackToRemove);
       toast.success("Track removed from playlist");
       setRefreshKey((k) => k + 1);
     } catch (err) {

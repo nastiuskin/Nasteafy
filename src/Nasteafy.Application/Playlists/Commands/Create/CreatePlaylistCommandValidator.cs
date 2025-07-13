@@ -7,8 +7,7 @@ namespace Nasteafy.Application.Playlists.Commands.Create
         public CreatePlaylistCommandValidator()
         {
             RuleFor(x => x.Title)
-                .NotEmpty()
-                .WithMessage("Playlist title should not be empty");   
+                .NotEmpty().WithMessage("Title is required");   
         }
     }
 }

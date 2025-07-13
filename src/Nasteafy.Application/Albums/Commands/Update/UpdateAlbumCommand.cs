@@ -4,18 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
-using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Albums.Commands.Update
 {
-    public class UpdateAlbumCommand : IRequest<Result>, ITransactionalCommand
-    {
-        [JsonIgnore]
-        public Guid AlbumId { get; set; }
-        public IFormFile? CoverFile { get; init; }
-        public DateTime ReleaseDate { get; init; }
-        public string? Title { get; init; } 
-    }
+    public record UpdateAlbumCommand(
+        Guid AlbumId,
+        IFormFile? CoverFile,
+        DateTime ReleaseDate,
+        string? Title) : IRequest<Result>, ITransactionalCommand;
 
     public class UpdateAlbumCommandHandler : IRequestHandler<UpdateAlbumCommand, Result>
     {
@@ -32,11 +28,12 @@ namespace Nasteafy.Application.Albums.Commands.Update
 
         public async Task<Result> Handle(UpdateAlbumCommand request, CancellationToken ct)
         {
-            var album = await _unitOfWork.Albums
-                .GetByIdAsync(request.AlbumId, ct);
+            var album = await _unitOfWork.Albums.GetByIdAsync(request.AlbumId, ct);
 
             if (!string.IsNullOrWhiteSpace(request.Title))
+            {
                 album!.Title = request.Title;
+            }
 
             if (request.CoverFile != null && request?.CoverFile?.Length > 0)
             {
@@ -53,6 +50,7 @@ namespace Nasteafy.Application.Albums.Commands.Update
 
             await _unitOfWork.Albums.UpdateAsync(album!, ct);
             await _unitOfWork.SaveChangesAsync(ct);
+
             return Result.Ok();
         }
     }

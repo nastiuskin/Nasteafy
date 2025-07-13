@@ -9,13 +9,11 @@ using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Albums.Commands.Create
 {
-    public class CreateAlbumCommand : IRequest<Result<Guid>>, ITransactionalCommand
-    {
-        public required string Title { get; init; }
-        public IFormFile? CoverFile { get; init; }
-        public required DateTime  ReleaseDate { get; init; }
-        public List<Guid> Artists { get; init; } = [];
-    }
+    public record CreateAlbumCommand(
+        string Title,
+        IFormFile? CoverFile,
+        DateTime ReleaseDate,
+        List<Guid> Artists) : IRequest<Result<Guid>>, ITransactionalCommand;
 
     public class CreateAlbumCommandHandler(IUnitOfWork unitOfWork,
          IFileStorageService fileStorageService)
@@ -29,7 +27,9 @@ namespace Nasteafy.Application.Albums.Commands.Create
               .ToListAsync(ct);
 
             if (artistIds.Count != request.Artists.Count)
+            {
                 return Result.Fail("Some of the specified artists were not found.").Log<CreateAlbumCommandHandler>();
+            }
 
             string? coverUrl = null;
 
@@ -43,10 +43,11 @@ namespace Nasteafy.Application.Albums.Commands.Create
                     FileType.AlbumCover);
 
                 if (uploadResult.IsSuccess)
+                {
                     coverUrl = uploadResult.Value;
+                }
             }
 
-            // It is better to create guid automatically via configuration builder, see example in UserConfiguration
             var albumId = Guid.NewGuid();
             var album = new Album
             {
@@ -58,7 +59,8 @@ namespace Nasteafy.Application.Albums.Commands.Create
                 {
                     AlbumId = albumId,
                     ArtistId = artistId
-                }).ToList(),
+                })
+                .ToList(),
             };
 
             await unitOfWork.Albums.AddAsync(album, ct);

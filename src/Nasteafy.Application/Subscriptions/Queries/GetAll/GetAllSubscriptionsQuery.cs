@@ -47,6 +47,7 @@ namespace Nasteafy.Application.Subscriptions.Queries.GetAll
                 .ToListAsync(ct);
 
             var response = new GetAllSubscriptionsResponse { Subscriptions = subscriptions };
+
             return Result.Ok(response);
         }
     }

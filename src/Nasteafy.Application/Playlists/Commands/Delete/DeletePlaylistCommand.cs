@@ -18,7 +18,7 @@ namespace Nasteafy.Application.Playlists.Commands.Delete
             if (!string.IsNullOrEmpty(playlist!.CoverUrl))
             {
                 await fileStorageService.DeleteFileAsync(FileType.PlaylistCover, playlist.CoverUrl);
-            }                
+            }
 
             unitOfWork.Playlists.Delete(playlist, ct);
             await unitOfWork.SaveChangesAsync(ct);

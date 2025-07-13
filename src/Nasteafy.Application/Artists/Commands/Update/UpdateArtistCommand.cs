@@ -4,17 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Abstractions.Helpers;
 using Nasteafy.Domain;
-using System.Text.Json.Serialization;
 
 namespace Nasteafy.Application.Artists.Commands.Update
 {
-    public class UpdateArtistCommand : IRequest<Result>, ITransactionalCommand
-    {
-        [JsonIgnore]
-        public Guid ArtistId { get; set; }
-        public string? Name { get; set; }
-        public IFormFile? AvatarFile { get; set; }
-    }
+    public record UpdateArtistCommand(
+         Guid ArtistId,
+         string? Name,
+         IFormFile? AvatarFile) : IRequest<Result>, ITransactionalCommand;
 
     public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, Result>
     {
@@ -34,8 +30,10 @@ namespace Nasteafy.Application.Artists.Commands.Update
             var artist = await _unitOfWork.Artists.GetByIdAsync(request.ArtistId, ct);
 
             if (!string.IsNullOrWhiteSpace(request.Name))
+            {
                 artist!.Name = request.Name;
-
+            }
+              
             if (request.AvatarFile != null && request?.AvatarFile?.Length > 0)
             {
                 await using var stream = request.AvatarFile.OpenReadStream();
@@ -50,8 +48,8 @@ namespace Nasteafy.Application.Artists.Commands.Update
             }
 
             await _unitOfWork.Artists.UpdateAsync(artist!, ct);
-
             await _unitOfWork.SaveChangesAsync(ct);
+
             return Result.Ok();
         }
     }

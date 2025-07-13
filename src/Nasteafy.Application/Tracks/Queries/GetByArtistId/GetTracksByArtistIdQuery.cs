@@ -22,9 +22,11 @@ public class GetTracksByArtistIdQueryHandler(IUnitOfWork unitOfWork,
 
         foreach (var t in tracks.Items)
         {
-            var fileUrl = !string.IsNullOrEmpty(t.FilePath)
-                ? await fileStorageService.GetFileUrlAsync(FileType.Audio, t.FilePath)
-                : null;
+            var getFileResult = await fileStorageService.GetFileUrlAsync(FileType.Audio, t.FilePath);
+            if (getFileResult.IsFailed)
+            {
+                continue;
+            }
 
             var albumCoverUrl = !string.IsNullOrEmpty(t.Album?.CoverUrl)
                 ? await fileStorageService.GetFileUrlAsync(FileType.AlbumCover, t.Album.CoverUrl)
@@ -36,10 +38,11 @@ public class GetTracksByArtistIdQueryHandler(IUnitOfWork unitOfWork,
                 string.Join(", ", t.ArtistTracks
                     .Where(at => at.Artist != null)
                     .Select(at => at.Artist.Name)),
-                fileUrl!.Value,
+                getFileResult!.Value,
                 t.Duration,
                 albumCoverUrl?.Value));
         }
+
         var result = new PagedResult<GetTrackDto>
         {
             Items = trackDtos,

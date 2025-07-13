@@ -17,5 +17,12 @@ namespace Nasteafy.Infrastructure.Database.Repositories
                     .ThenInclude(x => x.Subscription)
                 .FirstOrDefaultAsync(ct);
         }
+
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken, CancellationToken ct)
+        {
+            return await _context.Users                
+                .Where(u => u.RefreshToken != null && u.RefreshToken.Token == refreshToken)
+                .FirstOrDefaultAsync(ct);
+        }
     }
 }

@@ -2,7 +2,7 @@
 {
     public enum UserRole
     {
-        User,
+        Guest,
         Admin, 
         Artist
     }

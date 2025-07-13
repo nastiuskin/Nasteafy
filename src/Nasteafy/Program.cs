@@ -1,5 +1,3 @@
-using FluentResults;
-using Microsoft.AspNetCore.Mvc;
 using Nasteafy.Extensions;
 using Nasteafy.Persistence.Database.Extensions;
 using Serilog;
@@ -7,37 +5,16 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddUserSecrets<Program>() 
-    .AddEnvironmentVariables();
+builder.AddUserSecretsConfiguration();
 
-builder.Host.UseSerilog((context, loggerConfiguration) =>
-{
-    loggerConfiguration.WriteTo.Console();
-    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-});
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole("Admin"));
-});
+builder.Host.AddSerilog(builder.Configuration);
 
 builder.AddServices();
-builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
-});
+builder.Services
+    .AddCustomAuthorization()
+    .AddCustomCors()
+    .AddEndpoints(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
@@ -46,13 +23,12 @@ await app.SeedData();
 if (app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Testing"))
 {
     app.UseSwaggerWithUi();
-
     app.ApplyMigrations();
 }
 
-app.UseRouting();                  
-app.UseCors();                      
-app.UseGlobalExceptionHandling();  
+app.UseRouting();
+app.UseCors();
+app.UseGlobalExceptionHandling();
 app.UseRequestTimingMiddleware();
 app.UseAuthentication();
 app.UseAuthorization();

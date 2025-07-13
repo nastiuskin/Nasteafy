@@ -9,6 +9,7 @@ namespace Nasteafy.Application.Common.Abstractions.Auth
         Task<IList<string>> GetRolesAsync(User user);
         Task UpdateAsync(User user);
         Task<Result> CreateAsync(User user, string password);
-        Task AddToRoleAsync(User user, string role);
+        Task<Result> AddToRoleAsync(User user, string role);
+        Task<Result> RemoveRoleAsync(User user, string role);
     }
 }
