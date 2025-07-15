@@ -5,6 +5,7 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { AudioPlayerProvider } from './contexts/AudioPlayerContext';
 import { AuthProvider } from './contexts/AuthContext';
+import AdPopup from './components/AdPopup';
 
 const theme = localStorage.getItem("theme");
 if (theme === "dark") {
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
     <AuthProvider>
     <AudioPlayerProvider>
+       <AdPopup />
         <App />
     </AudioPlayerProvider>
     </AuthProvider>

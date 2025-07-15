@@ -4,7 +4,7 @@ import { Music, Trash } from "lucide-react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { client } from "../../../api/ApiClientProvider";
 import { handleApiError } from "../../../helpers/handleApiError";
-import { type UserPlaylistDto } from "../../../api/apiClient";
+import { PagedRequest, type UserPlaylistDto } from "../../../api/apiClient";
 import TrackList from "../../tracks/TrackList";
 import { Button } from "../../../components/ui/button";
 import { useAuth } from "../../../hooks/useAuth";
@@ -34,9 +34,14 @@ export default function PlaylistInfoCard() {
   }, [id]);
 
   const fetchTracksForPlaylist = async (page: number, pageSize: number) => {
+    const pagedRequest = new PagedRequest();
+    pagedRequest.init({
+      pageNumber: page,
+      pageSize: pageSize
+    });
     try {
       if (!playlist?.id) return { items: [], totalPages: 1 };
-      const result = await client.tracksGET4(playlist.id, page, pageSize);
+      const result = await client.paginatedSearch(playlist.id, pagedRequest);
       return {
         items: result.items ?? [],
         totalPages: result.totalPages ?? 1,

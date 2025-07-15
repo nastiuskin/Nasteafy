@@ -23,7 +23,7 @@ export default function AlbumPage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<UserPlaylistDto[]>([]);
-  const { isAdmin, isUser } = useAuth();
+  const { isAdmin, isUser, isGuest, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,20 +41,18 @@ export default function AlbumPage() {
     fetchAlbum();
   }, [albumId]);
 
-
   useEffect(() => {
-    fetchPlaylists();
+    if (!isGuest) {
+      fetchPlaylists();
+    }
   }, []);
 
-  const fetchPlaylists = async (pageSize = 1, pageNumber = 10) => {
+  const fetchPlaylists = async (pageSize = 10, pageNumber = 1) => {
     try {
       const pagedRequest = new PagedRequest();
       pagedRequest.init({
         pageNumber: pageNumber,
         pageSize: pageSize,
-        filters: [],
-        sortBy: null,
-        sortDirection: null
       });
       const response = await client.paginatedSearch4(pagedRequest);
       setPlaylists(response.items ?? []);
@@ -139,6 +137,11 @@ export default function AlbumPage() {
     }
   };
 
+  const protectedRenderActions = (track: GetTrackDto) => {
+    if (!isAuthenticated) return null;
+    return renderActions(track);
+  };
+
   const renderActions = (track: GetTrackDto) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -147,7 +150,7 @@ export default function AlbumPage() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {isUser && (
+        {!isGuest && (
           <>
             <div className="px-2 py-1 text-xs text-muted-foreground">Add to playlist</div>
             {playlists.map((playlist) => (
@@ -231,7 +234,7 @@ export default function AlbumPage() {
         <TrackList
           key={refreshKey}
           fetchTracks={fetchTracksForAlbum}
-          renderActions={renderActions}
+          renderActions={protectedRenderActions}
         />
       )}
 

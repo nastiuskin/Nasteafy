@@ -27,9 +27,6 @@ export default function HomePage() {
           pagedRequest.init({
             pageNumber: page,
             pageSize: 5,
-            filters: [],
-            sortBy: "Name",
-            sortDirection: null
           }); 
       try {
         const res = await client.paginatedSearch5(pagedRequest);
@@ -37,7 +34,6 @@ export default function HomePage() {
         setTotalPages(res.totalPages ?? null);
       } catch (err) {
         handleApiError(err);
-        console.error(err);
       }
     })();
   }, [page]);

@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
+import AdPopup from "../components/AdPopup"; 
 
 type AudioPlayerContextProps = {
   currentUrl: string | null;
@@ -31,7 +32,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
   const playTrack = (url: string, name?: string, artistNameValue?: string) => {
   const isSameTrack = url === currentUrl; 
-
     if (audioRef.current) {
       if (isSameTrack && !audioRef.current.paused) {
         audioRef.current.pause();
@@ -44,7 +44,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         setTrackName(name ?? null);
         setArtistName(artistNameValue ?? null);
         setIsPlaying(true);
-        setTimeout(() => {
+        setTimeout(() => {  
           if (audioRef.current) {
             audioRef.current.play();
             setIsPlaying(true);
@@ -53,25 +53,6 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
       }
     }
   };
-
-  // useEffect(() => {
-  //   const audio = audioRef.current;
-  //   if (!audio) return;
-
-  //   const handleEnded = () => setIsPlaying(false);
-  //   const handlePause = () => setIsPlaying(false);
-  //   const handlePlay = () => setIsPlaying(true);
-
-  //   audio.addEventListener("ended", handleEnded);
-  //   audio.addEventListener("pause", handlePause);
-  //   audio.addEventListener("play", handlePlay);
-
-  //   return () => {
-  //     audio.removeEventListener("ended", handleEnded);
-  //     audio.removeEventListener("pause", handlePause);
-  //     audio.removeEventListener("play", handlePlay);
-  //   };
-  // }, []);
 
   return (
    <AudioPlayerContext.Provider

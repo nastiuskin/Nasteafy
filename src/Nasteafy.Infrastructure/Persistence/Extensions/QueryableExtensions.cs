@@ -1,5 +1,4 @@
-﻿using Google.Api.Gax.Grpc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Domain.Base;
 using System.Linq.Dynamic.Core;
@@ -12,19 +11,29 @@ namespace Nasteafy.Infrastructure.Persistence.Extensions
         private static IQueryable<T> ApplyPaging<T>(this IQueryable<T> query, int pageNumber, int pageSize) =>
             query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
-        private static IQueryable<T> Sort<T>(this IQueryable<T> query, PagedRequest pagedRequest)
+        private static IQueryable<T> Sort<T>(this IQueryable<T> query, PagedRequest pagedRequest) where T : IEntity
         {
             if (!string.IsNullOrWhiteSpace(pagedRequest.SortBy))
             {
                 query = query.OrderBy(pagedRequest.SortBy + " " + pagedRequest.SortDirection);
             }
+            else
+            {
+                query = query.OrderBy(x => x.Id);
+            }
             return query;
         }
 
-        private static IQueryable<T> ApplyFilters<T>(this IQueryable<T> query, PagedRequest pagedRequest)
+        private static IQueryable<T> ApplyFilters<T>(this IQueryable<T> query, PagedRequest pagedRequest) where T : IEntity
         {
             var predicate = new StringBuilder();
             var requestFilters = pagedRequest.RequestFilters;
+
+            if(requestFilters is null || !requestFilters.Filters.Any())
+            {
+                return query;
+            }
+
             for (int i = 0; i < requestFilters.Filters.Count; i++)
             {
                 if (i > 0)
@@ -43,6 +52,7 @@ namespace Nasteafy.Infrastructure.Persistence.Extensions
 
             return query;
         }
+
         public static async Task<Application.Common.Models.PagedResult<T>> ToPagedResultAsync<T>(
             this IQueryable<T> query,
             PagedRequest request,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import type { AlbumDto, ArtistDto } from "../../api/apiClient";
+import { PagedRequest, type AlbumDto, type ArtistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import PaginatedList from "../../components/Pagination";
 import { Button } from "../../components/ui/button";
@@ -37,7 +37,12 @@ export default function ArtistProfilePage() {
 
   const fetchAlbums = async (page: number, pageSize: number) => {
     try {
-      const response = await client.paginatedSearch2(id!, page, pageSize);
+      const pagedRequest = new PagedRequest();
+      pagedRequest.init({
+        pageNumber: page,
+        pageSize: pageSize,
+      });
+      const response = await client.paginatedSearch6(id!, pagedRequest);
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,
@@ -75,7 +80,7 @@ export default function ArtistProfilePage() {
           : null
       );
       setEditOpen(false);
-      const updated = await client.artistsGET2(id!);
+      const updated = await client.artistsGET(id!);
       setArtist(updated);
     } catch (err) {
       handleApiError(err);
@@ -118,17 +123,19 @@ export default function ArtistProfilePage() {
               <User className="w-10 h-10 text-muted-foreground" />
             </div>
           )}
+          {isAdmin && (
+            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center cursor-pointer">
+              <Button
+                type="button"
+                variant="ghost"
+                className="p-2 h-auto w-auto bg-transparent hover:bg-transparent"
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil className="w-6 h-6 text-white" />
+              </Button>
+            </div>
+          )}
 
-          <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center cursor-pointer">
-            <Button
-              type="button"
-              variant="ghost"
-              className="p-2 h-auto w-auto bg-transparent hover:bg-transparent"
-              onClick={() => setEditOpen(true)}
-            >
-              <Pencil className="w-6 h-6 text-white" />
-            </Button>
-          </div>
         </div>
 
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-4 flex-1">

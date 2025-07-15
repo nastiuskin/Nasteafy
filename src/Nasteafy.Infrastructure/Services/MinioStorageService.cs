@@ -18,7 +18,9 @@ public class MinioStorageService(
 
         var extension = Path.GetExtension(fileName).ToLowerInvariant();
         if (!allowedExtensions.Contains(extension))
-            Result.Fail($"Extension '{extension}' is not allowed for file type '{fileType}'.").Log<MinioStorageService>();         
+        {
+            Result.Fail($"Extension '{extension}' is not allowed for file type '{fileType}'.").Log<MinioStorageService>();
+        }                    
 
         objectKey ??= Guid.NewGuid() + extension;
         var fullKey = $"{prefix}/{objectKey}";
@@ -64,7 +66,9 @@ public class MinioStorageService(
     public async Task<Result<string>> GetFileUrlAsync(FileType type, string? objectKey)
     {
         if (string.IsNullOrEmpty(objectKey))
+        {
             return Result.Fail("Failed to get file").Log<MinioStorageService>();
+        }           
 
         var bucketName = type == FileType.Audio ? options.Value.Buckets.Audio.Name : options.Value.Buckets.Image.Name;
 

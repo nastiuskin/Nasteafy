@@ -7,7 +7,7 @@ import { Button } from "../../../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { toast } from "react-hot-toast";
 import { handleApiError } from "../../../helpers/handleApiError";
-import { ArtistDto } from "../../../api/apiClient";
+import { ArtistDto, PagedRequest } from "../../../api/apiClient";
 import { client } from "../../../api/ApiClientProvider";
 import { Label } from "../../../components/ui/label";
 
@@ -50,8 +50,13 @@ export default function AlbumModal({
 
   useEffect(() => {
     const fetchArtists = async () => {
+       const pagedRequest = new PagedRequest();
+          pagedRequest.init({
+            pageNumber: 1,
+            pageSize: 10,
+          });
       try {
-        const response = await client.artistsGET(1, 100);
+        const response = await client.paginatedSearch5(pagedRequest);
         setArtists(response.items ?? []);
       } catch (err) {
         handleApiError(err);

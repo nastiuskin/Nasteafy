@@ -13,8 +13,8 @@
             set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
         }
 
-        public string SortBy { get; set; }
-        public string SortDirection { get; set; }
-        public RequestFilters RequestFilters { get; set; } = new();
+        public string? SortBy { get; set; }
+        public string? SortDirection { get; set; } = "ASC"; 
+        public RequestFilters? RequestFilters { get; set; } 
     }
 }

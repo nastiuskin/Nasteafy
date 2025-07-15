@@ -15,10 +15,7 @@ export default function PlaylistsPage() {
     const pagedRequest = new PagedRequest();
     pagedRequest.init({
       pageNumber: page,
-      pageSize: pageSize,
-      filters: [],
-      sortBy: null,
-      sortDirection: null
+      pageSize: pageSize
     });
     try {
       const response = await client.paginatedSearch4(pagedRequest);

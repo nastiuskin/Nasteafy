@@ -18,8 +18,10 @@ namespace Nasteafy.Application.Playlists.Queries.GetByUserId
         public async Task<Result<PagedResult<UserPlaylistDto>>> Handle(GetUserPlaylistsQuery query, CancellationToken ct)
         {
             var userId = userProvider.GetUserId();
-            if (userId == null  || userId == Guid.Empty)
+            if (userId == Guid.Empty)
+            {
                 return Result.Fail("UserId not found").Log<GetUserPlaylistsQueryHandler>();
+            }                
 
             var playlists = await unitOfWork.Playlists.GetByUserIdAsync(userId, query.PagedRequest, ct);
 
