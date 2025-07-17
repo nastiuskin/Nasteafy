@@ -11,10 +11,7 @@ namespace Nasteafy.Endpoints.Playlists.Delete
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/playlists/{playlistId:guid}", async (
-                [FromRoute] Guid playlistId,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapDelete("api/playlists/{playlistId:guid}", async ([FromRoute] Guid playlistId, ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(new DeletePlaylistCommand(playlistId), ct);
 

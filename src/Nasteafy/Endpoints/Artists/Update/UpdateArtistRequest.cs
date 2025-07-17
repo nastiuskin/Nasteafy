@@ -3,6 +3,7 @@
     public sealed record UpdateArtistRequest
     {
         public string? Name { get; init; }
+        public string? Biography { get; init; }
         public IFormFile? AvatarFile { get; init; }
     }
 }

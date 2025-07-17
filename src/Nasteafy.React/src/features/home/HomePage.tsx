@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import { ArtistDto, PagedRequest } from "../../api/apiClient";
+import { AlbumDto, ArtistDto, GetTrackDto, PagedRequest } from "../../api/apiClient";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import {
@@ -13,30 +13,51 @@ import {
 } from "../../components/ui/carousel";
 import { BarChart, Music, Users } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
+import { motion } from "framer-motion";
 import { handleApiError } from "../../helpers/handleApiError";
 
 export default function HomePage() {
   const [artists, setArtists] = useState<ArtistDto[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [albums, setAlbums] = useState<AlbumDto[]>([]);
+
+  const [artistPage, setArtistPage] = useState(1);
+  const [albumPage, setAlbumPage] = useState(1);
+
+  const [artistTotalPages, setArtistTotalPages] = useState<number | null>(null);
+  const [albumTotalPages, setAlbumTotalPages] = useState<number | null>(null);
+
   const { isAuthenticated } = useAuth();
+  const MotionCard = motion.create(Card);
 
   useEffect(() => {
     (async () => {
-       const pagedRequest = new PagedRequest();
-          pagedRequest.init({
-            pageNumber: page,
-            pageSize: 5,
-          }); 
+      const request = new PagedRequest();
+      request.init({ pageNumber: artistPage, pageSize: 5 });
+
       try {
-        const res = await client.paginatedSearch5(pagedRequest);
+        const res = await client.paginatedSearch5(request);
         setArtists(res.items ?? []);
-        setTotalPages(res.totalPages ?? null);
+        setArtistTotalPages(res.totalPages ?? null);
       } catch (err) {
         handleApiError(err);
       }
     })();
-  }, [page]);
+  }, [artistPage]);
+
+  useEffect(() => {
+    (async () => {
+      const request = new PagedRequest();
+      request.init({ pageNumber: albumPage, pageSize: 5, sortBy: "ReleaseDate" });
+
+      try {
+        const res = await client.paginatedSearch7(request);
+        setAlbums(res.items ?? []);
+        setAlbumTotalPages(res.totalPages ?? null);
+      } catch (err) {
+        handleApiError(err);
+      }
+    })();
+  }, [albumPage]);
 
   return (
     <div className="flex-1 w-full overflow-y-auto">
@@ -102,17 +123,74 @@ export default function HomePage() {
         </div>
 
         <section className="mb-10">
+          <h2 className="text-2xl font-semibold mb-4 px-2 sm:px-0">Latest releases</h2>
+          <div className="relative">
+             <Carousel key={`albums-${albumPage}`}  opts={{ align: "start" }} className="w-full">
+              <CarouselContent className="-ml-2">
+                {albums.map((album, index) => (
+                  <CarouselItem
+                    key={album.id}
+                    className="pl-2 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/5"
+                  >
+                    <Link to={`/albums/${album.id}`}>
+                      <MotionCard
+                        className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col items-center"
+                        whileHover={{ scale: 1.05 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.01 }}
+                      >
+                        <div className="w-full aspect-square overflow-hidden rounded-md mb-3">
+                          <img
+                            src={album.coverUrl || ""}
+                            alt={album.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                        <p className="text-base font-semibold text-foreground truncate w-full text-center">
+                          {album.title}
+                        </p>
+                      </MotionCard>
+                    </Link>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+
+              <CarouselPrevious
+                onClick={() => setAlbumPage((p) => Math.max(p - 1, 1))}
+                disabled={albumPage === 1}
+                className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 opacity-80 hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed w-10 h-10"
+              />
+              <CarouselNext
+                onClick={() =>
+                  setAlbumPage((p) =>
+                    albumTotalPages ? Math.min(p + 1, albumTotalPages) : p + 1
+                  )
+                }
+                disabled={albumTotalPages !== null && albumPage >= albumTotalPages}
+                className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 opacity-80 hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed w-10 h-10"
+              />
+            </Carousel>
+          </div>
+        </section>
+
+        <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-4 px-2 sm:px-0">Popular Artists</h2>
           <div className="relative">
-            <Carousel opts={{ align: "start" }} className="w-full">
+            <Carousel key={`artists-${artistPage}`}  opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-2">
-                {artists.map((artist) => (
+                {artists.map((artist, index) => (
                   <CarouselItem
                     key={artist.id}
                     className="pl-2 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/5"
                   >
                     <Link to={`/artists/${artist.id}`}>
-                      <Card className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col items-center">
+                      <MotionCard
+                        className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col items-center"
+                        whileHover={{ scale: 1.05 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.3 }}  
+                        transition={{ duration: 0.3, delay: index * 0.01 }}
+                      >
                         <div className="w-full aspect-square overflow-hidden rounded-md mb-3">
                           <img
                             src={artist.avatarUrl || ""}
@@ -123,22 +201,24 @@ export default function HomePage() {
                         <p className="text-base font-semibold text-foreground truncate w-full text-center">
                           {artist.name}
                         </p>
-                      </Card>
+                      </MotionCard>
                     </Link>
                   </CarouselItem>
                 ))}
               </CarouselContent>
 
               <CarouselPrevious
-                onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                disabled={page === 1}
+                onClick={() => setArtistPage((p) => Math.max(p - 1, 1))}
+                disabled={artistPage === 1}
                 className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 opacity-80 hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed w-10 h-10"
               />
               <CarouselNext
-                onClick={() => setPage((p) =>
-                  totalPages ? Math.min(p + 1, totalPages) : p + 1
-                )}
-                disabled={totalPages !== null && page >= totalPages}
+                onClick={() =>
+                  setArtistPage((p) =>
+                    artistTotalPages ? Math.min(p + 1, artistTotalPages) : p + 1
+                  )
+                }
+                disabled={artistTotalPages !== null && artistPage >= artistTotalPages}
                 className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 opacity-80 hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed w-10 h-10"
               />
             </Carousel>

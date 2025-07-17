@@ -12,9 +12,7 @@ namespace Nasteafy.Endpoints.Playlists.RemoveTrack
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/playlists/{playlistId:guid}/tracks/{trackId:guid}", async (
-                [FromRoute] Guid playlistId,
-                [FromRoute] Guid trackId,
+            routes.MapDelete("api/playlists/{playlistId:guid}/tracks/{trackId:guid}", async ([FromRoute] Guid playlistId, [FromRoute] Guid trackId,
                 ISender sender,
                 CancellationToken ct) =>
             {

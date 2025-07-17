@@ -7,6 +7,7 @@ namespace Nasteafy.Domain.Entities.Tracks
     {
         public required string Name { get; set; }
         public string? AvatarUrl { get; set; }
+        public string? Biography { get; set; }
         public bool CreatedByAdmin { get; set; }
 
         public Guid? UserId { get; set; }

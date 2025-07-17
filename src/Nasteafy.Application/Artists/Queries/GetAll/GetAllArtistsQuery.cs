@@ -29,6 +29,7 @@ namespace Nasteafy.Application.Artists.Queries
                     a.Id,
                     avatarUrl?.Value,
                     a.Name,
+                    a.Biography,
                     a.CreatedByAdmin));
             }
 

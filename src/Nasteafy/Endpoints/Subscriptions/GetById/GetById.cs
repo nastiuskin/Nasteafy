@@ -12,10 +12,7 @@ namespace Nasteafy.Endpoints.Subscriptions.GetById
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapGet("api/subscriptions/{Id:guid}", async (
-                [FromRoute] Guid Id,
-                ISender sender, 
-                CancellationToken ct) =>
+            routes.MapGet("api/subscriptions/{Id:guid}", async ([FromRoute] Guid Id, ISender sender, CancellationToken ct) =>
             {
                 var response = await sender.Send(new GetSubscriptionByIdQuery(Id), ct);
 

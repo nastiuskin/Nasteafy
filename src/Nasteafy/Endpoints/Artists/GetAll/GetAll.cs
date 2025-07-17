@@ -12,10 +12,7 @@ namespace Nasteafy.Endpoints.Artists
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/artists/paginated-search", async (
-                [FromBody] PagedRequest pagedRequest,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapPost("api/artists/paginated-search", async ([FromBody] PagedRequest pagedRequest, ISender sender, CancellationToken ct) =>
             {
                 var response = await sender.Send(new GetAllArtistsQuery(pagedRequest), ct);
 

@@ -38,9 +38,11 @@ export default function ArtistsPage() {
     try {
       await client.artistsPOST(
         data.name,
+        data.biography,
         data.avatarFile
           ? { data: data.avatarFile, fileName: data.avatarFile.name }
-          : null
+          : null,
+
       );
       setRefreshKey((k) => k + 1);
     } catch (err) {

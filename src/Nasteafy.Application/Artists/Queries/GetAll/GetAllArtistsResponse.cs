@@ -4,5 +4,6 @@
         Guid Id,
         string? AvatarUrl, 
         string Name, 
+        string? Biography,
         bool IsVerified);
 }

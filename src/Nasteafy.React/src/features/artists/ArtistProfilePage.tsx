@@ -75,6 +75,7 @@ export default function ArtistProfilePage() {
       await client.artistsPUT(
         artist?.id!,
         data.name,
+        data.biography,
         data.avatarFile
           ? { data: data.avatarFile, fileName: data.avatarFile.name }
           : null
@@ -201,6 +202,7 @@ export default function ArtistProfilePage() {
         initialData={{
           name: artist.name,
           avatarUrl: artist.avatarUrl,
+          biography: artist.biography
         }}
         onSubmit={handleUpdateArtist}
       />

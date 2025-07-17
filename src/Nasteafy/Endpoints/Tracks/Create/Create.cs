@@ -12,10 +12,7 @@ namespace Nasteafy.Endpoints.Tracks.Create
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/tracks", async (
-                [FromForm] CreateTrackRequest request, 
-                ISender sender, 
-                CancellationToken ct) =>
+            routes.MapPost("api/tracks", async ([FromForm] CreateTrackRequest request, ISender sender, CancellationToken ct) =>
             {
                 var command = new CreateTrackCommand(request.File, request.Title, request.Duration, request.AlbumId, request.Artists);
                 var response = await sender.Send(command, ct);

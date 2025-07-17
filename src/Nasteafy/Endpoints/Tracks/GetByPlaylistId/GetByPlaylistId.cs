@@ -12,9 +12,7 @@ namespace Nasteafy.Endpoints.Tracks
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/playlists/{playlistId:guid}/tracks/paginated-search", async (
-                [FromRoute] Guid playlistId,
-                [FromBody] PagedRequest pagedRequest,
+            routes.MapPost("api/playlists/{playlistId:guid}/tracks/paginated-search", async ([FromRoute] Guid playlistId, [FromBody] PagedRequest pagedRequest,
                 ISender sender,
                 CancellationToken ct) =>
             {

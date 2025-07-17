@@ -11,10 +11,7 @@ namespace Nasteafy.Endpoints.Artists.Delete
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapDelete("api/artists/{artistId:guid}", async (
-                [FromRoute] Guid artistId,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapDelete("api/artists/{artistId:guid}", async ([FromRoute] Guid artistId, ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(new DeleteArtistCommand(artistId), ct);
 

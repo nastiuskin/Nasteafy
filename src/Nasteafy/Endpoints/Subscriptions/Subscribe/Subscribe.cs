@@ -11,9 +11,7 @@ namespace Nasteafy.Endpoints.Subscriptions.Subscribe
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/users/subscriptions/{subscriptionId:guid}/subscribe", async (
-                [FromRoute] Guid subscriptionId,
-                ISender sender,
+            routes.MapPost("api/users/subscriptions/{subscriptionId:guid}/subscribe", async ([FromRoute] Guid subscriptionId, ISender sender,
                 CancellationToken ct) =>
             {
                 var command = new SubscribeUserCommand(subscriptionId);

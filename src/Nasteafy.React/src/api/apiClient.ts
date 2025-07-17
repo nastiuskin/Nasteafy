@@ -117,10 +117,11 @@ export interface IClient {
     paginatedSearch5(body: PagedRequest): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @param name (optional) 
+     * @param biography (optional) 
      * @param avatarFile (optional) 
      * @return OK
      */
-    artistsPUT(id: string, name: string | null | undefined, avatarFile: FileParameter | null | undefined): Promise<void>;
+    artistsPUT(id: string, name: string | null | undefined, biography: string | null | undefined, avatarFile: FileParameter | null | undefined): Promise<void>;
     /**
      * @return OK
      */
@@ -131,10 +132,11 @@ export interface IClient {
     artistsDELETE(artistId: string): Promise<void>;
     /**
      * @param name (optional) 
+     * @param biography (optional) 
      * @param artistPhoto (optional) 
      * @return Created
      */
-    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined): Promise<void>;
+    artistsPOST(name: string | null | undefined, biography: string | null | undefined, artistPhoto: FileParameter | null | undefined): Promise<void>;
     /**
      * @param coverFile (optional) 
      * @param releaseDate (optional) 
@@ -150,6 +152,10 @@ export interface IClient {
      * @return OK
      */
     paginatedSearch6(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @return OK
+     */
+    paginatedSearch7(body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
@@ -1596,10 +1602,11 @@ export class Client implements IClient {
 
     /**
      * @param name (optional) 
+     * @param biography (optional) 
      * @param avatarFile (optional) 
      * @return OK
      */
-    artistsPUT(id: string, name: string | null | undefined, avatarFile: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
+    artistsPUT(id: string, name: string | null | undefined, biography: string | null | undefined, avatarFile: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/artists/{id}";
         if (id === undefined || id === null)
             throw new Error("The parameter 'id' must be defined.");
@@ -1609,6 +1616,8 @@ export class Client implements IClient {
         const content_ = new FormData();
         if (name !== null && name !== undefined)
             content_.append("name", name.toString());
+        if (biography !== null && biography !== undefined)
+            content_.append("biography", biography.toString());
         if (avatarFile !== null && avatarFile !== undefined)
             content_.append("avatarFile", avatarFile.data, avatarFile.fileName ? avatarFile.fileName : "avatarFile");
 
@@ -1780,16 +1789,19 @@ export class Client implements IClient {
 
     /**
      * @param name (optional) 
+     * @param biography (optional) 
      * @param artistPhoto (optional) 
      * @return Created
      */
-    artistsPOST(name: string | null | undefined, artistPhoto: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
+    artistsPOST(name: string | null | undefined, biography: string | null | undefined, artistPhoto: FileParameter | null | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/artists";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = new FormData();
         if (name !== null && name !== undefined)
             content_.append("name", name.toString());
+        if (biography !== null && biography !== undefined)
+            content_.append("biography", biography.toString());
         if (artistPhoto !== null && artistPhoto !== undefined)
             content_.append("artistPhoto", artistPhoto.data, artistPhoto.fileName ? artistPhoto.fileName : "artistPhoto");
 
@@ -2041,6 +2053,68 @@ export class Client implements IClient {
     /**
      * @return OK
      */
+    paginatedSearch7(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/albums/paginated-search";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPaginatedSearch7(_response);
+        });
+    }
+
+    protected processPaginatedSearch7(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     albumsDELETE(albumId: string, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/albums/{albumId}";
         if (albumId === undefined || albumId === null)
@@ -2223,6 +2297,7 @@ export class ArtistDto implements IArtistDto {
     id?: string;
     avatarUrl?: string | undefined;
     name?: string | undefined;
+    biography?: string | undefined;
     isVerified?: boolean;
 
     constructor(data?: IArtistDto) {
@@ -2239,6 +2314,7 @@ export class ArtistDto implements IArtistDto {
             this.id = _data["id"];
             this.avatarUrl = _data["avatarUrl"];
             this.name = _data["name"];
+            this.biography = _data["biography"];
             this.isVerified = _data["isVerified"];
         }
     }
@@ -2255,6 +2331,7 @@ export class ArtistDto implements IArtistDto {
         data["id"] = this.id;
         data["avatarUrl"] = this.avatarUrl;
         data["name"] = this.name;
+        data["biography"] = this.biography;
         data["isVerified"] = this.isVerified;
         return data;
     }
@@ -2264,6 +2341,7 @@ export interface IArtistDto {
     id?: string;
     avatarUrl?: string | undefined;
     name?: string | undefined;
+    biography?: string | undefined;
     isVerified?: boolean;
 }
 
@@ -3042,6 +3120,7 @@ export interface IUpdateAlbumRequest {
 
 export class CreateArtistRequest implements ICreateArtistRequest {
     name!: string | undefined;
+    biography?: string | undefined;
     artistPhoto?: string | undefined;
 
     constructor(data?: ICreateArtistRequest) {
@@ -3056,6 +3135,7 @@ export class CreateArtistRequest implements ICreateArtistRequest {
     init(_data?: any) {
         if (_data) {
             this.name = _data["name"];
+            this.biography = _data["biography"];
             this.artistPhoto = _data["artistPhoto"];
         }
     }
@@ -3070,6 +3150,7 @@ export class CreateArtistRequest implements ICreateArtistRequest {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
+        data["biography"] = this.biography;
         data["artistPhoto"] = this.artistPhoto;
         return data;
     }
@@ -3077,11 +3158,13 @@ export class CreateArtistRequest implements ICreateArtistRequest {
 
 export interface ICreateArtistRequest {
     name: string | undefined;
+    biography?: string | undefined;
     artistPhoto?: string | undefined;
 }
 
 export class UpdateArtistRequest implements IUpdateArtistRequest {
     name?: string | undefined;
+    biography?: string | undefined;
     avatarFile?: string | undefined;
 
     constructor(data?: IUpdateArtistRequest) {
@@ -3096,6 +3179,7 @@ export class UpdateArtistRequest implements IUpdateArtistRequest {
     init(_data?: any) {
         if (_data) {
             this.name = _data["name"];
+            this.biography = _data["biography"];
             this.avatarFile = _data["avatarFile"];
         }
     }
@@ -3110,6 +3194,7 @@ export class UpdateArtistRequest implements IUpdateArtistRequest {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
+        data["biography"] = this.biography;
         data["avatarFile"] = this.avatarFile;
         return data;
     }
@@ -3117,6 +3202,7 @@ export class UpdateArtistRequest implements IUpdateArtistRequest {
 
 export interface IUpdateArtistRequest {
     name?: string | undefined;
+    biography?: string | undefined;
     avatarFile?: string | undefined;
 }
 

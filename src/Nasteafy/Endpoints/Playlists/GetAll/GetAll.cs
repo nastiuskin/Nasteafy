@@ -11,10 +11,7 @@ namespace Nasteafy.Endpoints.Playlists.GetAll
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/playlists/paginated-search", async (
-                [FromBody] PagedRequest pagedRequest,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapPost("api/playlists/paginated-search", async ([FromBody] PagedRequest pagedRequest, ISender sender, CancellationToken ct) =>
             {
                 var result = await sender.Send(new GetUserPlaylistsQuery(pagedRequest), ct);
 

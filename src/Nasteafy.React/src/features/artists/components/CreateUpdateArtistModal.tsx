@@ -9,6 +9,7 @@ import { Button } from "../../../components/ui/button";
 const ArtistSchema = z.object({
   name: z.string().min(1, "Name is required"),
   avatarFile: z.instanceof(File).optional(),
+  biography: z.string().max(1000, "Biography is too long").optional(),
 });
 
 export type ArtistFormData = z.infer<typeof ArtistSchema>;
@@ -19,6 +20,7 @@ type ArtistModalProps = {
   initialData?: {
     name?: string;
     avatarUrl?: string;
+    biography?: string;
   };
   onSubmit: (data: ArtistFormData) => Promise<void>;
 };
@@ -39,9 +41,10 @@ export default function ArtistModal({
     resolver: zodResolver(ArtistSchema),
     defaultValues: {
       name: initialData?.name || "",
+      biography: initialData?.biography || "",
     },
   });
-
+  
   const handleFormSubmit = async (data: ArtistFormData) => {
     try {
       await onSubmit(data);
@@ -79,6 +82,16 @@ export default function ArtistModal({
             />
             {errors.avatarFile && (
               <p className="text-red-500 text-xs mt-1">{errors.avatarFile.message}</p>
+            )}
+          </div>
+          <div>
+            <textarea
+              placeholder="Short biography"
+              {...register("biography")}
+              className="w-full border border-input rounded-md p-2 text-sm resize-y min-h-[80px] bg-background text-foreground placeholder:text-muted-foreground"
+            />
+            {errors.biography && (
+              <p className="text-red-500 text-xs mt-1">{errors.biography.message}</p>
             )}
           </div>
           <Button type="submit">{initialData ? "Update" : "Create"}</Button>

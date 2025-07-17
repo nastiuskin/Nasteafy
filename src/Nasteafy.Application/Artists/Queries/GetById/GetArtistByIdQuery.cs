@@ -24,6 +24,7 @@ namespace Nasteafy.Application.Artists.Queries.GetById
                 artist.Id,
                 avatarUrl?.Value,
                 artist.Name,
+                artist.Biography,
                 artist.CreatedByAdmin
             );
 

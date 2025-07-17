@@ -10,11 +10,7 @@ namespace Nasteafy.Endpoints.Auth.Refresh
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/auth/refresh", async (
-                HttpResponse response,
-                HttpRequest request,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapPost("api/auth/refresh", async (HttpResponse response, HttpRequest request, ISender sender, CancellationToken ct) =>
             {
                 var refreshToken = request.Cookies["refreshToken"];
 

@@ -21,6 +21,9 @@ namespace Nasteafy.Infrastructure.Database.Configurations.Tracks
                 .HasMaxLength(500)
                 .IsRequired(false);
 
+            builder.Property(x => x.Biography)
+                .HasMaxLength(10000);
+
             builder.Property(x => x.CreatedByAdmin)
                 .HasDefaultValue(false);
 

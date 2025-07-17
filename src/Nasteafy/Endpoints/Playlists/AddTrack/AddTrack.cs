@@ -11,9 +11,7 @@ namespace Nasteafy.Endpoints.Playlists.AddTrack
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/playlists/{playlistId:guid}/tracks/{trackId:guid}", async (
-                [FromRoute] Guid playlistId,
-                [FromRoute] Guid trackId,
+            routes.MapPost("api/playlists/{playlistId:guid}/tracks/{trackId:guid}", async ([FromRoute] Guid playlistId, [FromRoute] Guid trackId,
                 ISender sender,
                 CancellationToken ct) =>
             {

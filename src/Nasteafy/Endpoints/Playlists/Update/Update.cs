@@ -11,10 +11,7 @@ namespace Nasteafy.Endpoints.Playlists.Update
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPut("api/playlists/{id:guid}", async (
-                [FromRoute] Guid id,
-                [FromForm] UpdatePlaylistRequest request, 
-                ISender sender, 
+            routes.MapPut("api/playlists/{id:guid}", async ([FromRoute] Guid id, [FromForm] UpdatePlaylistRequest request, ISender sender, 
                 CancellationToken ct) =>
             {
                 var command = new UpdatePlaylistCommand(

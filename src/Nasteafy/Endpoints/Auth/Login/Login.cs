@@ -11,11 +11,7 @@ namespace Nasteafy.Endpoints.Auth.Login
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/auth/login", async (
-                [FromBody] LoginRequest request,
-                HttpResponse http,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapPost("api/auth/login", async ([FromBody] LoginRequest request, HttpResponse http, ISender sender, CancellationToken ct) =>
             {
                 var command = new LoginCommand(request.Email, request.Password);
                 var response = await sender.Send(command, ct);

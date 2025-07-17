@@ -10,6 +10,7 @@ namespace Nasteafy.Application.Artists.Commands.Update
     public record UpdateArtistCommand(
          Guid ArtistId,
          string? Name,
+         string? Biography,
          IFormFile? AvatarFile) : IRequest<Result>, ITransactionalCommand;
 
     public class UpdateArtistCommandHandler : IRequestHandler<UpdateArtistCommand, Result>
@@ -33,6 +34,8 @@ namespace Nasteafy.Application.Artists.Commands.Update
             {
                 artist!.Name = request.Name;
             }
+
+            artist!.Biography = request.Biography;
               
             if (request.AvatarFile != null && request?.AvatarFile?.Length > 0)
             {

@@ -12,10 +12,7 @@ namespace Nasteafy.Endpoints.Albums.Update
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPut("api/albums/{id:guid}", async (
-                [FromRoute] Guid id,
-                [FromForm] UpdateAlbumRequest request,
-                ISender sender,
+            routes.MapPut("api/albums/{id:guid}", async ([FromRoute] Guid id, [FromForm] UpdateAlbumRequest request, ISender sender,
                 CancellationToken ct) =>
          {
              var command = new UpdateAlbumCommand(id, request.CoverFile, request.ReleaseDate, request.Title);

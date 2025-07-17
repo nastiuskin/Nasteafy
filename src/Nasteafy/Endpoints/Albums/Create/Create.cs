@@ -12,10 +12,7 @@ namespace Nasteafy.Endpoints.Albums.Create
     {
         public void MapEndpoint(IEndpointRouteBuilder routes)
         {
-            routes.MapPost("api/albums", async (
-                [FromForm] CreateAlbumRequest request,
-                ISender sender,
-                CancellationToken ct) =>
+            routes.MapPost("api/albums", async ([FromForm] CreateAlbumRequest request,ISender sender,CancellationToken ct) =>
             {
                 var command = new CreateAlbumCommand(request.Title, request.CoverFile, request.ReleaseDate, request.Artists);
                 var result = await sender.Send(command, ct);

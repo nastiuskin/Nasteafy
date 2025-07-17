@@ -10,6 +10,7 @@ namespace Nasteafy.Application.Artists.Commands.Create
 {
     public record CreateArtistCommand(
         string Name,
+        string? Biography,
         IFormFile? ArtistPhoto) : IRequest<Result<Guid>>, ITransactionalCommand;
 
     public class CreateArtistCommandHandler(IUnitOfWork unitOfWork, 
@@ -21,7 +22,8 @@ namespace Nasteafy.Application.Artists.Commands.Create
             var artist = new Artist
             {
                 Name = request.Name.Trim(),
-                CreatedByAdmin = true
+                CreatedByAdmin = true,
+                Biography = request.Biography
             };
 
             if (request.ArtistPhoto != null && request?.ArtistPhoto?.Length > 0)
