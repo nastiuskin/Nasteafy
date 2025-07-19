@@ -14,6 +14,7 @@ import SplashScreen from './components/SplashScreen';
 import AlbumPage from './features/albums/AlbumPage';
 import SubscriptionsPage from './features/subscriptions/SubscriptionsPage';
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import LikedSongsPage from './features/tracks/LikedSongsPage';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,7 @@ function App() {
           <Route path="/artists" element={<ArtistsPage />} />
           <Route path="/artists/:id" element={<ArtistProfilePage />} />
           <Route path="/albums/:id" element={<AlbumPage />} />
+          <Route path="/liked-songs" element={<LikedSongsPage />} />
           <Route
             path='/subscriptions'
             element={

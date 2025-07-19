@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using MediatR;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Tracks.Queries.GetById;
@@ -11,12 +12,13 @@ public record GetTracksByArtistIdQuery(Guid ArtistId, PagedRequest PagedRequest)
     : IRequest<Result<PagedResult<GetTrackDto>>>;
 
 public class GetTracksByArtistIdQueryHandler(IUnitOfWork unitOfWork,
-    IFileStorageService fileStorageService)
-    : IRequestHandler<GetTracksByArtistIdQuery, Result<PagedResult<GetTrackDto>>>
+    IFileStorageService fileStorageService,
+    ICurrentUserProvider userProvider) : IRequestHandler<GetTracksByArtistIdQuery, Result<PagedResult<GetTrackDto>>>
 {
     public async Task<Result<PagedResult<GetTrackDto>>> Handle(GetTracksByArtistIdQuery request, CancellationToken ct)
     {
         var tracks = await unitOfWork.Tracks.GetByArtistIdAsync(request.ArtistId, request.PagedRequest, ct);
+        var userId = userProvider.GetUserId();
 
         var trackDtos = new List<GetTrackDto>();
 
@@ -40,7 +42,8 @@ public class GetTracksByArtistIdQueryHandler(IUnitOfWork unitOfWork,
                     .Select(at => at.Artist.Name)),
                 getFileResult!.Value,
                 t.Duration,
-                albumCoverUrl?.Value));
+                albumCoverUrl?.Value,
+                t.TrackLikes.Any(l => l.UserId == userId)));
         }
 
         var result = new PagedResult<GetTrackDto>

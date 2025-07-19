@@ -23,6 +23,8 @@ namespace Nasteafy.Infrastructure.Persistence.Contexts
         public DbSet<ArtistTrack> ArtistTracks { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
+        public DbSet<AlbumRating> AlbumRatings { get; set; }
+        public DbSet<TrackLike> TrackLikes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

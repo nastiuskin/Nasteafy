@@ -18,7 +18,16 @@ namespace Nasteafy.Infrastructure.Persistence.Repositories
                 .AsNoTracking()
                 .Where(album => album.AlbumArtists.Any(aa => aa.ArtistId == artistId))
                 .Include(album => album.AlbumArtists)
-                    .ThenInclude(aa => aa.Artist);
+                    .ThenInclude(aa => aa.Artist)
+                .Include(x => x.Ratings);
+
+            return await query.ToPagedResultAsync(request, ct);
+        }
+
+        public async Task<PagedResult<Album>> GetAllAlbumsWithRatings(PagedRequest request, CancellationToken ct)
+        {
+            var query = _context.Albums
+                .Include(a => a.Ratings);
 
             return await query.ToPagedResultAsync(request, ct);
         }

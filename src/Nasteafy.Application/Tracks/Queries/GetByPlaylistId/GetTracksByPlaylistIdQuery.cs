@@ -1,9 +1,11 @@
 ﻿using FluentResults;
 using MediatR;
+using Nasteafy.Application.Common.Abstractions.Auth;
 using Nasteafy.Application.Common.Abstractions.Data;
 using Nasteafy.Application.Common.Models;
 using Nasteafy.Application.Tracks.Queries.GetById;
 using Nasteafy.Domain;
+using Nasteafy.Domain.Entities.Tracks;
 
 namespace Nasteafy.Application.Tracks.Queries.GetByPlaylistId
 {
@@ -11,12 +13,13 @@ namespace Nasteafy.Application.Tracks.Queries.GetByPlaylistId
      : IRequest<Result<PagedResult<GetTrackDto>>>;
 
     public class GetTracksByArtistIdQueryHandler(IUnitOfWork unitOfWork,
-        IFileStorageService fileStorageService)
-        : IRequestHandler<GetTracksByPlaylistIdQuery, Result<PagedResult<GetTrackDto>>>
+        IFileStorageService fileStorageService,
+        ICurrentUserProvider userProvider) : IRequestHandler<GetTracksByPlaylistIdQuery, Result<PagedResult<GetTrackDto>>>
     {
         public async Task<Result<PagedResult<GetTrackDto>>> Handle(GetTracksByPlaylistIdQuery request, CancellationToken ct)
         {
             var tracks = await unitOfWork.Tracks.GetByPlaylistIdAsync(request.PlaylistId, request.PagedRequest, ct);
+            var userId = userProvider.GetUserId();
 
             var trackDtos = new List<GetTrackDto>();
 
@@ -32,15 +35,14 @@ namespace Nasteafy.Application.Tracks.Queries.GetByPlaylistId
                     ? await fileStorageService.GetFileUrlAsync(FileType.AlbumCover, t.Album.CoverUrl)
                     : null;
 
-                trackDtos.Add(new GetTrackDto(
-                    t.Id,
-                    t.Title,
+                trackDtos.Add(new GetTrackDto(t.Id, t.Title, 
                     string.Join(", ", t.ArtistTracks
                         .Where(at => at.Artist != null)
                         .Select(at => at.Artist.Name)),
                     getFileResult!.Value,
                     t.Duration,
-                    albumCoverUrl?.Value));
+                    albumCoverUrl?.Value,
+                    t.TrackLikes.Any(l => l.UserId == userId)));
             }
 
             var result = new PagedResult<GetTrackDto>

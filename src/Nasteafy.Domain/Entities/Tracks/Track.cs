@@ -13,5 +13,6 @@ namespace Nasteafy.Domain.Entities.Tracks
 
         public virtual ICollection<ArtistTrack> ArtistTracks { get; set; } = [];
         public virtual ICollection<PlaylistTrack> PlaylistTracks { get; set; } = [];
+        public virtual ICollection<TrackLike> TrackLikes { get; set; } = [];
     }
 }

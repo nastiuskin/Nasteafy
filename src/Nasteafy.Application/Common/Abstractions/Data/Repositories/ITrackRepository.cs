@@ -9,6 +9,6 @@ namespace Nasteafy.Application.Common.Abstractions.Data.Repositories
         Task<PagedResult<Track>> GetByAlbumIdAsync(Guid albumId, PagedRequest req, CancellationToken ct);
         Task<PagedResult<Track>> GetByPlaylistIdAsync(Guid playlistId, PagedRequest req, CancellationToken ct);
         Task<PagedResult<Track>> GetByTitleAsync(string title, PagedRequest req, CancellationToken ct);
-        //Task<PagedResult<Track>> GetLatestTracksAsync(PagedRequest req, CancellationToken ct);
+        Task<PagedResult<Track>> GetLikedSongs(PagedRequest req, Guid userId, CancellationToken ct);
     }
 }

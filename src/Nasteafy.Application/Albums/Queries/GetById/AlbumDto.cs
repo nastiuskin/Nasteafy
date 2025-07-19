@@ -4,5 +4,7 @@
         string Title,
         DateTime ReleaseDate,
         string? CoverUrl,
-        string Artist);
+        string Artist,
+        double AverageRating,
+        int? UserRating);
 }

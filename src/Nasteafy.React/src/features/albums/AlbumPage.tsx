@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import { PagedRequest, type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
+import { PagedRequest, RateAlbumRequest, type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
 import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
@@ -13,6 +13,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import UploadTrackModal from "../tracks/UploadTrackModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../../components/ui/dropdown-menu";
 import TrackList from "../tracks/TrackList";
+import RatingStars from "./components/RatingStars";
 
 export default function AlbumPage() {
   const { id: albumId } = useParams<{ id: string }>();
@@ -54,7 +55,7 @@ export default function AlbumPage() {
         pageNumber: pageNumber,
         pageSize: pageSize,
       });
-      const response = await client.paginatedSearch4(pagedRequest);
+      const response = await client.paginatedSearch5(pagedRequest);
       setPlaylists(response.items ?? []);
     } catch (err) {
       handleApiError(err);
@@ -94,7 +95,7 @@ export default function AlbumPage() {
       sortDirection: null
     });
     try {
-      const result = await client.paginatedSearch3(albumId, pagedRequest);
+      const result = await client.paginatedSearch4(albumId, pagedRequest);
       return {
         items: result.items ?? [],
         totalPages: result.totalPages ?? 1,
@@ -125,6 +126,16 @@ export default function AlbumPage() {
       handleApiError(err);
     }
   };
+
+   const handleRateAlbum = async (albumId: string, rating: number) => {
+      try {
+        var request = new RateAlbumRequest({ rating });
+        await client.rate(albumId, request);
+      } catch (err) {
+        handleApiError(err);
+      }
+    };
+  
 
   const handleDeleteTrack = async (trackId: string) => {
     try {
@@ -212,6 +223,14 @@ export default function AlbumPage() {
           <h1 className="text-4xl font-extrabold text-foreground">{album.title}</h1>
           <p className="text-muted-foreground text-sm">
             Released: {new Date(album.releaseDate!).toLocaleDateString()}
+          </p>
+          <RatingStars
+            value={album.userRating ?? album.averageRating!}
+            isUserRating={album.userRating != null}
+            canRate={isAuthenticated}
+            onRate={(r) => handleRateAlbum(album.id!, r)}
+          />
+          <p className="text-xs text-muted-foreground">
           </p>
           {isAdmin && (
             <div className="flex gap-2 flex-wrap">

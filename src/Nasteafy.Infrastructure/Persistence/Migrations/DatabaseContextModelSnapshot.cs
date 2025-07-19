@@ -252,6 +252,24 @@ namespace Nasteafy.Persistence.Migrations
                     b.ToTable("AlbumArtists", "music");
                 });
 
+            modelBuilder.Entity("Nasteafy.Domain.Entities.Tracks.AlbumRating", b =>
+                {
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AlbumId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AlbumRatings", "music");
+                });
+
             modelBuilder.Entity("Nasteafy.Domain.Entities.Tracks.Artist", b =>
                 {
                     b.Property<Guid>("Id")
@@ -357,6 +375,21 @@ namespace Nasteafy.Persistence.Migrations
                     b.HasIndex("AlbumId");
 
                     b.ToTable("Tracks", "music");
+                });
+
+            modelBuilder.Entity("Nasteafy.Domain.Entities.Tracks.TrackLike", b =>
+                {
+                    b.Property<Guid>("TrackId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("TrackId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TrackLikes", "music");
                 });
 
             modelBuilder.Entity("Nasteafy.Domain.Entities.Users.User", b =>
@@ -536,6 +569,25 @@ namespace Nasteafy.Persistence.Migrations
                     b.Navigation("Artist");
                 });
 
+            modelBuilder.Entity("Nasteafy.Domain.Entities.Tracks.AlbumRating", b =>
+                {
+                    b.HasOne("Nasteafy.Domain.Entities.Tracks.Album", "Album")
+                        .WithMany("Ratings")
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Nasteafy.Domain.Entities.Users.User", "User")
+                        .WithMany("AlbumRatings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Album");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Nasteafy.Domain.Entities.Tracks.Artist", b =>
                 {
                     b.HasOne("Nasteafy.Domain.Entities.Users.User", "User")
@@ -586,6 +638,25 @@ namespace Nasteafy.Persistence.Migrations
                     b.Navigation("Album");
                 });
 
+            modelBuilder.Entity("Nasteafy.Domain.Entities.Tracks.TrackLike", b =>
+                {
+                    b.HasOne("Nasteafy.Domain.Entities.Tracks.Track", "Track")
+                        .WithMany("TrackLikes")
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Nasteafy.Domain.Entities.Users.User", "User")
+                        .WithMany("TrackLikes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Track");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Nasteafy.Domain.Entities.Users.User", b =>
                 {
                     b.OwnsOne("Nasteafy.Domain.Entities.Users.RefreshToken", "RefreshToken", b1 =>
@@ -623,6 +694,8 @@ namespace Nasteafy.Persistence.Migrations
                 {
                     b.Navigation("AlbumArtists");
 
+                    b.Navigation("Ratings");
+
                     b.Navigation("Tracks");
                 });
 
@@ -643,11 +716,17 @@ namespace Nasteafy.Persistence.Migrations
                     b.Navigation("ArtistTracks");
 
                     b.Navigation("PlaylistTracks");
+
+                    b.Navigation("TrackLikes");
                 });
 
             modelBuilder.Entity("Nasteafy.Domain.Entities.Users.User", b =>
                 {
+                    b.Navigation("AlbumRatings");
+
                     b.Navigation("Playlists");
+
+                    b.Navigation("TrackLikes");
 
                     b.Navigation("UserSubscriptions");
                 });

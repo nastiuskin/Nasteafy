@@ -10,5 +10,6 @@ namespace Nasteafy.Domain.Entities.Tracks
 
         public virtual ICollection<AlbumArtist> AlbumArtists { get; set; } = [];
         public virtual ICollection<Track> Tracks { get; set; } = [];
+        public virtual ICollection<AlbumRating> Ratings { get; set; } = [];
     }
 }

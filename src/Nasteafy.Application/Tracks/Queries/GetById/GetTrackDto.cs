@@ -5,5 +5,6 @@
         string ArtistName, 
         string PathUrl,
         TimeSpan Duration,
-        string? AlbumCover);
+        string? AlbumCover,
+        bool IsLiked);
 }

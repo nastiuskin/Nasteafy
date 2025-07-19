@@ -1,8 +1,12 @@
+import { useCallback, useState } from "react";
 import PaginatedList from "../../components/Pagination";
 import { type GetTrackDto } from "../../api/apiClient";
 import { useAudioPlayer } from "../../contexts/AudioPlayerContext";
-import { Music, Pause, Play } from "lucide-react";
+import { Music, Pause, Play, Heart, HeartOff } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { useAuth } from "../../hooks/useAuth";
+import { client } from "../../api/ApiClientProvider";
+import toast from "react-hot-toast";
 
 type TrackListProps = {
   fetchTracks: (page: number, pageSize: number) => Promise<{
@@ -15,19 +19,75 @@ type TrackListProps = {
 
 export default function TrackList({ fetchTracks, renderActions }: TrackListProps) {
   const { playTrack, currentUrl, isPlaying } = useAudioPlayer();
+  const { isAuthenticated } = useAuth();
 
+  const [likedTracks, setLikedTracks] = useState<Record<string, boolean>>({});
+
+  const handleToggleLike = async (trackId: string, liked: boolean) => {
+    try {
+      await client.like(trackId, liked );
+      setLikedTracks((prev) => ({ ...prev, [trackId]: liked }));
+       if(liked)
+        toast.success("Track successfully added to liked songs")
+    } catch (err) {
+      console.error("Failed to toggle like", err);
+    }
+  };
+
+ const handlePageLoad = useCallback(async (page: number, size: number) => {
+  const data = await fetchTracks(page, size);
+
+  const newLikes: Record<string, boolean> = {};
+  data.items.forEach((t) => {
+    newLikes[t.id!] = t.isLiked ?? false;
+  });
+  setLikedTracks((prev) => ({ ...prev, ...newLikes }));
+
+  return data;
+}, [fetchTracks]);
+
+
+  const renderLikeButton = (trackId: string, isLiked: boolean) => (
+    <Button
+      variant="ghost"
+      className="p-2"
+      onClick={() => handleToggleLike(trackId, !isLiked)}
+    >
+      {isLiked ? (
+        <Heart className="w-5 h-5 text-red-500" fill="red" />
+      ) : (
+        <HeartOff className="w-5 h-5 text-muted-foreground" />
+      )}
+    </Button>
+  );
+
+  const renderPlayButton = (track: GetTrackDto, isCurrent: boolean) => (
+    <Button
+      className="p-2 rounded hover:bg-accent"
+      variant="ghost"
+      onClick={() => playTrack(track.pathUrl!, track.title!, track.artistName)}
+    >
+      {isCurrent && isPlaying ? (
+        <Pause className="w-6 h-6 text-primary" />
+      ) : (
+        <Play className="w-6 h-6 text-foreground" />
+      )}
+    </Button>
+  );
 
   return (
     <div className="mt-4">
       <PaginatedList
-        fetchPage={fetchTracks}
+        fetchPage={handlePageLoad}
         className="space-y-2"
         emptyContent={<p className="text-muted-foreground text-sm">No tracks yet</p>}
         renderItem={(track: GetTrackDto, index: number) => {
           const isCurrent = currentUrl === track.pathUrl;
+          const isLiked = likedTracks[track.id!] ?? false;
 
           return (
             <div
+              key={track.id}
               className={`flex items-center justify-between px-4 py-3 rounded-lg transition group border border-border bg-card ${
                 isCurrent ? "bg-muted" : "hover:bg-muted"
               }`}
@@ -56,20 +116,12 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
                 <span className="text-xs text-muted-foreground">
                   {track.duration ? formatDuration(track.duration) : "00:00"}
                 </span>
-                <Button
-                  className="p-2 rounded hover:bg-accent"
-                  variant="ghost"
-                  onClick={() =>
-                    playTrack(track.pathUrl!, track.title!, track.artistName)
-                  }
-                >
-                  {isCurrent && isPlaying ? (
-                    <Pause className="w-6 h-6 text-primary" />
-                  ) : (
-                    <Play className="w-6 h-6 text-foreground" />
-                  )}
-                </Button>
-                {renderActions!(track)}
+
+                {renderPlayButton(track, isCurrent)}
+
+                {isAuthenticated && renderLikeButton(track.id!, isLiked)}
+
+                {renderActions?.(track)}
               </div>
             </div>
           );

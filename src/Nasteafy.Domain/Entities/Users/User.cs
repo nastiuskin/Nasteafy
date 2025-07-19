@@ -12,5 +12,7 @@ namespace Nasteafy.Domain.Entities.Users
 
         public virtual ICollection<Playlist> Playlists { get; set; } = [];
         public virtual ICollection<UserSubscription> UserSubscriptions { get; set; } = [];
+        public virtual ICollection<AlbumRating> AlbumRatings { get; set; } = [];
+        public virtual ICollection<TrackLike> TrackLikes { get; set; } = [];
     }
 }

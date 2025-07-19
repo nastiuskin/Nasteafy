@@ -7,6 +7,8 @@ import ArtistCard from "./components/ArtistCard";
 import { useAuth } from "../../hooks/useAuth";
 import CreateArtistModal, { type ArtistFormData } from "./components/CreateUpdateArtistModal";
 import { Button } from "../../components/ui/button";
+import { motion } from "framer-motion";
+import { Mic } from "lucide-react";
 
 export default function ArtistsPage() {
   const { isAdmin } = useAuth();
@@ -17,13 +19,14 @@ export default function ArtistsPage() {
     const pagedRequest = new PagedRequest();
     pagedRequest.init({
       pageNumber: page,
-      pageSize: pageSize,
+      pageSize,
       filters: [],
       sortBy: null,
-      sortDirection: null
+      sortDirection: null,
     });
+
     try {
-      const response = await client.paginatedSearch5(pagedRequest);
+      const response = await client.paginatedSearch6(pagedRequest);
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,
@@ -41,8 +44,7 @@ export default function ArtistsPage() {
         data.biography,
         data.avatarFile
           ? { data: data.avatarFile, fileName: data.avatarFile.name }
-          : null,
-
+          : null
       );
       setRefreshKey((k) => k + 1);
     } catch (err) {
@@ -52,28 +54,53 @@ export default function ArtistsPage() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4 h-full">
-        <h1 className="text-2xl font-bold">Artists</h1>
-
-        {isAdmin && (
+      <div className="relative w-full rounded-xl overflow-hidden mb-6">
+        <div className="bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500 p-6 sm:p-8 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setOpen(true)}>Add Artist</Button>
-
-            <CreateArtistModal
-              open={open}
-              setOpen={setOpen}
-              onSubmit={handleCreateArtist}
-            />
+            <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg">
+              <Mic className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">Artists</h1>
+              <p className="text-sm text-white/80">Browse and manage your favorite artists</p>
+            </div>
           </div>
-        )}
+
+          {isAdmin && (
+            <Button
+              className="bg-white text-black hover:bg-white/80"
+              onClick={() => setOpen(true)}
+            >
+              Add Artist
+            </Button>
+          )}
+        </div>
       </div>
+
+      {isAdmin && (
+        <CreateArtistModal
+          open={open}
+          setOpen={setOpen}
+          onSubmit={handleCreateArtist}
+        />
+      )}
 
       <PaginatedList
         key={refreshKey}
         fetchPage={fetchArtists}
-        renderItem={(artist: ArtistDto) => <ArtistCard artist={artist} />}
+        renderItem={(artist: ArtistDto, i) => (
+          <motion.div
+            key={artist.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.03 }}
+          >
+            <ArtistCard artist={artist} />
+          </motion.div>
+        )}
         pageSize={18}
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" />
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+      />
     </div>
   );
 }

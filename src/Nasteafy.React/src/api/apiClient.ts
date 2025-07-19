@@ -29,15 +29,23 @@ export interface IClient {
     /**
      * @return OK
      */
+    paginatedSearch2(body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    /**
+     * @return OK
+     */
+    like(id: string, liked: boolean): Promise<void>;
+    /**
+     * @return OK
+     */
     tracksGET(id: string): Promise<GetTrackDto>;
     /**
      * @return OK
      */
-    paginatedSearch2(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch3(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
-    paginatedSearch3(albumId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch4(albumId: string, body: PagedRequest): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
@@ -84,7 +92,7 @@ export interface IClient {
     /**
      * @return OK
      */
-    paginatedSearch4(body: PagedRequest): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch5(body: PagedRequest): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
@@ -114,7 +122,7 @@ export interface IClient {
     /**
      * @return OK
      */
-    paginatedSearch5(body: PagedRequest): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch6(body: PagedRequest): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @param name (optional) 
      * @param biography (optional) 
@@ -147,15 +155,19 @@ export interface IClient {
     /**
      * @return OK
      */
+    rate(albumId: string, body: RateAlbumRequest): Promise<void>;
+    /**
+     * @return OK
+     */
     albumsGET(id: string): Promise<AlbumDto>;
     /**
      * @return OK
      */
-    paginatedSearch6(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch7(artistId: string, body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
-    paginatedSearch7(body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
+    paginatedSearch8(body: PagedRequest): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>;
     /**
      * @return OK
      */
@@ -375,6 +387,129 @@ export class Client implements IClient {
     /**
      * @return OK
      */
+    paginatedSearch2(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        let url_ = this.baseUrl + "/api/tracks/liked/paginated-search";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processPaginatedSearch2(_response);
+        });
+    }
+
+    protected processPaginatedSearch2(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null.fromJS(resultData200);
+            return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    like(id: string, liked: boolean, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/tracks/{id}/like?";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        if (liked === undefined || liked === null)
+            throw new Error("The parameter 'liked' must be defined and cannot be null.");
+        else
+            url_ += "liked=" + encodeURIComponent("" + liked) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PUT",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processLike(_response);
+        });
+    }
+
+    protected processLike(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     tracksGET(id: string, cancelToken?: CancelToken): Promise<GetTrackDto> {
         let url_ = this.baseUrl + "/api/tracks/{Id}";
         if (id === undefined || id === null)
@@ -436,7 +571,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    paginatedSearch2(artistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    paginatedSearch3(artistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/artists/{artistId}/tracks/paginated-search";
         if (artistId === undefined || artistId === null)
             throw new Error("The parameter 'artistId' must be defined.");
@@ -463,11 +598,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPaginatedSearch2(_response);
+            return this.processPaginatedSearch3(_response);
         });
     }
 
-    protected processPaginatedSearch2(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch3(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -501,7 +636,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    paginatedSearch3(albumId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    paginatedSearch4(albumId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/albums/{albumId}/tracks/paginated-search";
         if (albumId === undefined || albumId === null)
             throw new Error("The parameter 'albumId' must be defined.");
@@ -528,11 +663,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPaginatedSearch3(_response);
+            return this.processPaginatedSearch4(_response);
         });
     }
 
-    protected processPaginatedSearch3(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch4(response: AxiosResponse): Promise<PagedResult_1OfOfGetTrackDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1120,7 +1255,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    paginatedSearch4(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    paginatedSearch5(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/playlists/paginated-search";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1144,11 +1279,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPaginatedSearch4(_response);
+            return this.processPaginatedSearch5(_response);
         });
     }
 
-    protected processPaginatedSearch4(response: AxiosResponse): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch5(response: AxiosResponse): Promise<PagedResult_1OfOfUserPlaylistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1541,7 +1676,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    paginatedSearch5(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    paginatedSearch6(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/artists/paginated-search";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1565,11 +1700,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPaginatedSearch5(_response);
+            return this.processPaginatedSearch6(_response);
         });
     }
 
-    protected processPaginatedSearch5(response: AxiosResponse): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch6(response: AxiosResponse): Promise<PagedResult_1OfOfArtistDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -1927,6 +2062,67 @@ export class Client implements IClient {
     /**
      * @return OK
      */
+    rate(albumId: string, body: RateAlbumRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/albums/{albumId}/rate";
+        if (albumId === undefined || albumId === null)
+            throw new Error("The parameter 'albumId' must be defined.");
+        url_ = url_.replace("{albumId}", encodeURIComponent("" + albumId));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRate(_response);
+        });
+    }
+
+    protected processRate(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = ApiError.fromJS(resultData400);
+            return throwException("Bad Request", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return OK
+     */
     albumsGET(id: string, cancelToken?: CancelToken): Promise<AlbumDto> {
         let url_ = this.baseUrl + "/api/albums/{Id}";
         if (id === undefined || id === null)
@@ -1988,7 +2184,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    paginatedSearch6(artistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    paginatedSearch7(artistId: string, body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/artists/{artistId}/albums/paginated-search";
         if (artistId === undefined || artistId === null)
             throw new Error("The parameter 'artistId' must be defined.");
@@ -2015,11 +2211,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPaginatedSearch6(_response);
+            return this.processPaginatedSearch7(_response);
         });
     }
 
-    protected processPaginatedSearch6(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch7(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2053,7 +2249,7 @@ export class Client implements IClient {
     /**
      * @return OK
      */
-    paginatedSearch7(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    paginatedSearch8(body: PagedRequest, cancelToken?: CancelToken): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         let url_ = this.baseUrl + "/api/albums/paginated-search";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2077,11 +2273,11 @@ export class Client implements IClient {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processPaginatedSearch7(_response);
+            return this.processPaginatedSearch8(_response);
         });
     }
 
-    protected processPaginatedSearch7(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
+    protected processPaginatedSearch8(response: AxiosResponse): Promise<PagedResult_1OfOfAlbumDtoAndApplicationAnd_0AndCulture_neutralAndPublicKeyToken_null> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -2247,6 +2443,8 @@ export class AlbumDto implements IAlbumDto {
     releaseDate?: Date;
     coverUrl?: string | undefined;
     artist?: string | undefined;
+    averageRating?: number;
+    userRating?: number | undefined;
 
     constructor(data?: IAlbumDto) {
         if (data) {
@@ -2264,6 +2462,8 @@ export class AlbumDto implements IAlbumDto {
             this.releaseDate = _data["releaseDate"] ? new Date(_data["releaseDate"].toString()) : <any>undefined;
             this.coverUrl = _data["coverUrl"];
             this.artist = _data["artist"];
+            this.averageRating = _data["averageRating"];
+            this.userRating = _data["userRating"];
         }
     }
 
@@ -2281,6 +2481,8 @@ export class AlbumDto implements IAlbumDto {
         data["releaseDate"] = this.releaseDate ? this.releaseDate.toISOString() : <any>undefined;
         data["coverUrl"] = this.coverUrl;
         data["artist"] = this.artist;
+        data["averageRating"] = this.averageRating;
+        data["userRating"] = this.userRating;
         return data;
     }
 }
@@ -2291,6 +2493,8 @@ export interface IAlbumDto {
     releaseDate?: Date;
     coverUrl?: string | undefined;
     artist?: string | undefined;
+    averageRating?: number;
+    userRating?: number | undefined;
 }
 
 export class ArtistDto implements IArtistDto {
@@ -2917,6 +3121,7 @@ export class GetTrackDto implements IGetTrackDto {
     pathUrl?: string | undefined;
     duration?: string;
     albumCover?: string | undefined;
+    isLiked?: boolean;
 
     constructor(data?: IGetTrackDto) {
         if (data) {
@@ -2935,6 +3140,7 @@ export class GetTrackDto implements IGetTrackDto {
             this.pathUrl = _data["pathUrl"];
             this.duration = _data["duration"];
             this.albumCover = _data["albumCover"];
+            this.isLiked = _data["isLiked"];
         }
     }
 
@@ -2953,6 +3159,7 @@ export class GetTrackDto implements IGetTrackDto {
         data["pathUrl"] = this.pathUrl;
         data["duration"] = this.duration;
         data["albumCover"] = this.albumCover;
+        data["isLiked"] = this.isLiked;
         return data;
     }
 }
@@ -2964,6 +3171,7 @@ export interface IGetTrackDto {
     pathUrl?: string | undefined;
     duration?: string;
     albumCover?: string | undefined;
+    isLiked?: boolean;
 }
 
 export class GetUserResponse implements IGetUserResponse {
@@ -3072,6 +3280,42 @@ export interface ICreateAlbumRequest {
     coverFile?: string | undefined;
     releaseDate: Date;
     artists?: string[] | undefined;
+}
+
+export class RateAlbumRequest implements IRateAlbumRequest {
+    rating?: number;
+
+    constructor(data?: IRateAlbumRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.rating = _data["rating"];
+        }
+    }
+
+    static fromJS(data: any): RateAlbumRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new RateAlbumRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["rating"] = this.rating;
+        return data;
+    }
+}
+
+export interface IRateAlbumRequest {
+    rating?: number;
 }
 
 export class UpdateAlbumRequest implements IUpdateAlbumRequest {

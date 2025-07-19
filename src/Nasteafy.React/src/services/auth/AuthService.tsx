@@ -35,6 +35,7 @@ export const authService = {
   logout: async (): Promise<void> => {
     try {
       await client.logout();
+       window.location.reload(); 
     } catch (error) {
       handleApiError(error);
     }

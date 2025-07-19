@@ -16,7 +16,8 @@ namespace Nasteafy.Infrastructure.Database.Repositories
             var query = _context.Tracks
                 .AsNoTracking()
                 .Where(x => x.AlbumId == albumId)
-                .Include(x => x.Album);
+                .Include(x => x.Album)
+                .Include(x => x.TrackLikes);
 
             return await query.ToPagedResultAsync(req, ct);
         }
@@ -27,6 +28,8 @@ namespace Nasteafy.Infrastructure.Database.Repositories
                 .AsNoTracking()
                 .Where(x => x.ArtistId == artistId)
                     .Include(x => x.Artist)
+                    .Include(x => x.Track)
+                        .ThenInclude(x => x.TrackLikes)
                 .Select(x => x.Track);
 
             return await query.ToPagedResultAsync(req, ct);
@@ -51,7 +54,26 @@ namespace Nasteafy.Infrastructure.Database.Repositories
                      .ThenInclude(at => at.Artist)  
               .Include(x => x.Track)
                 .ThenInclude(x => x.Album)
+              .Include(x => x.Track)
+                .ThenInclude(x => x.TrackLikes)
              .Select(x => x.Track);
+
+            return await query.ToPagedResultAsync(req, ct);
+        }
+
+        public async Task<PagedResult<Track>> GetLikedSongs(PagedRequest req, Guid userId, CancellationToken ct)
+        {
+            var query = _context.TrackLikes
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .Include(x => x.Track)
+                    .ThenInclude(t => t.ArtistTracks)
+                        .ThenInclude(at => at.Artist)
+                .Include(x => x.Track)
+                    .ThenInclude(x => x.Album)
+                .Include(x => x.Track)
+                    .ThenInclude(x => x.TrackLikes)
+                .Select(x => x.Track);
 
             return await query.ToPagedResultAsync(req, ct);
         }

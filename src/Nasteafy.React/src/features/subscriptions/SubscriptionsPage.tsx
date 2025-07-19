@@ -56,7 +56,17 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Available Subscriptions</h1>
+      <div className="w-full rounded-xl overflow-hidden bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100 p-6 sm:p-8 flex items-center gap-6 shadow-sm border border-border">
+        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-muted/30 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-sm border border-border">
+          💳
+        </div>
+        <div className="flex flex-col justify-center text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold text-black">Available Subscriptions</h1>
+          <p className="text-sm text-muted-foreground">
+            Choose a plan that suits you best
+          </p>
+        </div>
+      </div>
 
       {subscriptions.length === 0 ? (
         <p className="text-muted-foreground">No subscriptions found.</p>

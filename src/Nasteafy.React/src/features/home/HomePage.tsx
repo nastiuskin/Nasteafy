@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import { AlbumDto, ArtistDto, GetTrackDto, PagedRequest } from "../../api/apiClient";
+import { AlbumDto, ArtistDto, GetTrackDto, PagedRequest, RateAlbumRequest, RequestFilters } from "../../api/apiClient";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import {
@@ -15,6 +15,9 @@ import { BarChart, Music, Users } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { motion } from "framer-motion";
 import { handleApiError } from "../../helpers/handleApiError";
+import RatingStars from "../albums/components/RatingStars";
+import { useSearchParams } from "react-router-dom";
+import { buildFilter } from "../../helpers/filtersBuilder";
 
 export default function HomePage() {
   const [artists, setArtists] = useState<ArtistDto[]>([]);
@@ -28,21 +31,28 @@ export default function HomePage() {
 
   const { isAuthenticated } = useAuth();
   const MotionCard = motion.create(Card);
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
 
   useEffect(() => {
     (async () => {
       const request = new PagedRequest();
-      request.init({ pageNumber: artistPage, pageSize: 5 });
+      request.init({
+        pageNumber: artistPage,
+        pageSize: 5,
+        requestFilters: query ? [buildFilter("Title", query)] : [],
+      });
 
       try {
-        const res = await client.paginatedSearch5(request);
+        const res = await client.paginatedSearch6(request);
         setArtists(res.items ?? []);
         setArtistTotalPages(res.totalPages ?? null);
       } catch (err) {
         handleApiError(err);
       }
     })();
-  }, [artistPage]);
+  }, [artistPage, query]);
+
 
   useEffect(() => {
     (async () => {
@@ -50,7 +60,7 @@ export default function HomePage() {
       request.init({ pageNumber: albumPage, pageSize: 5, sortBy: "ReleaseDate" });
 
       try {
-        const res = await client.paginatedSearch7(request);
+        const res = await client.paginatedSearch8(request);
         setAlbums(res.items ?? []);
         setAlbumTotalPages(res.totalPages ?? null);
       } catch (err) {
@@ -59,13 +69,22 @@ export default function HomePage() {
     })();
   }, [albumPage]);
 
+  const handleRateAlbum = async (albumId: string, rating: number) => {
+    try {
+      var request = new RateAlbumRequest({ rating });
+      await client.rate(albumId, request);
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
+
   return (
     <div className="flex-1 w-full overflow-y-auto">
       <div className="max-w-7xl mx-auto px-6 py-10 space-y-12">
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <Link to="/artists" className="block">
-            <Card className="hover:shadow-md transition cursor-pointer h-full">
+            <Card className="bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:shadow-lg transition cursor-pointer h-full">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Top Artists</CardTitle>
                 <Users className="h-5 w-5 text-muted-foreground" />
@@ -78,7 +97,7 @@ export default function HomePage() {
           </Link>
 
           <Link to="/subscriptions" className="block">
-            <Card className="hover:shadow-md transition cursor-pointer h-full">
+            <Card className="bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:shadow-lg transition cursor-pointer h-full">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium">Become an Artist</CardTitle>
                 <Music className="h-5 w-5 text-muted-foreground" />
@@ -92,7 +111,7 @@ export default function HomePage() {
 
           {isAuthenticated ? (
             <Link to="/playlists" className="block">
-              <Card className="hover:shadow-md transition cursor-pointer h-full">
+              <Card className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg transition cursor-pointer h-full">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Your Playlists</CardTitle>
                   <BarChart className="h-5 w-5 text-muted-foreground" />
@@ -105,7 +124,7 @@ export default function HomePage() {
             </Link>
           ) : (
             <Link to="/register" className="block">
-              <Card className="hover:shadow-md transition cursor-pointer h-full">
+              <Card className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:shadow-lg transition cursor-pointer h-full">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-sm font-medium">Join Now</CardTitle>
                   <BarChart className="h-5 w-5 text-muted-foreground" />
@@ -125,20 +144,20 @@ export default function HomePage() {
         <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-4 px-2 sm:px-0">Latest releases</h2>
           <div className="relative">
-             <Carousel key={`albums-${albumPage}`}  opts={{ align: "start" }} className="w-full">
+            <Carousel key={`albums-${albumPage}`} opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-2">
                 {albums.map((album, index) => (
                   <CarouselItem
                     key={album.id}
                     className="pl-2 basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/5"
                   >
-                    <Link to={`/albums/${album.id}`}>
-                      <MotionCard
-                        className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col items-center"
-                        whileHover={{ scale: 1.05 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.01 }}
-                      >
+                    <MotionCard
+                      className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col justify-between"
+                      whileHover={{ scale: 1.05 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.01 }}
+                    >
+                      <Link to={`/albums/${album.id}`} className="w-full flex flex-col items-center">
                         <div className="w-full aspect-square overflow-hidden rounded-md mb-3">
                           <img
                             src={album.coverUrl || ""}
@@ -149,8 +168,17 @@ export default function HomePage() {
                         <p className="text-base font-semibold text-foreground truncate w-full text-center">
                           {album.title}
                         </p>
-                      </MotionCard>
-                    </Link>
+                      </Link>
+
+                      <div className="mt-3 flex justify-center">
+                        <RatingStars
+                          value={album.userRating ?? album.averageRating!}
+                          isUserRating={album.userRating != null}
+                          canRate={isAuthenticated}
+                          onRate={(r) => handleRateAlbum(album.id!, r)}
+                        />
+                      </div>
+                    </MotionCard>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -176,7 +204,7 @@ export default function HomePage() {
         <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-4 px-2 sm:px-0">Popular Artists</h2>
           <div className="relative">
-            <Carousel key={`artists-${artistPage}`}  opts={{ align: "start" }} className="w-full">
+            <Carousel key={`artists-${artistPage}`} opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-2">
                 {artists.map((artist, index) => (
                   <CarouselItem
@@ -188,7 +216,7 @@ export default function HomePage() {
                         className="group bg-muted hover:bg-muted/70 rounded-lg p-4 transition shadow hover:shadow-lg h-full flex flex-col items-center"
                         whileHover={{ scale: 1.05 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.3 }}  
+                        viewport={{ once: true, amount: 0.3 }}
                         transition={{ duration: 0.3, delay: index * 0.01 }}
                       >
                         <div className="w-full aspect-square overflow-hidden rounded-md mb-3">

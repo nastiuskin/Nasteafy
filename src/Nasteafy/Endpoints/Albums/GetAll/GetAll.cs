@@ -4,7 +4,6 @@ using Nasteafy.Abstractions;
 using Nasteafy.Application.Albums.Queries.GetAll;
 using Nasteafy.Application.Albums.Queries.GetById;
 using Nasteafy.Application.Common.Models;
-using Nasteafy.Application.Tracks.Queries.GetById;
 using Nasteafy.Extensions;
 
 namespace Nasteafy.Endpoints.Albums.GetAll
