@@ -7,22 +7,36 @@ import { handleApiError } from "../../helpers/handleApiError";
 import PaginatedList from "../../components/Pagination";
 import PlaylistModal, { type PlaylistFormData } from "./components/CreateUpdatePlaylistModal";
 import { Music } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { buildFilter } from "../../helpers/filtersBuilder";
 
 export default function PlaylistsPage() {
   const [open, setOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q");
+  const [noResults, setNoResults] = useState(false);
 
   const fetchPlaylists = async (page: number, pageSize: number) => {
     const pagedRequest = new PagedRequest();
     pagedRequest.init({
       pageNumber: page,
       pageSize: pageSize,
+      requestFilters: query
+        ? {
+          filters: [buildFilter("Title", query)],
+        }
+        : undefined,
     });
 
     try {
       const response = await client.paginatedSearch5(pagedRequest);
+      const items = response.items ?? [];
+      setNoResults(query != null && items.length === 0);
+
       return {
-        items: response.items ?? [],
+        items,
         totalPages: response.totalPages ?? 1,
       };
     } catch (err) {
@@ -67,6 +81,12 @@ export default function PlaylistsPage() {
           </Button>
         </div>
       </div>
+
+       {noResults && (
+        <p className="text-muted-foreground text-center mt-4">
+          No playlists found for "{query}"
+        </p>
+      )}
 
       <PlaylistModal
         open={open}

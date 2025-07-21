@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/button";
 import { useAuth } from "../../hooks/useAuth";
 import { client } from "../../api/ApiClientProvider";
 import toast from "react-hot-toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../components/ui/tooltip";
 
 type TrackListProps = {
   fetchTracks: (page: number, pageSize: number) => Promise<{
@@ -15,9 +16,11 @@ type TrackListProps = {
   }>;
   title?: string;
   renderActions?: (track: GetTrackDto) => React.ReactNode;
+  query?: string;
+  noResults?: boolean;
 };
 
-export default function TrackList({ fetchTracks, renderActions }: TrackListProps) {
+export default function TrackList({ fetchTracks, renderActions, query, noResults }: TrackListProps) {
   const { playTrack, currentUrl, isPlaying } = useAudioPlayer();
   const { isAuthenticated } = useAuth();
 
@@ -25,26 +28,26 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
 
   const handleToggleLike = async (trackId: string, liked: boolean) => {
     try {
-      await client.like(trackId, liked );
+      await client.like(trackId, liked);
       setLikedTracks((prev) => ({ ...prev, [trackId]: liked }));
-       if(liked)
+      if (liked)
         toast.success("Track successfully added to liked songs")
     } catch (err) {
       console.error("Failed to toggle like", err);
     }
   };
 
- const handlePageLoad = useCallback(async (page: number, size: number) => {
-  const data = await fetchTracks(page, size);
+  const handlePageLoad = useCallback(async (page: number, size: number) => {
+    const data = await fetchTracks(page, size);
 
-  const newLikes: Record<string, boolean> = {};
-  data.items.forEach((t) => {
-    newLikes[t.id!] = t.isLiked ?? false;
-  });
-  setLikedTracks((prev) => ({ ...prev, ...newLikes }));
+    const newLikes: Record<string, boolean> = {};
+    data.items.forEach((t) => {
+      newLikes[t.id!] = t.isLiked ?? false;
+    });
+    setLikedTracks((prev) => ({ ...prev, ...newLikes }));
 
-  return data;
-}, [fetchTracks]);
+    return data;
+  }, [fetchTracks]);
 
 
   const renderLikeButton = (trackId: string, isLiked: boolean) => (
@@ -61,11 +64,27 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
     </Button>
   );
 
-  const renderPlayButton = (track: GetTrackDto, isCurrent: boolean) => (
+  const renderPlayButton = (track: GetTrackDto, isCurrent: boolean, index: number) => {
+  const { user, isAuthenticated, isGuest } = useAuth();
+
+  const canPlayAny = isAuthenticated && user?.subscriptionType !== "Free";
+  const isFirst = index === 0;
+
+  const handlePlayClick = () => {
+    if (!canPlayAny && !isFirst) return; 
+    playTrack(track.pathUrl!, track.title!, track.artistName);
+  };
+
+  const tooltipMessage =
+    !canPlayAny && !isFirst
+      ? "Only first track can be played in Free mode"
+      : "";
+
+  const playBtn = (
     <Button
       className="p-2 rounded hover:bg-accent"
       variant="ghost"
-      onClick={() => playTrack(track.pathUrl!, track.title!, track.artistName)}
+      onClick={handlePlayClick}
     >
       {isCurrent && isPlaying ? (
         <Pause className="w-6 h-6 text-primary" />
@@ -75,12 +94,40 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
     </Button>
   );
 
+return !canPlayAny && !isFirst ? (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button
+        variant="ghost"
+        className="p-2"
+        onClick={(e) => e.preventDefault()}
+      >
+        <Play className="w-6 h-6 text-muted-foreground" />
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent side="top">
+      Only the first track can be played in Free mode
+    </TooltipContent>
+  </Tooltip>
+) : (
+  playBtn
+);
+};
+
   return (
     <div className="mt-4">
       <PaginatedList
         fetchPage={handlePageLoad}
         className="space-y-2"
-        emptyContent={<p className="text-muted-foreground text-sm">No tracks yet</p>}
+        emptyContent={
+          noResults && query ? (
+            <p className="text-muted-foreground text-sm text-center">
+              No tracks found for "{query}"
+            </p>
+          ) : (
+            <p className="text-muted-foreground text-sm text-center">No tracks yet</p>
+          )
+        }
         renderItem={(track: GetTrackDto, index: number) => {
           const isCurrent = currentUrl === track.pathUrl;
           const isLiked = likedTracks[track.id!] ?? false;
@@ -88,9 +135,8 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
           return (
             <div
               key={track.id}
-              className={`flex items-center justify-between px-4 py-3 rounded-lg transition group border border-border bg-card ${
-                isCurrent ? "bg-muted" : "hover:bg-muted"
-              }`}
+              className={`flex items-center justify-between px-4 py-3 rounded-lg transition group border border-border bg-card ${isCurrent ? "bg-muted" : "hover:bg-muted"
+                }`}
             >
               <div className="flex items-center gap-4">
                 <span className="w-6 text-sm text-muted-foreground">{index + 1}</span>
@@ -117,7 +163,7 @@ export default function TrackList({ fetchTracks, renderActions }: TrackListProps
                   {track.duration ? formatDuration(track.duration) : "00:00"}
                 </span>
 
-                {renderPlayButton(track, isCurrent)}
+                {renderPlayButton(track, isCurrent, index)}
 
                 {isAuthenticated && renderLikeButton(track.id!, isLiked)}
 

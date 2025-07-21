@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
 import { PagedRequest, type AlbumDto, type ArtistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { Pencil, User } from "lucide-react";
 import ArtistModal, { type ArtistFormData } from "./components/CreateUpdateArtistModal";
 import { useAuth } from "../../hooks/useAuth";
+import { buildFilter } from "../../helpers/filtersBuilder";
 
 export default function ArtistProfilePage() {
   const { id } = useParams();
@@ -21,6 +22,10 @@ export default function ArtistProfilePage() {
   const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q");
+  const [noResults, setNoResults] = useState(false);
 
   useEffect(() => {
     const fetchArtist = async () => {
@@ -41,8 +46,16 @@ export default function ArtistProfilePage() {
       pagedRequest.init({
         pageNumber: page,
         pageSize: pageSize,
+        requestFilters: query
+          ? {
+            filters: [buildFilter("Title", query)],
+          }
+          : undefined,
       });
       const response = await client.paginatedSearch7(id!, pagedRequest);
+      const items = response.items!;
+      setNoResults(query != null && items.length === 0);
+
       return {
         items: response.items ?? [],
         totalPages: response.totalPages ?? 1,
@@ -174,7 +187,13 @@ export default function ArtistProfilePage() {
           key={refreshKey}
           fetchPage={fetchAlbums}
           pageSize={8}
-          emptyContent={<p className="text-muted-foreground text-sm">No albums yet</p>}
+          emptyContent={
+            query && noResults ? (
+              <p className="text-muted-foreground text-sm text-center">No albums found for "{query}"</p>
+            ) : (
+              <p className="text-muted-foreground text-sm text-center">No albums yet</p>
+            )
+          }
           renderItem={(album: AlbumDto) => (
             <Link
               to={`/albums/${album.id}`}

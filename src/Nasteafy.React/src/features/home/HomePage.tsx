@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
-import { AlbumDto, ArtistDto, GetTrackDto, PagedRequest, RateAlbumRequest, RequestFilters } from "../../api/apiClient";
+import { AlbumDto, ArtistDto, FilterLogicalOperators, GetTrackDto, PagedRequest, RateAlbumRequest, RequestFilters } from "../../api/apiClient";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import {
@@ -30,17 +30,23 @@ export default function HomePage() {
   const [albumTotalPages, setAlbumTotalPages] = useState<number | null>(null);
 
   const { isAuthenticated } = useAuth();
-  const MotionCard = motion.create(Card);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
+  const MotionCard = motion.create(Card);
+
   useEffect(() => {
-    (async () => {
+    const fetch = async () => {
       const request = new PagedRequest();
       request.init({
         pageNumber: artistPage,
         pageSize: 5,
-        requestFilters: query ? [buildFilter("Title", query)] : [],
+        requestFilters: query
+          ? new RequestFilters({
+            logicalOperator: FilterLogicalOperators._0,
+            filters: [buildFilter("Name", query)],
+          })
+          : undefined,
       });
 
       try {
@@ -50,15 +56,26 @@ export default function HomePage() {
       } catch (err) {
         handleApiError(err);
       }
-    })();
-  }, [artistPage, query]);
+    };
+
+    fetch();
+  }, [artistPage, query, searchParams]);
 
 
   useEffect(() => {
     (async () => {
       const request = new PagedRequest();
-      request.init({ pageNumber: albumPage, pageSize: 5, sortBy: "ReleaseDate" });
-
+      request.init({
+        pageNumber: albumPage,
+        pageSize: 5,
+        sortBy: "ReleaseDate",
+        requestFilters: query
+          ? new RequestFilters({
+            logicalOperator: FilterLogicalOperators._0,
+            filters: [buildFilter("Title", query)],
+          })
+          : undefined,
+      });
       try {
         const res = await client.paginatedSearch8(request);
         setAlbums(res.items ?? []);
@@ -67,7 +84,7 @@ export default function HomePage() {
         handleApiError(err);
       }
     })();
-  }, [albumPage]);
+  }, [albumPage, query, searchParams]);
 
   const handleRateAlbum = async (albumId: string, rating: number) => {
     try {
@@ -144,6 +161,11 @@ export default function HomePage() {
         <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-4 px-2 sm:px-0">Latest releases</h2>
           <div className="relative">
+            {query && albums.length === 0 && (
+              <p className="text-muted-foreground text-center mt-4">
+                No albums found for "{query}"
+              </p>
+            )}
             <Carousel key={`albums-${albumPage}`} opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-2">
                 {albums.map((album, index) => (
@@ -203,6 +225,11 @@ export default function HomePage() {
 
         <section className="mb-10">
           <h2 className="text-2xl font-semibold mb-4 px-2 sm:px-0">Popular Artists</h2>
+          {query && artists.length === 0 && (
+            <p className="text-muted-foreground text-center mt-4">
+              No artists found for "{query}"
+            </p>
+          )}
           <div className="relative">
             <Carousel key={`artists-${artistPage}`} opts={{ align: "start" }} className="w-full">
               <CarouselContent className="-ml-2">

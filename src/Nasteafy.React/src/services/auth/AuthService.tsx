@@ -1,6 +1,7 @@
 import { handleApiError } from "../../helpers/handleApiError";
 import { client } from "../../api/ApiClientProvider"
 import { LoginRequest, RegisterRequest } from "../../api/apiClient";
+import { useNavigate } from "react-router-dom";
 
 export const authService = {
   login: async (email: string, password: string): Promise<string | null> => {
@@ -34,8 +35,7 @@ export const authService = {
 
   logout: async (): Promise<void> => {
     try {
-      await client.logout();
-       window.location.reload(); 
+      await client.logout();       
     } catch (error) {
       handleApiError(error);
     }

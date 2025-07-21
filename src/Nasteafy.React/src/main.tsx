@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AudioPlayerProvider } from './contexts/AudioPlayerContext';
 import { AuthProvider } from './contexts/AuthContext';
 import AdPopup from './components/AdPopup';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
 
 const theme = localStorage.getItem("theme");
 if (theme === "dark") {
@@ -17,12 +18,14 @@ if (theme === "dark") {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-    <AuthProvider>
-    <AudioPlayerProvider>
-       <AdPopup />
-        <App />
-    </AudioPlayerProvider>
-    </AuthProvider>
+      <TooltipProvider>
+        <AuthProvider>
+          <AudioPlayerProvider>
+            <AdPopup />
+            <App />
+          </AudioPlayerProvider>
+        </AuthProvider>
+      </TooltipProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

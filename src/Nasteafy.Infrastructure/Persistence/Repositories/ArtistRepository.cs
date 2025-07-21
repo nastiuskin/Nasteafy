@@ -38,5 +38,11 @@ namespace Nasteafy.Infrastructure.Database.Repositories
 
             return await query.ToPagedResultAsync(request, ct);
         }
+
+        public async Task<Artist?> GetByUserIdAsync(Guid userId, CancellationToken ct)
+        {
+            return await _context.Artists
+                .FirstOrDefaultAsync(x => x.UserId == userId, ct);
+        }
     }
 }

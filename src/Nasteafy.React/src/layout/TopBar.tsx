@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 import {
@@ -32,13 +32,9 @@ export default function Topbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const params = new URLSearchParams(location.search);
-    params.set("q", searchQuery.trim());
-    navigate({ pathname: location.pathname, search: params.toString() });
-  };
+  useEffect(() => {
+    setSearchQuery("");
+  }, [location.pathname])
 
   const toggleTheme = () => {
     const html = document.documentElement;
@@ -58,15 +54,20 @@ export default function Topbar() {
   return (
     <>
       <div className="h-16 px-6 flex items-center justify-between bg-background border-b border-border">
-        <form onSubmit={handleSearch} className="w-1/2">
+     <div className="w-1/2">
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              const params = new URLSearchParams(location.search);
+              params.set("q", e.target.value.trim());
+              navigate({ pathname: location.pathname, search: params.toString() });
+            }}
             className="w-full bg-muted text-foreground px-4 py-2 rounded placeholder:text-muted-foreground"
           />
-        </form>
+        </div>
 
         <div className="flex gap-4 items-center">
           <Button
@@ -81,7 +82,7 @@ export default function Topbar() {
 
           <Button
             variant="ghost"
-            onClick={() => navigate("/subscriptions")}
+           onClick={() => navigate({ pathname: "/subscriptions", search: "" })}
             className="text-sm text-foreground hover:underline flex items-center gap-1"
           >
             {user?.subscriptionType ? (

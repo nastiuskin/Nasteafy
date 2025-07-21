@@ -40,12 +40,14 @@ namespace Nasteafy.Infrastructure.Persistence.Extensions
                 {
                     predicate.Append($" {requestFilters.LogicalOperator} ");
                 }
-                predicate.Append(requestFilters.Filters[i].Path + $".{nameof(string.Contains)}(@{i})");
+                predicate.Append($"({requestFilters.Filters[i].Path}.ToLower().Contains(@{i}))");
             }
 
             if (requestFilters.Filters.Any())
             {
-                var propertyValues = requestFilters.Filters.Select(filter => filter.Value).ToArray();
+                var propertyValues = requestFilters.Filters
+                    .Select(filter => filter.Value.ToString().ToLower())
+                    .ToArray();
 
                 query = query.Where(predicate.ToString(), propertyValues);
             }

@@ -60,8 +60,7 @@ namespace Nasteafy.Application.Subscriptions.Commands
         private void DeactivateOtherSubscriptions(User user, Guid activeSubscriptionId)
         {
             var now = dateTimeService.UtcNow;
-            foreach (var sub in user.UserSubscriptions.Where(s => s.EndDate > now &&
-                    s.SubscriptionId != activeSubscriptionId))
+            foreach (var sub in user.UserSubscriptions.Where(s => s.EndDate > now && s.SubscriptionId != activeSubscriptionId))
             {
                 sub.EndDate = now;
             }
@@ -109,7 +108,7 @@ namespace Nasteafy.Application.Subscriptions.Commands
                 await userManager.AddToRoleAsync(user, artistRole);
             }
 
-            var existingArtist = await unitOfWork.Artists.GetByIdAsync(user.Id, ct);
+            var existingArtist = await unitOfWork.Artists.GetByUserIdAsync(user.Id, ct);
 
             if (existingArtist is null)
             {

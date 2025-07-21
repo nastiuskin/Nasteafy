@@ -69,6 +69,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = async () => {
     try {
       await authService.logout();
+      navigate("/")
     } catch (error) {
       handleApiError(error);
     } finally {

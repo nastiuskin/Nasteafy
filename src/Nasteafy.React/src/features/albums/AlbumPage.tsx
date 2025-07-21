@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { client } from "../../api/ApiClientProvider";
 import { PagedRequest, RateAlbumRequest, type AlbumDto, type GetTrackDto, type UserPlaylistDto } from "../../api/apiClient";
 import { handleApiError } from "../../helpers/handleApiError";
@@ -14,6 +14,7 @@ import UploadTrackModal from "../tracks/UploadTrackModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../../components/ui/dropdown-menu";
 import TrackList from "../tracks/TrackList";
 import RatingStars from "./components/RatingStars";
+import { buildFilter } from "../../helpers/filtersBuilder";
 
 export default function AlbumPage() {
   const { id: albumId } = useParams<{ id: string }>();
@@ -25,6 +26,11 @@ export default function AlbumPage() {
   const [trackToDelete, setTrackToDelete] = useState<string | null>(null);
   const [playlists, setPlaylists] = useState<UserPlaylistDto[]>([]);
   const { isAdmin, isUser, isGuest, isAuthenticated } = useAuth();
+
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q");
+  const [noResults, setNoResults] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -82,29 +88,38 @@ export default function AlbumPage() {
     }
   };
 
-  const fetchTracksForAlbum = async (page: number, pageSize: number) => {
-    if (!albumId) {
-      return { items: [], totalPages: 1 };
-    }
-    const pagedRequest = new PagedRequest();
-    pagedRequest.init({
-      pageNumber: page,
-      pageSize: pageSize,
-      filters: [],
-      sortBy: null,
-      sortDirection: null
-    });
-    try {
-      const result = await client.paginatedSearch4(albumId, pagedRequest);
-      return {
-        items: result.items ?? [],
-        totalPages: result.totalPages ?? 1,
-      };
-    } catch (error) {
-      handleApiError(error);
-      return { items: [], totalPages: 1 };
-    }
-  };
+const fetchTracksForAlbum = async (page: number, pageSize: number) => {
+  if (!albumId) {
+    return { items: [], totalPages: 1 };
+  }
+
+  const pagedRequest = new PagedRequest();
+  pagedRequest.init({
+    pageNumber: page,
+    pageSize: pageSize,
+    filters: [],
+    sortBy: null,
+    sortDirection: null,
+    requestFilters: query
+      ? {
+          filters: [buildFilter("Title", query)],
+        }
+      : undefined,
+  });
+
+  try {
+    const result = await client.paginatedSearch4(albumId, pagedRequest);
+    const items = result.items ?? [];
+    setNoResults(Boolean(query) && items.length === 0);
+    return {
+      items,
+      totalPages: result.totalPages ?? 1,
+    };
+  } catch (error) {
+    handleApiError(error);
+    return { items: [], totalPages: 1 };
+  }
+};
 
   const handleDeleteAlbum = async () => {
     try {
@@ -127,15 +142,15 @@ export default function AlbumPage() {
     }
   };
 
-   const handleRateAlbum = async (albumId: string, rating: number) => {
-      try {
-        var request = new RateAlbumRequest({ rating });
-        await client.rate(albumId, request);
-      } catch (err) {
-        handleApiError(err);
-      }
-    };
-  
+  const handleRateAlbum = async (albumId: string, rating: number) => {
+    try {
+      var request = new RateAlbumRequest({ rating });
+      await client.rate(albumId, request);
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
+
 
   const handleDeleteTrack = async (trackId: string) => {
     try {
@@ -251,9 +266,11 @@ export default function AlbumPage() {
 
       {albumId && (
         <TrackList
-          key={refreshKey}
+          key={`${refreshKey}-${query || ""}`}
           fetchTracks={fetchTracksForAlbum}
           renderActions={protectedRenderActions}
+          noResults={noResults}
+          query={query || ""}
         />
       )}
 

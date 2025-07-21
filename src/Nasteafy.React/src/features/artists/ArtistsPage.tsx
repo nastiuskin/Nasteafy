@@ -9,11 +9,16 @@ import CreateArtistModal, { type ArtistFormData } from "./components/CreateUpdat
 import { Button } from "../../components/ui/button";
 import { motion } from "framer-motion";
 import { Mic } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { buildFilter } from "../../helpers/filtersBuilder";
 
 export default function ArtistsPage() {
   const { isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q");
+  const [noResults, setNoResults] = useState(false);
 
   const fetchArtists = async (page: number, pageSize: number) => {
     const pagedRequest = new PagedRequest();
@@ -23,12 +28,20 @@ export default function ArtistsPage() {
       filters: [],
       sortBy: null,
       sortDirection: null,
+      requestFilters: query
+        ? {
+          filters: [buildFilter("Name", query)],
+        }
+        : undefined,
     });
 
     try {
       const response = await client.paginatedSearch6(pagedRequest);
+      const items = response.items ?? [];
+
+      setNoResults(query != null && items.length === 0);
       return {
-        items: response.items ?? [],
+        items,
         totalPages: response.totalPages ?? 1,
       };
     } catch (err) {
@@ -76,6 +89,12 @@ export default function ArtistsPage() {
           )}
         </div>
       </div>
+
+      {noResults && (
+        <p className="text-muted-foreground text-center mt-4">
+          No artists found for "{query}"
+        </p>
+      )}
 
       {isAdmin && (
         <CreateArtistModal
